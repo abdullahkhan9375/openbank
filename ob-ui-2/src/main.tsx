@@ -4,7 +4,6 @@ import './index.css';
 import {
   createBrowserRouter,
   RouterProvider,
-  Route,
 } from "react-router-dom";
 import { Root } from "./pages/Root";
 import { ShowHome } from './pages/Home/ShowHome';
@@ -28,7 +27,7 @@ const router = createBrowserRouter (
     ]
   },
   ]
-)
+);
 
 const root = ReactDOM.createRoot(
   document.getElementById('root') as HTMLElement
