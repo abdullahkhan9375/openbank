@@ -1,13 +1,19 @@
-import { FormEvent, useState } from "react";
-import { labelDivClass } from "./CommonStyling";
+import { FormEvent, useEffect, useState } from "react";
+import { labelDivClass, labelText } from "./CommonStyling";
 import { ChoiceDetails, TChoice } from "./ChoiceDetails";
+import { textInputClass } from "./BankDetails";
 
 const lEmptyChoice: TChoice =
 {
     id: 0,
     body: "",
     correct: false,
+    explanation: "",
 };
+
+const actioButtonBase = "rounded-sm border-2 border-black text-lg "
+const actionButtonClass = `${actioButtonBase}, bg-purple hover:border-gray-light text-gray-light `
+const actioButtonDisabledClass = `${actioButtonBase} cursor-not-allowed bg-gray text-black hover:border-black `
 
 export const QuestionDetails = () =>
 {
@@ -15,6 +21,7 @@ export const QuestionDetails = () =>
     const [ questionStatement, setQuestionStatement ] = useState<string>("");
     const [ choices, setChoices ] = useState<TChoice[]>([]);
     const [ selectedChoice, setSelectedChoice ] = useState<TChoice>(lEmptyChoice);
+    const [ error, setError ] = useState<boolean>(true);
 
     const handleSelectedChoice = (index: number) =>
     {
@@ -33,12 +40,54 @@ export const QuestionDetails = () =>
         }
     };
 
+    useEffect(() =>
+    {
+        setError(false);
+        if (choices.length === 0 || choiceQty !== choices.length)
+        {
+            setError(true);
+        }
+        if (choiceQty === choices.length) // If choices are there but one is empty.
+        {
+            for (const choice of choices)
+            {
+                if (choice.body === "")
+                {
+                    setError(true);
+                    break
+                }
+            }
+        }
+        console.log("Choices: ", choices);
+    }, [choices])
+
     console.log("Selected choice: ", selectedChoice);
 
     const handleSubmit = (event: FormEvent) =>
     {
-        console.log(event);
         event.preventDefault();
+        if (choiceQty === choices.length) // If choices are there but one is empty.
+        {
+            for (const choice of choices)
+            {
+                if (choice.body === "")
+                {
+                    setError(true);
+                    return;
+                }
+            }
+        }
+
+        setError(false);
+
+        const lQuestion =
+        {
+            statement: questionStatement,
+            qty: choiceQty,
+            choices: choices,
+        };
+
+        console.log(lQuestion);
     };
 
     const onChoiceSubmit = (aChoice: TChoice) =>
@@ -57,31 +106,32 @@ export const QuestionDetails = () =>
             setChoices([...choices, aChoice])
         } else {
             lChoices[choiceIndex] = aChoice;
-            setChoices(lChoices)
+            setChoices(lChoices) 
         }
+        setSelectedChoice(aChoice);
     }
 
     return (
-        <div className="bg-pink h-3/6 w-5/6 py-10 px-10 shadow-lg">
+        <div className="container bg-gray flex flex-col w-[100em] items-start justify-evenly mx-5 h-3/6 py-[3em] px-[3em] shadow-lg">
             <form onSubmit={handleSubmit} action=""
-                className="container flex flex-col h-full justify-between">
+                className="container flex flex-col h-full justify-around">
                 <div>
                     <div className={"container flex flex-row px-2 py-1 items-center justify-between w-full"}>
-                        <label> Question Statement </label>
+                        <label className={labelText}> Question Statement </label>
                         <input type="text"
-                            className="w-3/4"
+                            className={`${textInputClass}, w-[50em]`}
                             value={questionStatement}
                             onChange={(event) => setQuestionStatement(event.target.value)}
                         />
                     </div>
                     <div className="container flex flex-row px-2 items-center justify-between w-full">
-                        <label> No. of Choices </label>
-                        <input type="number" className="self-center w-1/6" value={choiceQty} onChange={(event) => setChoiceQty(Number(event.target.value))}/>
+                        <label className={labelText}> No. of Choices </label>
+                        <input type="number" className={`${textInputClass}, w-[5em]`} value={choiceQty} onChange={(event) => setChoiceQty(Number(event.target.value))}/>
                     </div>
                 </div>
                 <div>
                     <div className="container flex flex-row mt-3 px-2">
-                        <div className="container flex flex-col text-center pt-3 w-1/3 h-[185px] bg-white overflow-scroll">
+                        <div className={`${textInputClass}container flex flex-col text-center pt-3 w-1/3 h-[197px] bg-white overflow-scroll`}>
                             {
                                 Array(choiceQty).fill(0).map((_, index: number) =>
                                 {
@@ -92,7 +142,10 @@ export const QuestionDetails = () =>
                         <ChoiceDetails selectedChoice={selectedChoice} onSubmitQuestion={onChoiceSubmit}/>
                     </div>
                 </div>
-                <input type="submit" value="Submit"/>
+                <div className="container flex flex-row mx-auto items-center justify-around w-[20em]">
+                        <button className="border-0 bg-gray text-lg hover:text-gray-light"> Cancel </button>
+                        <button type="submit" className={`${error ? actioButtonDisabledClass : actionButtonClass}, w-[10em]`}> Submit </button>
+                </div>
             </form>
         </div>
     )
