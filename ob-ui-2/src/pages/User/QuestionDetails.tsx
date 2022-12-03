@@ -1,137 +1,145 @@
 import { FormEvent, useEffect, useState } from "react";
-import { labelDivClass, labelText } from "./CommonStyling";
+import { formDivClass, labelDivClass, labelText } from "./CommonStyling";
 import { ChoiceDetails, TChoice } from "./ChoiceDetails";
 import { textInputClass } from "./BankDetails";
+import { actioButtonDisabledClass, actionButtonClass } from "../../common/buttons/styles";
 
-const lEmptyChoice: TChoice =
+export type TQuestion =
 {
-    id: 0,
-    body: "",
-    correct: false,
-    explanation: "",
-};
+    id: string,
+    statement: string,
+    choices: TChoice[],
+}
 
-const actioButtonBase = "rounded-sm border-2 border-black text-lg "
-const actionButtonClass = `${actioButtonBase}, bg-purple hover:border-gray-light text-gray-light `
-const actioButtonDisabledClass = `${actioButtonBase} cursor-not-allowed bg-gray text-black hover:border-black `
-
-export const QuestionDetails = () =>
+interface IQuestionDetailsProps
 {
-    const [ choiceQty, setChoiceQty ] = useState<number>(1);
-    const [ questionStatement, setQuestionStatement ] = useState<string>("");
-    const [ choices, setChoices ] = useState<TChoice[]>([]);
-    const [ selectedChoice, setSelectedChoice ] = useState<TChoice>(lEmptyChoice);
-    const [ error, setError ] = useState<boolean>(true);
+    question: TQuestion;
+    onCancelSubmit: () => void;
+    onSubmit: (aQuestion: TQuestion) => void;
+}
+
+type TQuestionError =
+{
+    invalidChoices: boolean,
+    invalidStatement: boolean,
+    invalidQty: boolean,
+    invalidCorrect: boolean,
+}
+
+export const QuestionDetails = (aQuestionDetailsProps: IQuestionDetailsProps) =>
+{
+    const lQuestion = aQuestionDetailsProps.question;
+    const [ question, setQuestion ] = useState<TQuestion>(lQuestion)
+    const [ choiceQty, setChoiceQty ] = useState<number>(lQuestion.choices.length);
+    const [ selectedChoice, setSelectedChoice ] = useState<TChoice>(lQuestion.choices[0]);
+    const [ error, setError ] = useState<TQuestionError>(
+        {
+            invalidChoices: false,
+            invalidStatement: true,
+            invalidQty: false,
+            invalidCorrect: false,
+        }
+    );
+
+    useEffect(() =>
+    {
+        setQuestion(aQuestionDetailsProps.question);
+    }, [aQuestionDetailsProps.question]);
+
+    useEffect(() =>
+    {
+        const lBlankChoiceExists = question.choices.findIndex((aChoice: TChoice) => aChoice.body === "") !== -1;
+        const lCorrectOptionDoesntExist = question.choices.findIndex((aChoice: TChoice) => aChoice.correct === true) === -1;
+
+        setError({
+            invalidQty: choiceQty === 0,
+            invalidCorrect: lCorrectOptionDoesntExist,
+            invalidStatement: question.statement === "",
+            invalidChoices: question.choices.length === 0
+                         || choiceQty !== question.choices.length
+                         || lBlankChoiceExists
+                });
+    
+        // console.log("Errors: ", error);
+    }, [question, choiceQty])
 
     const handleSelectedChoice = (index: number) =>
     {
-        const lIndex = choices.findIndex((aChoice: TChoice) =>
+        const lIndex = question.choices.findIndex((aChoice: TChoice) =>
         {
             return aChoice.id === index
-            
         });
 
         if (lIndex === -1)
         {
-            setSelectedChoice({ ...lEmptyChoice, id: index });
+            setSelectedChoice({ id: index, body: "", correct: false, explanation: ""});
         } else
         {
-            setSelectedChoice({...choices[lIndex]})
+            setSelectedChoice({...question.choices[lIndex]})
         }
     };
-
-    useEffect(() =>
-    {
-        setError(false);
-        if (choices.length === 0 || choiceQty !== choices.length)
-        {
-            setError(true);
-        }
-        if (choiceQty === choices.length) // If choices are there but one is empty.
-        {
-            for (const choice of choices)
-            {
-                if (choice.body === "")
-                {
-                    setError(true);
-                    break
-                }
-            }
-        }
-        console.log("Choices: ", choices);
-    }, [choices])
-
-    console.log("Selected choice: ", selectedChoice);
 
     const handleSubmit = (event: FormEvent) =>
     {
         event.preventDefault();
-        if (choiceQty === choices.length) // If choices are there but one is empty.
-        {
-            for (const choice of choices)
-            {
-                if (choice.body === "")
-                {
-                    setError(true);
-                    return;
-                }
-            }
-        }
 
-        setError(false);
-
-        const lQuestion =
+        const lEditedQuestion: TQuestion =
         {
-            statement: questionStatement,
-            qty: choiceQty,
-            choices: choices,
+            id: question.id,
+            statement: question.statement,
+            choices: question.choices,
         };
 
-        console.log(lQuestion);
+        aQuestionDetailsProps.onSubmit(lEditedQuestion);
     };
 
     const onChoiceSubmit = (aChoice: TChoice) =>
     {
-        const lChoices: TChoice[] = choices;
+        const lChoices: TChoice[] = question.choices;
 
         const choiceIndex: number = lChoices.findIndex((lChoice: TChoice) =>
         {
             return lChoice.id === aChoice.id
         });
 
-        console.log("Index: ", choiceIndex);
-
         if (choiceIndex === -1)
         {
-            setChoices([...choices, aChoice])
-        } else {
+            setQuestion({ ...question, choices: [...question.choices, aChoice ]});
+        } else
+        {
             lChoices[choiceIndex] = aChoice;
-            setChoices(lChoices) 
+            setQuestion({ ...question, choices: lChoices});
         }
+
         setSelectedChoice(aChoice);
     }
 
+    const lError =     error.invalidChoices
+                    || error.invalidCorrect
+                    || error.invalidQty
+                    || error.invalidStatement;
+
     return (
-        <div className="container bg-gray flex flex-col w-[100em] items-start justify-evenly mx-5 h-3/6 py-[3em] px-[3em] shadow-lg">
-            <form onSubmit={handleSubmit} action=""
+        <div className="container bg-gray-light flex flex-col mx-auto h-[33em] pt-3 px-[3em] mt-[10em] border-2">
+            <form onSubmit={handleSubmit} action="">
+                <div
                 className="container flex flex-col h-full justify-around">
-                <div>
-                    <div className={"container flex flex-row px-2 py-1 items-center justify-between w-full"}>
-                        <label className={labelText}> Question Statement </label>
-                        <input type="text"
-                            className={`${textInputClass}, w-[50em]`}
-                            value={questionStatement}
-                            onChange={(event) => setQuestionStatement(event.target.value)}
-                        />
+                    <div className={`${formDivClass} my-5 flex-col`}>
+                        <div className={"container flex flex-col px-2 py-1 justify-between w-full"}>
+                            <label className={labelText}> Question Statement </label>
+                            <input type="text"
+                                className={`${textInputClass} h-[5em] p-0 mt-2`}
+                                value={question.statement}
+                                onChange={(event) => setQuestion({ ...question, statement: event.target.value })}
+                            />
+                        </div>
+                        <div className="container flex flex-row px-2 mt-3 w-2/5 justify-between">
+                            <label className={labelText}> No. of Choices </label>
+                            <input type="number" className={`${textInputClass} w-[5em] h-[2em]`} value={choiceQty} onChange={(event) => setChoiceQty(Number(event.target.value))}/>
+                        </div>
                     </div>
-                    <div className="container flex flex-row px-2 items-center justify-between w-full">
-                        <label className={labelText}> No. of Choices </label>
-                        <input type="number" className={`${textInputClass}, w-[5em]`} value={choiceQty} onChange={(event) => setChoiceQty(Number(event.target.value))}/>
-                    </div>
-                </div>
-                <div>
-                    <div className="container flex flex-row mt-3 px-2">
-                        <div className={`${textInputClass}container flex flex-col text-center pt-3 w-1/3 h-[197px] bg-white overflow-scroll`}>
+                    <div className={formDivClass}>
+                        <div className={`${textInputClass}container flex flex-col text-center pt-3 w-1/6 h-[197px] bg-white overflow-scroll`}>
                             {
                                 Array(choiceQty).fill(0).map((_, index: number) =>
                                 {
@@ -139,12 +147,16 @@ export const QuestionDetails = () =>
                                 })
                             }
                         </div>
-                        <ChoiceDetails selectedChoice={selectedChoice} onSubmitQuestion={onChoiceSubmit}/>
+                        <ChoiceDetails selectedChoice={selectedChoice} onSaveChoice={onChoiceSubmit}/>
                     </div>
-                </div>
-                <div className="container flex flex-row mx-auto items-center justify-around w-[20em]">
-                        <button className="border-0 bg-gray text-lg hover:text-gray-light"> Cancel </button>
-                        <button type="submit" className={`${error ? actioButtonDisabledClass : actionButtonClass}, w-[10em]`}> Submit </button>
+                    <div className="container flex flex-row mx-auto mt-4 items-center justify-around w-[20em]">
+                            <button className="border-0 bg-gray-light text-lg" onClick={aQuestionDetailsProps.onCancelSubmit}> Cancel </button>
+                            <button type="submit"
+                            className={`${lError ? actioButtonDisabledClass : actionButtonClass} w-[10em]`}> Submit </button>
+                    </div>
+                    <div className={`mx-auto text-red mt-2 ${lError ? "opacity-1": "opacity-0"}`}>
+                     {lError && " You haven't saved all choices and/or typed a question statement and/or nominated a correct choice."}
+                    </div>
                 </div>
             </form>
         </div>
