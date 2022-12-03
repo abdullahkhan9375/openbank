@@ -9,6 +9,7 @@ import { Root } from "./pages/Root";
 import { ShowHome } from './pages/Home/ShowHome';
 import { ErrorPage } from './pages/ErrorPage';
 import { ShowUser } from './pages/User/ShowUser';
+import { BankDetails } from './pages/Bank/BankDetails';
 
 const router = createBrowserRouter (
   [{
@@ -23,6 +24,10 @@ const router = createBrowserRouter (
       {
         path:"user",
         element: <ShowUser/>,
+      },
+      {
+        path: "bankedit",
+        element: <BankDetails/>
       }
     ]
   },

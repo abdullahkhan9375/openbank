@@ -1,7 +1,6 @@
 import { FormEvent, useEffect, useState } from "react";
-import { formDivClass, labelDivClass, labelText } from "./CommonStyling";
+import { formDivClass, labelDivClass, labelText, textInputClass } from "../../common/CommonStyling";
 import { ChoiceDetails, TChoice } from "./ChoiceDetails";
-import { textInputClass } from "./BankDetails";
 import { actioButtonDisabledClass, actionButtonClass } from "../../common/buttons/styles";
 
 export type TQuestion =
@@ -40,6 +39,11 @@ export const QuestionDetails = (aQuestionDetailsProps: IQuestionDetailsProps) =>
             invalidCorrect: false,
         }
     );
+
+    const lError: boolean =  error.invalidChoices
+                    || error.invalidCorrect
+                    || error.invalidQty
+                    || error.invalidStatement;
 
     useEffect(() =>
     {
@@ -83,6 +87,7 @@ export const QuestionDetails = (aQuestionDetailsProps: IQuestionDetailsProps) =>
     {
         event.preventDefault();
 
+        if (lError) { return; }
         const lEditedQuestion: TQuestion =
         {
             id: question.id,
@@ -114,13 +119,8 @@ export const QuestionDetails = (aQuestionDetailsProps: IQuestionDetailsProps) =>
         setSelectedChoice(aChoice);
     }
 
-    const lError =     error.invalidChoices
-                    || error.invalidCorrect
-                    || error.invalidQty
-                    || error.invalidStatement;
-
     return (
-        <div className="container bg-gray-light flex flex-col mx-auto h-[33em] pt-3 px-[3em] mt-[10em] border-2">
+        <div className="container bg-gray-light flex flex-col mx-auto h-[33em] pt-3 px-[3em] border-2">
             <form onSubmit={handleSubmit} action="">
                 <div
                 className="container flex flex-col h-full justify-around">

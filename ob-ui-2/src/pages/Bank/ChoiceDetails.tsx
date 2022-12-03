@@ -1,7 +1,6 @@
 import { FormEvent, useEffect, useState } from "react";
 import { actioButtonDisabledClass, actionButtonClass } from "../../common/buttons/styles";
-import { textInputClass } from "./BankDetails";
-import { labelText } from "./CommonStyling";
+import { labelText, textInputClass } from "../../common/CommonStyling";
 
 export type TChoice =
 {
@@ -24,6 +23,7 @@ export const ChoiceDetails = (aChoiceProps: IChoiceProps) =>
 
     const handleSubmit = (event: FormEvent) =>
     {
+        if (error) return;
         console.log("Choice: ", choice);
         aChoiceProps.onSaveChoice(choice);
     };

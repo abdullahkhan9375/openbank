@@ -1,6 +1,6 @@
 import { useState } from "react";
 import { BaseButton } from "../../common"
-import { BankDetails  } from "./BankDetails";
+import { BankDetails  } from "../Bank/BankDetails";
 
 export const ShowUser = () =>
 {
@@ -8,9 +8,7 @@ export const ShowUser = () =>
 
     return (
         <>
-        <div className="container flex flex-col bg-gray-light w-[70em] h-[95vh] bg-white mx-auto items-center justify-between">
-            <BankDetails/>
-        </div>
+            User
         </>
     )
 }
