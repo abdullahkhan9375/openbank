@@ -10,6 +10,7 @@ import { ShowHome } from './pages/Home/ShowHome';
 import { ErrorPage } from './pages/ErrorPage';
 import { ShowUser } from './pages/User/ShowUser';
 import { BankDetails } from './pages/Bank/BankDetails';
+import { ShowBanks } from './pages/Bank/ShowBanks';
 
 const router = createBrowserRouter (
   [{
@@ -20,6 +21,10 @@ const router = createBrowserRouter (
       {
         path: "home",
         element: <ShowHome/>,
+      },
+      {
+        path: "banks",
+        element: <ShowBanks/>,
       },
       {
         path:"user",

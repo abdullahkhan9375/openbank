@@ -49,7 +49,7 @@ export const ChoiceDetails = (aChoiceProps: IChoiceProps) =>
                         <input type="text" className={`${textInputClass} w-4/5`} value={choice.body} onChange={(event) => {setChoice({...choice, body: event.target.value })}
                         }/>
                         <label className={labelText}> Correct </label>
-                        <input type="checkbox" className="bg-gray-light" value={String(choice.correct)} onChange={(event) => {setChoice({...choice, correct: event.target.checked })}
+                        <input type="checkbox" className="bg-gray-light" value={String(choice.correct)} checked={choice.correct} onChange={(event) => {setChoice({...choice, correct: event.target.checked })}
                         } />
                     </div>
                     <div className="mb-1">

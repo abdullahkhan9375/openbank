@@ -72,3 +72,54 @@ button:focus-visible {
     background-color: #f9f9f9;
   }
 }
+
+.react-tagsinput {
+background-color: #EBEBEB;
+border: 2px solid #190628;
+overflow: hidden;
+padding-left: 5px;
+padding-top: 5px;
+}
+
+.react-tagsinput--focused {
+border-color: #190628;
+}
+
+.react-tagsinput-tag {
+  font-family: "Inter", Avenir, Helvetica, Arial, sans-serif;
+background-color: #4100FD;
+border-radius: 2px;
+border: 1px solid #190628;
+color: #F1F1F1;
+display: inline-block;
+font-size: 15px;
+font-weight: 400;
+margin-bottom: 5px;
+margin-right: 5px;
+padding: 5px;
+}
+
+.react-tagsinput-remove {
+cursor: pointer;
+font-weight: bold;
+}
+
+.react-tagsinput-tag a::before {
+content: " ×";
+color: #F1F1F1;
+}
+
+.react-tagsinput-input {
+background: transparent;
+border: 0;
+color: #777;
+font-family: "Inter";
+font-size: 15px;
+font-weight: 400;
+margin-bottom: 6px;
+margin-top: 1px;
+outline: none;
+padding: 5px;
+width: 80px;
+}
+

@@ -6,6 +6,8 @@ import { isEqual } from "lodash";
 import { v4 as uuidv4 } from 'uuid';
 import { actioButtonDisabledClass, actionButtonClass, altActionButtonClass } from "../../common/buttons/styles";
 import { Link } from "react-router-dom";
+import TagsInput from "react-tagsinput";
+
 
 type TBank =
 {
@@ -152,11 +154,7 @@ export const BankDetails = () =>
                                         </div>
                                             <div className={labelDivClass}>
                                                 <label className={labelText}> Tags </label>
-                                                <input  className={textInputClass}
-                                                        value={bank.tags}
-                                                        onChange={(event) => setBank({ ...bank, tags: [event.target.value]})}
-                                                        type={"text"}
-                                                />
+                                                <TagsInput value={bank.tags} onChange={(tags: string[]) => setBank({...bank, tags: tags })}/>
                                             </div>
                                         </div>
                                         <div className="container mt-2 items-center flex flex-col justify-between">
@@ -187,6 +185,9 @@ export const BankDetails = () =>
                             </div>
                         </div>
             }
+
+    <style>
+    </style>
         </div>
     )
 }
