@@ -11,6 +11,8 @@ import { ErrorPage } from './pages/ErrorPage';
 import { ShowUser } from './pages/User/ShowUser';
 import { BankDetails } from './pages/Bank/BankDetails';
 import { ShowBanks } from './pages/Bank/ShowBanks';
+import  store from "./store";
+import { Provider } from 'react-redux';
 
 const router = createBrowserRouter (
   [{
@@ -44,6 +46,8 @@ const root = ReactDOM.createRoot(
 );
 root.render(
   <React.StrictMode>
-    <RouterProvider router={router}/>
-  </React.StrictMode>
+    <Provider store={store}>
+      <RouterProvider router={router}/>
+    </Provider>
+    </React.StrictMode>
 );

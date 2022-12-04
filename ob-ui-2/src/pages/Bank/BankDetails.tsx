@@ -7,9 +7,10 @@ import { v4 as uuidv4 } from 'uuid';
 import { actioButtonDisabledClass, actionButtonClass, altActionButtonClass } from "../../common/buttons/styles";
 import { Link } from "react-router-dom";
 import TagsInput from "react-tagsinput";
+import { useSelector, useDispatch } from 'react-redux'
+import { bankAdded } from "../../reducers/bank";
 
-
-type TBank =
+export type TBank =
 {
     bankName: string,
     isPublic: boolean,
@@ -41,6 +42,13 @@ type TBankError =
     invalidQuestion: boolean,
 };
 
+type TStateBank =
+{
+    state: {
+        bank: TBank
+    }
+}
+
 export const BankDetails = () =>
 {
     const lEmptyQuestion: TQuestion =
@@ -50,6 +58,11 @@ export const BankDetails = () =>
         choices: [lEmptyChoice],
     };
 
+
+    const bankStore = useSelector((state: any) => state.bank);
+    console.log("Bank Store:", bankStore);
+
+    const dispatch = useDispatch()
     const [ bank, setBank ] = useState<TBank>(lEmptyBank);
     const [ addingQuestion, setAddingQuestion ] = useState<boolean>(false);
     const [ selectedQuestion, setSelectedQuestion ] = useState<TQuestion>(lEmptyQuestion);
@@ -90,8 +103,7 @@ export const BankDetails = () =>
             createdAt: String(Date.now()),
         };
 
-        // API CALL RUNS HERE.
-        console.log(lBank);
+        dispatch(bankAdded(lBank));
     }
 
     const handleCancel = () =>
@@ -134,7 +146,7 @@ export const BankDetails = () =>
                                             </label>
                                             <input
                                                 value={bank.bankName}
-                                                onChange={(event) => {setBank({...bank, bankName: event.target.value })}}
+                                                onChange={(event) => { setBank({ ...bank, bankName: event.target.value })}}
                                                 className={`${textInputClass} w-[30em]`} type={"text"}
                                             />
                                         </div>
@@ -154,7 +166,7 @@ export const BankDetails = () =>
                                         </div>
                                             <div className={labelDivClass}>
                                                 <label className={labelText}> Tags </label>
-                                                <TagsInput value={bank.tags} onChange={(tags: string[]) => setBank({...bank, tags: tags })}/>
+                                                <TagsInput value={bank.tags} onChange={(tags: string[]) => setBank({...bank, tags: tags })} />
                                             </div>
                                         </div>
                                         <div className="container mt-2 items-center flex flex-col justify-between">
