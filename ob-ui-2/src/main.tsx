@@ -33,8 +33,18 @@ const router = createBrowserRouter (
         element: <ShowUser/>,
       },
       {
-        path: "bankedit",
-        element: <BankDetails/>
+        path: "banks",
+        children:
+        [
+          {
+            path: ":bankId",
+            element: <BankDetails/>
+          },
+          {
+            path:"new",
+            element: <BankDetails/>
+          }
+        ],
       }
     ]
   },

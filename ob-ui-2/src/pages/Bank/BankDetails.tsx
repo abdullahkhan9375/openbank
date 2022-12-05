@@ -5,13 +5,14 @@ import { QuestionDetails, TQuestion } from "./QuestionDetails";
 import { isEqual } from "lodash";
 import { v4 as uuidv4 } from 'uuid';
 import { actioButtonDisabledClass, actionButtonClass, altActionButtonClass } from "../../common/buttons/styles";
-import { Link } from "react-router-dom";
+import { Link, useNavigate, useParams } from "react-router-dom";
 import TagsInput from "react-tagsinput";
 import { useSelector, useDispatch } from 'react-redux'
 import { bankAdded } from "../../reducers/bank";
 
 export type TBank =
 {
+    bankId: string,
     bankName: string,
     isPublic: boolean,
     tags: string[],
@@ -21,6 +22,7 @@ export type TBank =
 
 const lEmptyBank: TBank =
 {
+    bankId: "",
     bankName: "",
     isPublic: false,
     tags: [],
@@ -42,13 +44,6 @@ type TBankError =
     invalidQuestion: boolean,
 };
 
-type TStateBank =
-{
-    state: {
-        bank: TBank
-    }
-}
-
 export const BankDetails = () =>
 {
     const lEmptyQuestion: TQuestion =
@@ -58,16 +53,18 @@ export const BankDetails = () =>
         choices: [lEmptyChoice],
     };
 
-
-    const bankStore = useSelector((state: any) => state.bank);
-    console.log("Bank Store:", bankStore);
-
     const dispatch = useDispatch()
-    const [ bank, setBank ] = useState<TBank>(lEmptyBank);
+    const { bankId } = useParams();
+
+    const editingBank = useSelector((state: any) => state.bank.find((aBank: TBank) => aBank.bankId === bankId));
+
+    console.log("Bank Id: ", bankId);
+    const [ bank, setBank ] = useState<TBank>(editingBank ?? lEmptyBank);
     const [ addingQuestion, setAddingQuestion ] = useState<boolean>(false);
     const [ selectedQuestion, setSelectedQuestion ] = useState<TQuestion>(lEmptyQuestion);
-    const [ questions, setQuestions ] = useState<TQuestion[]>([]);
+    const [ questions, setQuestions ] = useState<TQuestion[]>(bank.questions);
     const [ error, setError ] = useState<TBankError>({ invalidName: false, invalidQuestion: false })
+    const navigate = useNavigate();
 
     useEffect(() =>
     {
@@ -101,9 +98,11 @@ export const BankDetails = () =>
             ...bank,
             questions: questions,
             createdAt: String(Date.now()),
+            bankId: bank.bankId !== "" ? bank.bankId : uuidv4(),
         };
 
         dispatch(bankAdded(lBank));
+        navigate("/banks");
     }
 
     const handleCancel = () =>
@@ -172,7 +171,7 @@ export const BankDetails = () =>
                                         <div className="container mt-2 items-center flex flex-col justify-between">
                                             <div className="container flex flex-row items-center justify-between">
                                                 <h3 className={headingText}> Your questions </h3>
-                                                <button className={`${actionButtonClass} mr-2 text-lg w-[10em] `} onClick={() => setAddingQuestion(true)}>
+                                                <button className={`${actionButtonClass} mr-2 text-lg font-bold w-[10em]`} onClick={() => setAddingQuestion(true)}>
                                                     Add a question
                                                 </button>
                                             </div>
@@ -185,7 +184,7 @@ export const BankDetails = () =>
                                         </div>
                                         <div className="container flex flex-row mx-auto w-full justify-center items-center">
                                             <button type="button" className={`bg-white hover:border-white text-black text-lg w-[10em] mx-3`}>
-                                                <Link to="/home" className="text-black hover:text-black">Cancel</Link>
+                                                <Link to="/banks" className="text-black hover:text-black">Cancel</Link>
                                             </button>
                                             <button type="button" onClick={handleSaveBank} className={`${(error.invalidName || error.invalidQuestion)
                                                     ? `${actioButtonDisabledClass} text-lg w-[10em] mx-3` :
