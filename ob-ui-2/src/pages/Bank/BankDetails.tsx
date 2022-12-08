@@ -1,7 +1,6 @@
-import { useEffect, useState } from "react";
-import { TChoice } from "./ChoiceDetails";
+import { useEffect, useMemo, useState } from "react";
 import { formBox, headingText, labelDivClass, labelText, mainContainer, textInputClass } from "../../common/CommonStyling";
-import { QuestionDetails, TQuestion } from "./QuestionDetails";
+import { QuestionDetails } from "./QuestionDetails";
 import { isEqual } from "lodash";
 import { v4 as uuidv4 } from 'uuid';
 import { actioButtonDisabledClass, actionButtonClass, altActionButtonClass } from "../../common/buttons/styles";
@@ -9,16 +8,11 @@ import { Link, useNavigate, useParams } from "react-router-dom";
 import TagsInput from "react-tagsinput";
 import { useSelector, useDispatch } from 'react-redux'
 import { bankAdded } from "../../reducers/bank";
-
-export type TBank =
-{
-    bankId: string,
-    bankName: string,
-    isPublic: boolean,
-    tags: string[],
-    questions: TQuestion[],
-    createdAt: string,
-};
+import { CellContext, createColumnHelper, flexRender, getCoreRowModel, useReactTable } from "@tanstack/react-table";
+import { DeleteDialog } from "../../common/dialogs/DeleteDialog";
+import { Table } from "../../common/Table";
+import { BsFillPencilFill, BsFillTrashFill } from "react-icons/bs";
+import { TBank, TBankError, TChoice, TQuestion } from "../../model";
 
 const lEmptyBank: TBank =
 {
@@ -28,7 +22,7 @@ const lEmptyBank: TBank =
     tags: [],
     questions: [],
     createdAt: "",
-}
+};
 
 const lEmptyChoice: TChoice =
 {
@@ -38,33 +32,28 @@ const lEmptyChoice: TChoice =
     explanation: "",
 };
 
-type TBankError =
-{
-    invalidName: boolean,
-    invalidQuestion: boolean,
-};
-
 export const BankDetails = () =>
 {
     const lEmptyQuestion: TQuestion =
     {
         id: uuidv4(),
+        name: "",
         statement: "",
         choices: [lEmptyChoice],
     };
 
-    const dispatch = useDispatch()
+    const dispatch = useDispatch();
     const { bankId } = useParams();
 
     const editingBank = useSelector((state: any) => state.bank.find((aBank: TBank) => aBank.bankId === bankId));
 
-    console.log("Bank Id: ", bankId);
     const [ bank, setBank ] = useState<TBank>(editingBank ?? lEmptyBank);
     const [ addingQuestion, setAddingQuestion ] = useState<boolean>(false);
     const [ selectedQuestion, setSelectedQuestion ] = useState<TQuestion>(lEmptyQuestion);
     const [ questions, setQuestions ] = useState<TQuestion[]>(bank.questions);
     const [ error, setError ] = useState<TBankError>({ invalidName: false, invalidQuestion: false })
     const navigate = useNavigate();
+    const [questionForDeletion, setQuestionForDeletion] = useState<CellContext<TQuestion, string> | undefined>(undefined);
 
     useEffect(() =>
     {
@@ -76,15 +65,27 @@ export const BankDetails = () =>
 
     const onAddQuestion = () => setAddingQuestion(true);
 
-    console.log("Bank:" , bank);
+    // console.log("Bank:" , bank);
 
-    const onSelectQuestion = (aQuestionIndex: number) =>
+    const handleDeleteQuestion = (info: CellContext<TQuestion, string>) =>
     {
-        setSelectedQuestion(questions[aQuestionIndex]);
+        let lQuestions = questions;
+        lQuestions = lQuestions.filter((aQuestion: TQuestion) => aQuestion.id !== info.row.original.id);
+        setQuestions(lQuestions);
+    };
+
+    const handleSelectQuestion = (info: CellContext<TQuestion, string>) =>
+    {
+        const selectedQuestion = questions.find((aQuestion: TQuestion) => aQuestion.id === info.row.original.id);
+        if (selectedQuestion !== undefined)
+        {
+            setSelectedQuestion(selectedQuestion);
         setAddingQuestion(true);
+        }
+        else console.log("Could not find question.");
     }
 
-    const onCancelSubmit = () =>
+    const handleCancelSubmit = () =>
     {
         setAddingQuestion(false);
     };
@@ -107,10 +108,10 @@ export const BankDetails = () =>
 
     const handleCancel = () =>
     {
-
+        navigate("/banks");
     }
 
-    const onSubmitQuestion = (aQuestion: TQuestion) =>
+    const handleSubmitQuestion = (aQuestion: TQuestion) =>
     {
         const lQuestions: TQuestion[] = questions; 
         const lQuestionIndex: number = questions.findIndex((lQuestion: TQuestion) => lQuestion.id == aQuestion.id);
@@ -129,11 +130,29 @@ export const BankDetails = () =>
         setSelectedQuestion(lEmptyQuestion);
     };
 
+    const columnHelper = createColumnHelper<TQuestion>();
+    const columns = useMemo (() =>[
+    columnHelper.accessor('statement',
+    {
+        header: () => "Statement",
+        cell: info => <div className="container px-4 py-1"><p> {info.getValue()} </p></div>
+    }),
+    columnHelper.accessor("id",{
+        header: () => "",
+        cell: info => <div className="container flex flex-row justify-around">
+            <BsFillPencilFill className="cursor-pointer" onClick={() => handleSelectQuestion(info)}/>
+            <BsFillTrashFill className="cursor-pointer" onClick={() => handleDeleteQuestion(info)}/>
+            </div>
+    }),
+    ], [questions]);
+
+    const data = useMemo(() => questions, [questions]);
+
     return (
         <div className={mainContainer}>
             { addingQuestion
-                    ? <QuestionDetails onCancelSubmit={onCancelSubmit} onSubmit={onSubmitQuestion} question={selectedQuestion}/>
-                    :  <div className="container flex flex-col w-[60em] mt-[10em]">
+                    ? <QuestionDetails onCancelSubmit={handleCancelSubmit} onSubmit={handleSubmitQuestion} question={selectedQuestion}/>
+                    :  <div className="container flex flex-col w-[60em]">
                             <div className={formBox}>
                                 <h3 className={headingText}> Tell us about your question bank </h3>
                                 <form className="py-2">
@@ -175,11 +194,10 @@ export const BankDetails = () =>
                                                     Add a question
                                                 </button>
                                             </div>
-                                            <div className="container flex flex-col h-[20em] overflow-scroll">
-                                                {questions.map((aQuestion: TQuestion, index: number) =>
+                                            <div className="container flex flex-col h-[20em]">
                                                 {
-                                                    return <a onClick={() => onSelectQuestion(index)}>Question #{index}</a>;
-                                                })}
+                                                    questions.length ? <Table data={data} columns={columns}/> : <></>
+                                                }
                                             </div>
                                         </div>
                                         <div className="container flex flex-row mx-auto w-full justify-center items-center">

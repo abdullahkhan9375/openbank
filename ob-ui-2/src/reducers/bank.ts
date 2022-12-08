@@ -1,7 +1,6 @@
-import { createSlice } from '@reduxjs/toolkit'
+import { createSlice } from '@reduxjs/toolkit';
 import { isEmpty, isEqual } from 'lodash';
-import { TBank } from '../pages/Bank/BankDetails'
-import { TQuestion } from '../pages/Bank/QuestionDetails'
+import { TBank } from '../model';
 
 export const bankSlice = createSlice({
   name: 'bank',
@@ -19,6 +18,11 @@ export const bankSlice = createSlice({
         const lBanks: TBank[] = state;
         const lNewBank: TBank = action.payload;
         const lExistsIndex = lBanks.findIndex((aBank: TBank) => aBank.bankId === lNewBank.bankId);
+        if (lBanks[0] === undefined)
+        {
+            state.push(action.payload);
+            return;
+        }
         if (lBanks[0].bankName === "")
         {
             state[0] = action.payload;
@@ -33,9 +37,13 @@ export const bankSlice = createSlice({
             state[lExistsIndex] = action.payload;
         }
     },
+    bankDeleted(state, action)
+    {
+        return state.filter((aBank: TBank) => aBank.bankId !== action.payload);
+    }
   }})
 
 // Action creators are generated for each case reducer function
-export const { bankAdded } = bankSlice.actions
+export const { bankAdded, bankDeleted } = bankSlice.actions;
 
-export default bankSlice.reducer
+export default bankSlice.reducer;

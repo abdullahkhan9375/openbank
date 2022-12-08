@@ -1,14 +1,7 @@
 import { FormEvent, useEffect, useState } from "react";
 import { actioButtonDisabledClass, actionButtonClass } from "../../common/buttons/styles";
 import { labelText, textInputClass } from "../../common/CommonStyling";
-
-export type TChoice =
-{
-    id: number;
-    body: string;
-    correct: boolean;
-    explanation?: string;
-};
+import { TChoice } from "../../model";
 
 interface IChoiceProps
 {

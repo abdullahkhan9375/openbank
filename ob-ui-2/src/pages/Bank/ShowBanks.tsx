@@ -1,4 +1,5 @@
 import { mainContainer } from "../../common/CommonStyling";
+import { BsFillPencilFill, BsFillTrashFill } from "react-icons/bs";
 import
 {
     CellContext,
@@ -10,27 +11,19 @@ import
 } from '@tanstack/react-table';
 import { TQuestion } from "./QuestionDetails";
 import { actioButtonBase, actionButtonClass } from "../../common/buttons/styles";
-import { BankDetails, TBank } from "./BankDetails";
+import { BankDetails } from "./BankDetails";
 import { useSelector, useDispatch } from 'react-redux'
-import { bankAdded } from "../../reducers/bank";
+import { bankAdded, bankDeleted } from "../../reducers/bank";
 import { useNavigate } from "react-router-dom";
 import { useMemo } from "react";
-
-type TBankView =
-{
-    bankId: string,
-    bankName: string, 
-    isPublic: boolean,
-    tags: string[],
-    numQuestions: number,
-    createdAt: string,
-    editable: boolean,
-}
+import { Table } from "../../common/Table";
+import { TBank, TBankView } from "../../model";
 
 export const ShowBanks = () =>
 {
     const banks: TBank[] = useSelector((state: any) => state.bank);
     const navigate = useNavigate();
+    const dispatch = useDispatch();
 
     const lBanksData = banks.map((aBank: TBank) =>
     {
@@ -47,7 +40,7 @@ export const ShowBanks = () =>
         )
     });
 
-    const handleBankEdit = (info: CellContext<TBankView, boolean>) =>
+    const handleBankEdit = (info: CellContext<TBankView, string>) =>
     {
         const bankId = info.row.original.bankId;
         navigate(`${bankId}`)
@@ -56,6 +49,11 @@ export const ShowBanks = () =>
     const handleCreateBank = () =>
     {
         navigate(`new`);
+    }
+
+    const handleDeleteBank = (info: CellContext<TBankView, string>) =>
+    {
+        dispatch(bankDeleted(info.row.original.bankId));
     }
 
     const columnHelper = createColumnHelper<TBankView>();
@@ -81,19 +79,18 @@ export const ShowBanks = () =>
         header: () => "Total Questions",
         cell: info => <p className="text-center"> {info.getValue()} </p>
     }),
-    columnHelper.accessor("editable",{
-        header: () => "Edit",
-        cell: info => <p className="text-center"> {info.renderValue() ? <div onClick={() => handleBankEdit(info)}> Edit </div> : "Not Editable"} </p>
+    columnHelper.accessor("bankId",{
+        header: () => "",
+        cell: info => <div className="container flex flex-col mx-auto"> {info.renderValue()
+            ? <div className="container flex flex-row justify-around">
+            <BsFillPencilFill className="cursor-pointer" onClick={() => handleBankEdit(info)}/>
+            <BsFillTrashFill className="cursor-pointer" onClick={() => handleDeleteBank(info)}/>
+            </div>
+            :  "Not Editable"} </div>
     }),
-    ], []);
+    ], [banks]);
 
-    const data = useMemo(() => lBanksData, []);
-
-    const table = useReactTable({
-        data: data as TBankView[],
-        columns: columns,
-        getCoreRowModel: getCoreRowModel(),
-      })
+    const data = useMemo(() => lBanksData, [banks]);
 
     return (
         <div className={`${mainContainer}`}>
@@ -101,35 +98,7 @@ export const ShowBanks = () =>
                 <div className="container flex flex-row justify-end mt-5 w-[60em]">
                     <button className={`${actionButtonClass} font-bold`} onClick={handleCreateBank}> Create a bank </button>
                 </div>
-                <table className="container mt-5 border-2 w-[60em] bg-gray-light">
-                    <thead className="border-2">
-                    {table.getHeaderGroups().map(headerGroup => (
-                        <tr className="" key={headerGroup.id}>
-                        {headerGroup.headers.map((header, index) => (
-                            <th className={`${index % 2 === 0 ? "bg-white" : "bg-gray-light"}`} key={header.id}>
-                            {header.isPlaceholder
-                                ? null
-                                : flexRender(
-                                    header.column.columnDef.header,
-                                    header.getContext()
-                                )}
-                            </th>
-                        ))}
-                        </tr>
-                    ))}
-                    </thead>
-                    <tbody>
-                        {table.getRowModel().rows.map(row => (
-                            <tr key={row.id}>
-                            {row.getVisibleCells().map((cell, index) => (
-                                <td className={`${index % 2 === 0 ? "bg-white" : "bg-gray-light"}`} key={cell.id}>
-                                {flexRender(cell.column.columnDef.cell, cell.getContext())}
-                                </td>
-                            ))}
-                            </tr>
-                        ))}
-                    </tbody>
-                </table>
+                <Table data={data} columns={columns}/>
         </div>
     );
 };

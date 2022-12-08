@@ -13,6 +13,8 @@ import { BankDetails } from './pages/Bank/BankDetails';
 import { ShowBanks } from './pages/Bank/ShowBanks';
 import  store from "./store";
 import { Provider } from 'react-redux';
+import { ShowTests } from './pages/Test/ShowTests';
+import { TestDetails } from './pages/Test/TestDetails';
 
 const router = createBrowserRouter (
   [{
@@ -27,6 +29,24 @@ const router = createBrowserRouter (
       {
         path: "banks",
         element: <ShowBanks/>,
+      },
+      {
+        path: "tests",
+        element: <ShowTests/>,
+      },
+      {
+        path: "tests",
+        children:
+        [
+          {
+            path: "testId",
+            element: <></>
+          },
+          {
+            path: "new",
+            element: <TestDetails/>
+          }
+        ]
       },
       {
         path:"user",

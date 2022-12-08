@@ -1,14 +1,9 @@
 import { FormEvent, useEffect, useState } from "react";
 import { formDivClass, labelDivClass, labelText, textInputClass } from "../../common/CommonStyling";
-import { ChoiceDetails, TChoice } from "./ChoiceDetails";
 import { actioButtonDisabledClass, actionButtonClass } from "../../common/buttons/styles";
+import { TChoice, TQuestion, TQuestionError } from "../../model";
+import { ChoiceDetails } from "./ChoiceDetails";
 
-export type TQuestion =
-{
-    id: string,
-    statement: string,
-    choices: TChoice[],
-}
 
 interface IQuestionDetailsProps
 {
@@ -17,13 +12,6 @@ interface IQuestionDetailsProps
     onSubmit: (aQuestion: TQuestion) => void;
 }
 
-type TQuestionError =
-{
-    invalidChoices: boolean,
-    invalidStatement: boolean,
-    invalidQty: boolean,
-    invalidCorrect: boolean,
-}
 
 export const QuestionDetails = (aQuestionDetailsProps: IQuestionDetailsProps) =>
 {
@@ -91,6 +79,7 @@ export const QuestionDetails = (aQuestionDetailsProps: IQuestionDetailsProps) =>
         const lEditedQuestion: TQuestion =
         {
             id: question.id,
+            name: question.name,
             statement: question.statement,
             choices: question.choices,
         };
@@ -125,15 +114,24 @@ export const QuestionDetails = (aQuestionDetailsProps: IQuestionDetailsProps) =>
                 <div
                 className="container flex flex-col h-full justify-around">
                     <div className={`${formDivClass} my-5 flex-col`}>
-                        <div className={"container flex flex-col px-2 py-1 justify-between w-full"}>
+                        <div className={"container flex flex-row px-2 justify-between w-full"}>
+                                <label className={labelText}> Name </label>
+                                <input type="text"
+                                    className={`${textInputClass} p-0 mt-2`}
+                                    value={question.name}
+                                    onChange={(event) => setQuestion({ ...question, name: event.target.value })}
+                                />
+                            </div>
+                        <div className={"container flex flex-row px-2 justify-between w-full"}>
                             <label className={labelText}> Question Statement </label>
                             <input type="text"
-                                className={`${textInputClass} h-[5em] p-0 mt-2`}
+                                className={`${textInputClass} w-[40em] h-[5em] p-0 mt-2`}
                                 value={question.statement}
                                 onChange={(event) => setQuestion({ ...question, statement: event.target.value })}
                             />
                         </div>
-                        <div className="container flex flex-row px-2 mt-3 w-2/5 justify-between">
+                        
+                        <div className="container flex flex-row px-2 mt-2 justify-between">
                             <label className={labelText}> No. of Choices </label>
                             <input type="number" className={`${textInputClass} w-[5em] h-[2em]`} value={choiceQty} onChange={(event) => setChoiceQty(Number(event.target.value))}/>
                         </div>
