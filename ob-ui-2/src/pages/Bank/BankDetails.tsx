@@ -20,6 +20,7 @@ const lEmptyBank: TBank =
     bankName: "",
     isPublic: false,
     tags: [],
+    numChoices: 0,
     questions: [],
     createdAt: "",
 };
@@ -64,8 +65,6 @@ export const BankDetails = () =>
     }, [questions, bank]);
 
     const onAddQuestion = () => setAddingQuestion(true);
-
-    // console.log("Bank:" , bank);
 
     const handleDeleteQuestion = (info: CellContext<TQuestion, string>) =>
     {
@@ -132,9 +131,9 @@ export const BankDetails = () =>
 
     const columnHelper = createColumnHelper<TQuestion>();
     const columns = useMemo (() =>[
-    columnHelper.accessor('statement',
+    columnHelper.accessor('name',
     {
-        header: () => "Statement",
+        header: () => "Question Name",
         cell: info => <div className="container px-4 py-1"><p> {info.getValue()} </p></div>
     }),
     columnHelper.accessor("id",{
@@ -151,10 +150,10 @@ export const BankDetails = () =>
     return (
         <div className={mainContainer}>
             { addingQuestion
-                    ? <QuestionDetails onCancelSubmit={handleCancelSubmit} onSubmit={handleSubmitQuestion} question={selectedQuestion}/>
+                    ? <QuestionDetails numChoices={bank.numChoices} onCancelSubmit={handleCancelSubmit} onSubmit={handleSubmitQuestion} question={selectedQuestion}/>
                     :  <div className="container flex flex-col w-[60em]">
                             <div className={formBox}>
-                                <h3 className={headingText}> Tell us about your question bank </h3>
+                                <h3 className={headingText}> {editingBank ? "Edit this question bank." : "Set up a new Question Bank"}</h3>
                                 <form className="py-2">
                                     <div className="container flex flex-col">
                                         <div className={labelDivClass}>
@@ -187,6 +186,18 @@ export const BankDetails = () =>
                                                 <TagsInput value={bank.tags} onChange={(tags: string[]) => setBank({...bank, tags: tags })} />
                                             </div>
                                         </div>
+                                        <div className={labelDivClass}>
+                                            <label
+                                                className={labelText}>
+                                                    Choices per Question
+                                            </label>
+                                            <input
+                                                value={bank.numChoices}
+                                                type="number"
+                                                onChange={(event) => { setBank({ ...bank, numChoices: Number(event.target.value)})}}
+                                                className={`${textInputClass} w-[5em]`}
+                                            />
+                                        </div>
                                         <div className="container mt-2 items-center flex flex-col justify-between">
                                             <div className="container flex flex-row items-center justify-between">
                                                 <h3 className={headingText}> Your questions </h3>
@@ -196,7 +207,11 @@ export const BankDetails = () =>
                                             </div>
                                             <div className="container flex flex-col h-[20em]">
                                                 {
-                                                    questions.length ? <Table data={data} columns={columns}/> : <></>
+                                                    questions.length > 0
+                                                    ? <Table data={data} columns={columns}/>
+                                                    : <div className="mt-10 text-center">
+                                                        <h2 className="font-normal text-4xl text-gray">You haven't added any questions yet.</h2>
+                                                      </div>
                                                 }
                                             </div>
                                         </div>

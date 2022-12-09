@@ -11,4 +11,4 @@ export const ShowUser = () =>
             User
         </>
     )
-}
+};

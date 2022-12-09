@@ -3,10 +3,11 @@ import { useNavigate } from "react-router-dom";
 import { actionButtonClass } from "../../common/buttons/styles";
 import { mainContainer } from "../../common/CommonStyling";
 import { useSelector, useDispatch } from 'react-redux';
-import { createColumnHelper } from "@tanstack/react-table";
+import { CellContext, createColumnHelper } from "@tanstack/react-table";
 import { BsFillPencilFill, BsFillTrashFill } from "react-icons/bs";
 import { Table } from "../../common/Table";
-import { TTest, TTestView } from "../../model";
+import { TQuestion, TTest, TTestView } from "../../model";
+import { testDeleted } from "../../reducers/test";
 // TODO: publish/subscribe system.
 
 export const ShowTests = () =>
@@ -26,11 +27,27 @@ export const ShowTests = () =>
             description: aTest.description,
             tags: aTest.tags,
             timeLimit: aTest.timeLimit,
-            numQuestions: aTest.questions.length,
+            numQuestions: aTest.subscribedQuestions.length,
             passingScore: aTest.passingScore,
         }
-        )
+        );
     });
+
+    const handleEditTest = (info: CellContext<TTestView, string>) =>
+    {
+        const testId = info.row.original.id;
+        navigate(`${testId}`);
+    };
+
+    const handleDeleteTest = (info: CellContext<TTestView, string>) =>
+    {
+        dispatch(testDeleted(info.row.original.id));
+    };
+
+    const handleCreateTest = () =>
+    {
+        navigate("new");
+    };
 
     const columnHelper = createColumnHelper<TTestView>();
     const columns = useMemo (() =>[
@@ -60,33 +77,37 @@ export const ShowTests = () =>
         cell: info => <p> {`${info.getValue()}`} </p>,
     }),
     columnHelper.accessor('numQuestions', {
-        header: () => "Total Questions",
+        header: () => "Questions",
         cell: info => <p className="text-center"> {info.getValue()} </p>
     }),
     columnHelper.accessor('passingScore', {
         header: () => "Passing Score",
         cell: info => <p className="text-center"> {info.getValue()} </p>
     }),
-    columnHelper.accessor("id",{
+    columnHelper.accessor("name",{
         header: () => "",
         cell: info => <div className="container flex flex-col mx-auto"> {info.renderValue()
             ? <div className="container flex flex-row justify-around">
-            <BsFillPencilFill className="cursor-pointer" onClick={() => {}}/>
-            <BsFillTrashFill className="cursor-pointer" onClick={() => {}}/>
+            <BsFillPencilFill className="cursor-pointer" onClick={() => handleEditTest(info)}/>
+            <BsFillTrashFill className="cursor-pointer" onClick={() => handleDeleteTest(info)}/>
             </div>
             :  "Not Editable"} </div>
     }),
     ], [tests]);
 
     const data = useMemo(() => lTestsData, [tests]);
-    
+
     return (
         <div className={mainContainer}>
             <h1 className="font-normal"> Your Tests </h1>
                 <div className="container flex flex-row justify-end mt-5 w-[60em]">
-                    <button className={`${actionButtonClass} font-bold`} onClick={() => navigate("new")}> Create a test </button>
+                    <button className={`${actionButtonClass} font-bold`} onClick={handleCreateTest}> Create a test </button>
                 </div>
-                <Table data={data} columns={columns}/>
+                {tests.length > 0
+                    ? <Table data={data} columns={columns}/>
+                    : <div className="mt-10">
+                        <h2 className="font-normal text-4xl text-gray">You are not subscribed to any tests currently.</h2>
+                      </div>}
         </div>
     )
-}
+};

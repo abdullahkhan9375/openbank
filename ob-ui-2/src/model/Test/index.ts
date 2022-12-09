@@ -12,7 +12,7 @@ type TTestBase =
 
 export type TTest =
 {
-    questions: [],
+    subscribedQuestions: [],
 } & TTestBase;
 
 export type TTestView =

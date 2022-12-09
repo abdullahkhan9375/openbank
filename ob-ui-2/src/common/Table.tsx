@@ -15,7 +15,7 @@ export const Table = (aTableProps: ITableProps) =>
     });
 
     return (
-        <table className="container mt-5 border-2 w-[58.6em] bg-gray-light">
+        <table className="container mt-5 border-2 w-[60em] bg-gray-light">
                     <thead className="border-2">
                     {table.getHeaderGroups().map(headerGroup => (
                         <tr className="" key={headerGroup.id}>

@@ -1,8 +1,10 @@
 import { useState } from "react"
 import { formBox, headingText, labelDivClass, labelText, mainContainer, textInputClass } from "../../common/CommonStyling"
-import { TTest } from "../../model"
+import { TQuestion, TTest } from "../../model"
 import TagsInput from "react-tagsinput";
 import { QuestionSubscription } from "./QuestionSubscription";
+import { useParams } from "react-router-dom";
+import { useSelector, useDispatch } from 'react-redux';
 
 const lEmptyTest: TTest =
 {
@@ -12,13 +14,43 @@ const lEmptyTest: TTest =
     createdAt: "",
     description: "",
     tags: [],
-    questions: [],
+    subscribedQuestions: [],
     timeLimit: 0,
     passingScore: 10,
-}
+};
+
 export const TestDetails = () =>
 {
-    const [test, setTest] = useState<TTest>(lEmptyTest);
+    const { testId } = useParams();
+
+    const editingTest = useSelector((state: any) => state.test.find((aTest: TTest) => aTest.id === testId));
+
+    const [test, setTest] = useState<TTest>(editingTest ?? lEmptyTest);
+    const [subscribedQuestions, setSubscribedQuestions] = useState<TQuestion[]>(editingTest?.subscribedQuestions ?? []);
+
+    const handleSubscribeQuestion = (event: any, aQuestion: TQuestion) =>
+    {
+        let lSubbedQuestions = subscribedQuestions;
+        if (event.target.checked)
+        {
+            const lQuestionIndex = lSubbedQuestions.findIndex((lQuestion: TQuestion) => lQuestion.id === aQuestion.id);
+            if (lQuestionIndex === -1)
+            {
+                setSubscribedQuestions([...subscribedQuestions, aQuestion]);
+            }
+        }
+        else
+        {
+            lSubbedQuestions = lSubbedQuestions.filter((lQuestion: TQuestion) => lQuestion.id !== aQuestion.id);
+            setSubscribedQuestions(lSubbedQuestions);
+        }
+    };
+
+    const handleRemoveQuestion = (id: string) =>
+    {
+        let lSubbedQuestions = subscribedQuestions.filter((lQuestion: TQuestion) => lQuestion.id !== id);
+        setSubscribedQuestions(lSubbedQuestions);
+    };
 
     return (
         <div className={mainContainer}>
@@ -89,10 +121,14 @@ export const TestDetails = () =>
                                 <TagsInput value={test.tags} onChange={(tags: string[]) => setTest({...test, tags: tags })} />
                             </div>
                         </div>
-                        <QuestionSubscription/>
+                        <QuestionSubscription
+                            subscribedQuestions={subscribedQuestions}
+                            onSubscribeQuestion={handleSubscribeQuestion}
+                            onDeleteQuestion={handleRemoveQuestion}
+                        />
                     </form>
                 </div>
             </div>
         </div>
     )
-}
+};

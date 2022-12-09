@@ -11,6 +11,7 @@ type TBankBase =
 
 export type TBank =
 {
+    numChoices: number,
     questions: TQuestion[],
 } & TBankBase;
 

@@ -14,45 +14,24 @@ const lEmptyChoice: TChoice =
     explanation: "",
 };
 
-export const QuestionSubscription = () =>
+interface IQuestionSubscriptionProps
+{
+    subscribedQuestions: TQuestion[],
+    onSubscribeQuestion: (event: any, aQuestion: TQuestion) => void;
+    onDeleteQuestion: (id: string) => void;
+}
+
+export const QuestionSubscription = (aSubProps: IQuestionSubscriptionProps) =>
 {
     const lSubscribedBanks = useSelector((state: any) => state.bank);
     console.log("Subscribed banks: ", lSubscribedBanks);
 
     const [selectedBank, setSelectedBank] = useState<TBank | undefined>(undefined);
-    console.log("Selected bank: ", selectedBank);
-    const [subscribedQuestions, setSubscribedQuestions] = useState<TQuestion[]>([]);
-    console.log("Subscribed questiosn: ", subscribedQuestions);
-    
+   
     const checkQuestionExists = (id: string) =>
     {
-        const lFindQuestion = subscribedQuestions.findIndex((aQuestion: any) => aQuestion.id === id);
+        const lFindQuestion = aSubProps.subscribedQuestions.findIndex((aQuestion: any) => aQuestion.id === id);
         return lFindQuestion !== -1
-    };
-
-    const handleSubscribeQuestion = (event: any, aQuestion: TQuestion) =>
-    {
-        let lSubbedQuestions = subscribedQuestions;
-        console.log("Checked: ", event.target.checked);
-        if (event.target.checked)
-        {
-            const lQuestionIndex = lSubbedQuestions.findIndex((lQuestion: TQuestion) => lQuestion.id === aQuestion.id);
-            if (lQuestionIndex === -1)
-            {
-                setSubscribedQuestions([...subscribedQuestions, aQuestion]);
-            }
-        }
-        else
-        {
-            lSubbedQuestions = lSubbedQuestions.filter((lQuestion: TQuestion) => lQuestion.id !== aQuestion.id);
-            setSubscribedQuestions(lSubbedQuestions);
-        }
-    };
-
-    const handleRemoveQuestion = (id: string) =>
-    {
-        let lSubbedQuestions = subscribedQuestions.filter((lQuestion: TQuestion) => lQuestion.id !== id);
-        setSubscribedQuestions(lSubbedQuestions);
     };
 
     return (
@@ -76,12 +55,12 @@ export const QuestionSubscription = () =>
                     {selectedBank?.questions.map((aQuestion: TQuestion) =>
                     {
                         return (<div>
-                                <a onClick={() => {}}> {aQuestion.id} </a>
+                                <a onClick={() => {}}> {aQuestion.name} </a>
                                 <input
                                     type="checkbox"
                                     className="bg-gray-light"
-                                    checked={subscribedQuestions.findIndex((lQuestion: TQuestion) => lQuestion.id === aQuestion.id) !== -1}
-                                    onChange={(event) => handleSubscribeQuestion(event, aQuestion)}/>
+                                    checked={aSubProps.subscribedQuestions.findIndex((lQuestion: TQuestion) => lQuestion.id === aQuestion.id) !== -1}
+                                    onChange={(event) => aSubProps.onSubscribeQuestion(event, aQuestion)}/>
                             </div>
                         );
                     })}
@@ -90,13 +69,12 @@ export const QuestionSubscription = () =>
             <div className="container flex flex-col items-center">
                 <h3 className={labelText}> Subscribed Questions </h3>
                 <div className={lSubscriptionBoxClass}>
-                    { subscribedQuestions.map((aQuestion: TQuestion) =>
+                    { aSubProps.subscribedQuestions.map((aQuestion: TQuestion) =>
                     {
                         return (
                             <div>
-                                <a>{aQuestion.id}</a>
-                                <span onClick={() => handleRemoveQuestion(aQuestion.id)}> X </span>
-
+                                <a>{aQuestion.name}</a>
+                                <span onClick={() => aSubProps.onDeleteQuestion(aQuestion.id)}> X </span>
                             </div>
                         );
                     })}
@@ -104,4 +82,4 @@ export const QuestionSubscription = () =>
             </div>
         </div>
     )
-}
+};

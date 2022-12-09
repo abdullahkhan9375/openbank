@@ -8,6 +8,7 @@ import { ChoiceDetails } from "./ChoiceDetails";
 interface IQuestionDetailsProps
 {
     question: TQuestion;
+    numChoices: number;
     onCancelSubmit: () => void;
     onSubmit: (aQuestion: TQuestion) => void;
 }
@@ -17,7 +18,7 @@ export const QuestionDetails = (aQuestionDetailsProps: IQuestionDetailsProps) =>
 {
     const lQuestion = aQuestionDetailsProps.question;
     const [ question, setQuestion ] = useState<TQuestion>(lQuestion)
-    const [ choiceQty, setChoiceQty ] = useState<number>(lQuestion.choices.length);
+    const [ choiceQty, setChoiceQty ] = useState<number>(aQuestionDetailsProps.numChoices);
     const [ selectedChoice, setSelectedChoice ] = useState<TChoice>(lQuestion.choices[0]);
     const [ error, setError ] = useState<TQuestionError>(
         {
@@ -36,7 +37,8 @@ export const QuestionDetails = (aQuestionDetailsProps: IQuestionDetailsProps) =>
     useEffect(() =>
     {
         setQuestion(aQuestionDetailsProps.question);
-    }, [aQuestionDetailsProps.question]);
+        setChoiceQty(aQuestionDetailsProps.numChoices);
+    }, [aQuestionDetailsProps]);
 
     useEffect(() =>
     {
@@ -129,11 +131,6 @@ export const QuestionDetails = (aQuestionDetailsProps: IQuestionDetailsProps) =>
                                 value={question.statement}
                                 onChange={(event) => setQuestion({ ...question, statement: event.target.value })}
                             />
-                        </div>
-                        
-                        <div className="container flex flex-row px-2 mt-2 justify-between">
-                            <label className={labelText}> No. of Choices </label>
-                            <input type="number" className={`${textInputClass} w-[5em] h-[2em]`} value={choiceQty} onChange={(event) => setChoiceQty(Number(event.target.value))}/>
                         </div>
                     </div>
                     <div className={formDivClass}>

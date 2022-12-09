@@ -9,7 +9,6 @@ import
     getCoreRowModel,
     useReactTable,
 } from '@tanstack/react-table';
-import { TQuestion } from "./QuestionDetails";
 import { actioButtonBase, actionButtonClass } from "../../common/buttons/styles";
 import { BankDetails } from "./BankDetails";
 import { useSelector, useDispatch } from 'react-redux'
@@ -66,6 +65,7 @@ export const ShowBanks = () =>
     columnHelper.accessor('createdAt',
     {
         header: () => "Created At",
+        cell: info => <p className="text-center"> {info.getValue()} </p>,
     }),
     columnHelper.accessor('isPublic', {
         header:() => "Visibility",
@@ -98,7 +98,13 @@ export const ShowBanks = () =>
                 <div className="container flex flex-row justify-end mt-5 w-[60em]">
                     <button className={`${actionButtonClass} font-bold`} onClick={handleCreateBank}> Create a bank </button>
                 </div>
-                <Table data={data} columns={columns}/>
+                {
+                    banks.length > 0
+                    ? <Table data={data} columns={columns}/>
+                    : <div className="mt-10 text-center">
+                        <h2 className="font-normal text-4xl text-gray">You aren't subscribed to any banks yet.</h2>
+                        </div>
+                }
         </div>
     );
 };

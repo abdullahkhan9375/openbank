@@ -39,8 +39,8 @@ const router = createBrowserRouter (
         children:
         [
           {
-            path: "testId",
-            element: <></>
+            path: ":testId",
+            element: <TestDetails/>
           },
           {
             path: "new",
