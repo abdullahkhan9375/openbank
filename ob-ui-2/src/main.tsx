@@ -39,7 +39,7 @@ const router = createBrowserRouter (
         children:
         [
           {
-            path: ":testId",
+            path: ":id",
             element: <TestDetails/>
           },
           {
@@ -57,7 +57,7 @@ const router = createBrowserRouter (
         children:
         [
           {
-            path: ":bankId",
+            path: ":id",
             element: <BankDetails/>
           },
           {

@@ -2,8 +2,8 @@ import { TQuestion } from "../Question";
 
 type TBankBase =
 {
-    bankId: string,
-    bankName: string,
+    id: string,
+    name: string,
     isPublic: boolean,
     tags: string[],
     createdAt: string,
@@ -24,4 +24,5 @@ export type TBankError =
 {
     invalidName: boolean,
     invalidQuestion: boolean,
+    emptyChoice: boolean,
 };

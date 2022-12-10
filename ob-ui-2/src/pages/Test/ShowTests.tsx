@@ -1,7 +1,7 @@
 import { useMemo, useState } from "react";
 import { useNavigate } from "react-router-dom";
 import { actionButtonClass } from "../../common/buttons/styles";
-import { mainContainer } from "../../common/CommonStyling";
+import { mainContainerClass } from "../../common";
 import { useSelector, useDispatch } from 'react-redux';
 import { CellContext, createColumnHelper } from "@tanstack/react-table";
 import { BsFillPencilFill, BsFillTrashFill } from "react-icons/bs";
@@ -29,17 +29,18 @@ export const ShowTests = () =>
             timeLimit: aTest.timeLimit,
             numQuestions: aTest.subscribedQuestions.length,
             passingScore: aTest.passingScore,
+            editable: true, // Change with user priv
         }
         );
     });
 
-    const handleEditTest = (info: CellContext<TTestView, string>) =>
+    const handleEditTest = (info: CellContext<TTestView, boolean>) =>
     {
-        const testId = info.row.original.id;
-        navigate(`${testId}`);
+        const id = info.row.original.id;
+        navigate(`${id}`);
     };
 
-    const handleDeleteTest = (info: CellContext<TTestView, string>) =>
+    const handleDeleteTest = (info: CellContext<TTestView, boolean>) =>
     {
         dispatch(testDeleted(info.row.original.id));
     };
@@ -84,9 +85,9 @@ export const ShowTests = () =>
         header: () => "Passing Score",
         cell: info => <p className="text-center"> {info.getValue()} </p>
     }),
-    columnHelper.accessor("name",{
+    columnHelper.accessor("editable",{
         header: () => "",
-        cell: info => <div className="container flex flex-col mx-auto"> {info.renderValue()
+        cell: info => <div className="container flex flex-col mx-auto"> {info.getValue()
             ? <div className="container flex flex-row justify-around">
             <BsFillPencilFill className="cursor-pointer" onClick={() => handleEditTest(info)}/>
             <BsFillTrashFill className="cursor-pointer" onClick={() => handleDeleteTest(info)}/>
@@ -98,7 +99,7 @@ export const ShowTests = () =>
     const data = useMemo(() => lTestsData, [tests]);
 
     return (
-        <div className={mainContainer}>
+        <div className={mainContainerClass}>
             <h1 className="font-normal"> Your Tests </h1>
                 <div className="container flex flex-row justify-end mt-5 w-[60em]">
                     <button className={`${actionButtonClass} font-bold`} onClick={handleCreateTest}> Create a test </button>
@@ -106,7 +107,7 @@ export const ShowTests = () =>
                 {tests.length > 0
                     ? <Table data={data} columns={columns}/>
                     : <div className="mt-10">
-                        <h2 className="font-normal text-4xl text-gray">You are not subscribed to any tests currently.</h2>
+                        <h2 className="font-normal text-4xl text-gray">You aren't subscribed to any tests currently.</h2>
                       </div>}
         </div>
     )

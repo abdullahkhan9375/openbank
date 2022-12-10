@@ -1,7 +1,6 @@
-import { BaseButton  } from "../../common";
 import { Link } from "react-router-dom";
-import { actionButtonClass, altActionButtonClass } from "../../common/buttons/styles";
-import { mainContainer } from "../../common/CommonStyling";
+import { actionButtonClass, altActionButtonClass } from "../../common";
+import { mainContainerClass } from "../../common";
 
 // eslint-disable-next-line @typescript-eslint/no-empty-interface
 interface IShowHome {}
@@ -9,7 +8,7 @@ interface IShowHome {}
 export const ShowHome = (aShowHomeProps: IShowHome) =>
 {
     return (
-        <div className={mainContainer}>
+        <div className={mainContainerClass}>
           <div className="h-2/5 w-[40vw] container mx-auto flex flex-col justify-evenly items-center">
             <h1 className='text-9xl text-black font-bold'> OpenBank </h1>
               <p className='text-6xl text-black font-light'> The first (free) B.Y.O.B platform. </p>

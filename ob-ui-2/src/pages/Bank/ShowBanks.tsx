@@ -1,4 +1,3 @@
-import { mainContainer } from "../../common/CommonStyling";
 import { BsFillPencilFill, BsFillTrashFill } from "react-icons/bs";
 import
 {
@@ -9,7 +8,7 @@ import
     getCoreRowModel,
     useReactTable,
 } from '@tanstack/react-table';
-import { actioButtonBase, actionButtonClass } from "../../common/buttons/styles";
+import { actionButtonClass, mainContainerClass } from "../../common";
 import { BankDetails } from "./BankDetails";
 import { useSelector, useDispatch } from 'react-redux'
 import { bankAdded, bankDeleted } from "../../reducers/bank";
@@ -24,12 +23,12 @@ export const ShowBanks = () =>
     const navigate = useNavigate();
     const dispatch = useDispatch();
 
-    const lBanksData = banks.map((aBank: TBank) =>
+    const lBanksData: TBankView[] = banks.map((aBank: TBank) =>
     {
         return (
             {
-                bankId: aBank.bankId,
-                bankName: aBank.bankName,
+                id: aBank.id,
+                name: aBank.name,
                 isPublic: aBank.isPublic,
                 tags: aBank.tags,
                 numQuestions: aBank.questions.length,
@@ -41,8 +40,8 @@ export const ShowBanks = () =>
 
     const handleBankEdit = (info: CellContext<TBankView, string>) =>
     {
-        const bankId = info.row.original.bankId;
-        navigate(`${bankId}`)
+        const id = info.row.original.id;
+        navigate(`${id}`)
     }
 
     const handleCreateBank = () =>
@@ -52,12 +51,12 @@ export const ShowBanks = () =>
 
     const handleDeleteBank = (info: CellContext<TBankView, string>) =>
     {
-        dispatch(bankDeleted(info.row.original.bankId));
+        dispatch(bankDeleted(info.row.original.id));
     }
 
     const columnHelper = createColumnHelper<TBankView>();
     const columns = useMemo (() =>[
-    columnHelper.accessor('bankName',
+    columnHelper.accessor('name',
     {
         header: () => "Bank Name",
         cell: info => <p className="text-center"> {info.getValue()} </p>
@@ -79,7 +78,7 @@ export const ShowBanks = () =>
         header: () => "Total Questions",
         cell: info => <p className="text-center"> {info.getValue()} </p>
     }),
-    columnHelper.accessor("bankId",{
+    columnHelper.accessor("id",{
         header: () => "",
         cell: info => <div className="container flex flex-col mx-auto"> {info.renderValue()
             ? <div className="container flex flex-row justify-around">
@@ -93,7 +92,7 @@ export const ShowBanks = () =>
     const data = useMemo(() => lBanksData, [banks]);
 
     return (
-        <div className={`${mainContainer}`}>
+        <div className={`${mainContainerClass}`}>
                 <h1 className="font-normal"> Your Banks </h1>
                 <div className="container flex flex-row justify-end mt-5 w-[60em]">
                     <button className={`${actionButtonClass} font-bold`} onClick={handleCreateBank}> Create a bank </button>

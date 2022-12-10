@@ -1,3 +1,5 @@
+import { TQuestion } from "../Question";
+
 type TTestBase =
 {
     id: string,
@@ -12,10 +14,19 @@ type TTestBase =
 
 export type TTest =
 {
-    subscribedQuestions: [],
+    subscribedQuestions: TQuestion[],
 } & TTestBase;
 
 export type TTestView =
 {
     numQuestions: number,
+    editable: boolean,
 } & TTestBase;
+
+export type TTestError =
+{
+    invalidName: boolean,
+    invalidTimeLimit: boolean,
+    invalidPassingScore: boolean,
+    invalidNumQuestions: boolean,
+};

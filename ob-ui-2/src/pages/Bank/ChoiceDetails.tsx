@@ -1,6 +1,6 @@
 import { FormEvent, useEffect, useState } from "react";
-import { actioButtonDisabledClass, actionButtonClass } from "../../common/buttons/styles";
-import { labelText, textInputClass } from "../../common/CommonStyling";
+import { actioButtonDisabledClass, actionButtonClass } from "../../common";
+import { labelTextClass, textInputClass } from "../../common";
 import { TChoice } from "../../model";
 
 interface IChoiceProps
@@ -36,17 +36,17 @@ export const ChoiceDetails = (aChoiceProps: IChoiceProps) =>
             <div className="w-full mx-3">
                 <form onSubmit={handleSubmit}>
                     <div className="mb-1">
-                        <label className={labelText}> Choice #{choice.id} </label>
+                        <label className={labelTextClass}> Choice #{choice.id} </label>
                     </div>
                     <div className="mb-1">
                         <input type="text" className={`${textInputClass} w-4/5`} value={choice.body} onChange={(event) => {setChoice({...choice, body: event.target.value })}
                         }/>
-                        <label className={labelText}> Correct </label>
+                        <label className={labelTextClass}> Correct </label>
                         <input type="checkbox" className="bg-gray-light" value={String(choice.correct)} checked={choice.correct} onChange={(event) => {setChoice({...choice, correct: event.target.checked })}
                         } />
                     </div>
                     <div className="mb-1">
-                        <label className={labelText}> Explanation </label>
+                        <label className={labelTextClass}> Explanation </label>
                     </div>
                     <div className="container flex flex-row">
                         <input className={`${textInputClass} w-full h-[100px]`} value={choice.explanation} onChange={(event) => {setChoice({...choice, explanation: event.target.value })}} type="text"/>

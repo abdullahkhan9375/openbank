@@ -1,9 +1,9 @@
 import { FormEvent, useEffect, useState } from "react";
-import { formDivClass, labelDivClass, labelText, textInputClass } from "../../common/CommonStyling";
+import { formDivClass, labelDivClass, labelTextClass, textInputClass } from "../../common/CommonStyling";
 import { actioButtonDisabledClass, actionButtonClass } from "../../common/buttons/styles";
 import { TChoice, TQuestion, TQuestionError } from "../../model";
 import { ChoiceDetails } from "./ChoiceDetails";
-
+import { isEqual } from "lodash";
 
 interface IQuestionDetailsProps
 {
@@ -13,13 +13,13 @@ interface IQuestionDetailsProps
     onSubmit: (aQuestion: TQuestion) => void;
 }
 
-
 export const QuestionDetails = (aQuestionDetailsProps: IQuestionDetailsProps) =>
 {
     const lQuestion = aQuestionDetailsProps.question;
     const [ question, setQuestion ] = useState<TQuestion>(lQuestion)
     const [ choiceQty, setChoiceQty ] = useState<number>(aQuestionDetailsProps.numChoices);
     const [ selectedChoice, setSelectedChoice ] = useState<TChoice>(lQuestion.choices[0]);
+    const [ hasChanged, setHasChanged ] = useState<boolean>(false);
     const [ error, setError ] = useState<TQuestionError>(
         {
             invalidChoices: false,
@@ -30,9 +30,10 @@ export const QuestionDetails = (aQuestionDetailsProps: IQuestionDetailsProps) =>
     );
 
     const lError: boolean =  error.invalidChoices
-                    || error.invalidCorrect
-                    || error.invalidQty
-                    || error.invalidStatement;
+                          || error.invalidCorrect
+                          || error.invalidQty
+                          || error.invalidStatement
+                          || !hasChanged;
 
     useEffect(() =>
     {
@@ -53,8 +54,11 @@ export const QuestionDetails = (aQuestionDetailsProps: IQuestionDetailsProps) =>
                          || choiceQty !== question.choices.length
                          || lBlankChoiceExists
                 });
-    
+        setHasChanged(!isEqual(question, aQuestionDetailsProps.question));
+        console.log("Questions: ", question);
+        console.log("Question Props: ", aQuestionDetailsProps.question);
         // console.log("Errors: ", error);
+        console.log("Has Changed: ", hasChanged);
     }, [question, choiceQty])
 
     const handleSelectedChoice = (index: number) =>
@@ -76,7 +80,7 @@ export const QuestionDetails = (aQuestionDetailsProps: IQuestionDetailsProps) =>
     const handleSubmit = (event: FormEvent) =>
     {
         event.preventDefault();
-
+        console.log("Error: ", error);
         if (lError) { return; }
         const lEditedQuestion: TQuestion =
         {
@@ -91,7 +95,7 @@ export const QuestionDetails = (aQuestionDetailsProps: IQuestionDetailsProps) =>
 
     const onChoiceSubmit = (aChoice: TChoice) =>
     {
-        const lChoices: TChoice[] = question.choices;
+        const lChoices: TChoice[] = [...question.choices];
 
         const choiceIndex: number = lChoices.findIndex((lChoice: TChoice) =>
         {
@@ -117,7 +121,7 @@ export const QuestionDetails = (aQuestionDetailsProps: IQuestionDetailsProps) =>
                 className="container flex flex-col h-full justify-around">
                     <div className={`${formDivClass} my-5 flex-col`}>
                         <div className={"container flex flex-row px-2 justify-between w-full"}>
-                                <label className={labelText}> Name </label>
+                                <label className={labelTextClass}> Name </label>
                                 <input type="text"
                                     className={`${textInputClass} p-0 mt-2`}
                                     value={question.name}
@@ -125,7 +129,7 @@ export const QuestionDetails = (aQuestionDetailsProps: IQuestionDetailsProps) =>
                                 />
                             </div>
                         <div className={"container flex flex-row px-2 justify-between w-full"}>
-                            <label className={labelText}> Question Statement </label>
+                            <label className={labelTextClass}> Question Statement </label>
                             <input type="text"
                                 className={`${textInputClass} w-[40em] h-[5em] p-0 mt-2`}
                                 value={question.statement}
@@ -156,4 +160,4 @@ export const QuestionDetails = (aQuestionDetailsProps: IQuestionDetailsProps) =>
             </form>
         </div>
     )
-}
+};

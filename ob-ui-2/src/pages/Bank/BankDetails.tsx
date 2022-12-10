@@ -1,4 +1,4 @@
-import { useEffect, useMemo, useState } from "react";
+import { useCallback, useEffect, useMemo, useState } from "react";
 import { formBox, headingText, labelDivClass, labelText, mainContainer, textInputClass } from "../../common/CommonStyling";
 import { QuestionDetails } from "./QuestionDetails";
 import { isEqual } from "lodash";
@@ -13,11 +13,12 @@ import { DeleteDialog } from "../../common/dialogs/DeleteDialog";
 import { Table } from "../../common/Table";
 import { BsFillPencilFill, BsFillTrashFill } from "react-icons/bs";
 import { TBank, TBankError, TChoice, TQuestion } from "../../model";
+import { SaveItemPanel } from "../../common/buttons/SaveItemPanel";
 
 const lEmptyBank: TBank =
 {
-    bankId: "",
-    bankName: "",
+    id: "",
+    name: "",
     isPublic: false,
     tags: [],
     numChoices: 0,
@@ -33,36 +34,62 @@ const lEmptyChoice: TChoice =
     explanation: "",
 };
 
+const lEmptyQuestion: TQuestion =
+{
+    id: uuidv4(),
+    name: "",
+    statement: "",
+    choices: [lEmptyChoice],
+};
+
 export const BankDetails = () =>
 {
-    const lEmptyQuestion: TQuestion =
-    {
-        id: uuidv4(),
-        name: "",
-        statement: "",
-        choices: [lEmptyChoice],
-    };
-
     const dispatch = useDispatch();
-    const { bankId } = useParams();
+    const { id } = useParams();
 
-    const editingBank = useSelector((state: any) => state.bank.find((aBank: TBank) => aBank.bankId === bankId));
+    const editingBank: TBank = useSelector((state: any) => state.bank.find((aBank: TBank) => aBank.id === id));
+
+    console.log("ID: ", id);
 
     const [ bank, setBank ] = useState<TBank>(editingBank ?? lEmptyBank);
     const [ addingQuestion, setAddingQuestion ] = useState<boolean>(false);
     const [ selectedQuestion, setSelectedQuestion ] = useState<TQuestion>(lEmptyQuestion);
     const [ questions, setQuestions ] = useState<TQuestion[]>(bank.questions);
-    const [ error, setError ] = useState<TBankError>({ invalidName: false, invalidQuestion: false })
+    const [ error, setError ] = useState<TBankError>({ invalidName: bank.name==="", invalidQuestion: bank.questions.length === 0, emptyChoice: false });
+    const [hasChanged, setHasChanged] = useState<boolean>(false);
     const navigate = useNavigate();
     const [questionForDeletion, setQuestionForDeletion] = useState<CellContext<TQuestion, string> | undefined>(undefined);
 
     useEffect(() =>
     {
         setError({
-            invalidName: bank.bankName === "",
+            ...error,
+            invalidName: bank.name === "",
             invalidQuestion: questions.length === 0,
         });
+        setHasChanged(!isEqual(bank, editingBank ?? lEmptyBank));
+        console.log("Errors on Bank Details: ", error);
+        console.log("Has Changed: ", hasChanged);
     }, [questions, bank]);
+
+    const validateQuestions = () =>
+    {
+        for (const question of questions)
+        {
+            if (question.choices.length !== bank.numChoices)
+            {
+                setError({ ...error, emptyChoice: true });
+                return;
+            }
+        }
+        setError({ ...error, emptyChoice: false })
+    };
+
+    useEffect(() =>
+    {
+        // console.log("Empty choice: ", error.emptyChoice);
+        validateQuestions();
+    }, [bank.numChoices, bank.questions]);
 
     const onAddQuestion = () => setAddingQuestion(true);
 
@@ -79,9 +106,8 @@ export const BankDetails = () =>
         if (selectedQuestion !== undefined)
         {
             setSelectedQuestion(selectedQuestion);
-        setAddingQuestion(true);
+            setAddingQuestion(true);
         }
-        else console.log("Could not find question.");
     }
 
     const handleCancelSubmit = () =>
@@ -98,7 +124,7 @@ export const BankDetails = () =>
             ...bank,
             questions: questions,
             createdAt: String(Date.now()),
-            bankId: bank.bankId !== "" ? bank.bankId : uuidv4(),
+            id: bank.id !== "" ? bank.id : uuidv4(),
         };
 
         dispatch(bankAdded(lBank));
@@ -112,7 +138,8 @@ export const BankDetails = () =>
 
     const handleSubmitQuestion = (aQuestion: TQuestion) =>
     {
-        const lQuestions: TQuestion[] = questions; 
+
+        const lQuestions: TQuestion[] = [...questions]; 
         const lQuestionIndex: number = questions.findIndex((lQuestion: TQuestion) => lQuestion.id == aQuestion.id);
 
         if (lQuestionIndex === -1)
@@ -127,6 +154,7 @@ export const BankDetails = () =>
 
         setAddingQuestion(false);
         setSelectedQuestion(lEmptyQuestion);
+        validateQuestions(); // User will be submitting valid questions only. ChoiceDetails takes care of validation.
     };
 
     const columnHelper = createColumnHelper<TQuestion>();
@@ -146,14 +174,16 @@ export const BankDetails = () =>
     ], [questions]);
 
     const data = useMemo(() => questions, [questions]);
+    const lSaveDisabled = (error.invalidName || error.invalidQuestion || error.emptyChoice) || !hasChanged;
+    console.log("Save disabled: ", lSaveDisabled);
 
     return (
         <div className={mainContainer}>
             { addingQuestion
                     ? <QuestionDetails numChoices={bank.numChoices} onCancelSubmit={handleCancelSubmit} onSubmit={handleSubmitQuestion} question={selectedQuestion}/>
-                    :  <div className="container flex flex-col w-[60em]">
+                    :  <div className="container flex flex-col w-[61.4em]">
                             <div className={formBox}>
-                                <h3 className={headingText}> {editingBank ? "Edit this question bank." : "Set up a new Question Bank"}</h3>
+                                <h3 className={headingText}> {editingBank ? "Edit this question bank" : "Set up a new question bank"}</h3>
                                 <form className="py-2">
                                     <div className="container flex flex-col">
                                         <div className={labelDivClass}>
@@ -162,8 +192,8 @@ export const BankDetails = () =>
                                                     Name
                                             </label>
                                             <input
-                                                value={bank.bankName}
-                                                onChange={(event) => { setBank({ ...bank, bankName: event.target.value })}}
+                                                value={bank.name}
+                                                onChange={(event) => { setBank({ ...bank, name: event.target.value })}}
                                                 className={`${textInputClass} w-[30em]`} type={"text"}
                                             />
                                         </div>
@@ -216,14 +246,7 @@ export const BankDetails = () =>
                                             </div>
                                         </div>
                                         <div className="container flex flex-row mx-auto w-full justify-center items-center">
-                                            <button type="button" className={`bg-white hover:border-white text-black text-lg w-[10em] mx-3`}>
-                                                <Link to="/banks" className="text-black hover:text-black">Cancel</Link>
-                                            </button>
-                                            <button type="button" onClick={handleSaveBank} className={`${(error.invalidName || error.invalidQuestion)
-                                                    ? `${actioButtonDisabledClass} text-lg w-[10em] mx-3` :
-                                                    `${altActionButtonClass} text-gray-light text-lg w-[10em] mx-3 hover:border-white`}`}>
-                                                        Save
-                                            </button>
+                                            <SaveItemPanel onSave={handleSaveBank} cancelLink={"/banks"} error={lSaveDisabled}/>
                                         </div>
                                 </form>
                             </div>

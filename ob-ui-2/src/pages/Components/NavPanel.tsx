@@ -1,6 +1,6 @@
 import { ReactElement, useState } from "react";
 import { Link } from "react-router-dom";
-import { altActionButtonClass } from "../../common/buttons/styles";
+import { altActionButtonClass } from "../../common";
 
 type THoverOption =
 {
