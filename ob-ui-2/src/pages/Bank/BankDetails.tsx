@@ -1,5 +1,12 @@
 import { useCallback, useEffect, useMemo, useState } from "react";
-import { formBox, headingText, labelDivClass, labelText, mainContainer, textInputClass } from "../../common/CommonStyling";
+import {
+        formBoxClass,
+        headingTextClass,
+        labelDivClass,
+        labelTextClass,
+        mainContainerClass,
+        textInputClass
+    } from "../../common";
 import { QuestionDetails } from "./QuestionDetails";
 import { isEqual } from "lodash";
 import { v4 as uuidv4 } from 'uuid';
@@ -9,11 +16,10 @@ import TagsInput from "react-tagsinput";
 import { useSelector, useDispatch } from 'react-redux'
 import { bankAdded } from "../../reducers/bank";
 import { CellContext, createColumnHelper, flexRender, getCoreRowModel, useReactTable } from "@tanstack/react-table";
-import { DeleteDialog } from "../../common/dialogs/DeleteDialog";
 import { Table } from "../../common/Table";
 import { BsFillPencilFill, BsFillTrashFill } from "react-icons/bs";
 import { TBank, TBankError, TChoice, TQuestion } from "../../model";
-import { SaveItemPanel } from "../../common/buttons/SaveItemPanel";
+import { SaveItemPanel } from "../../common";
 
 const lEmptyBank: TBank =
 {
@@ -178,17 +184,17 @@ export const BankDetails = () =>
     console.log("Save disabled: ", lSaveDisabled);
 
     return (
-        <div className={mainContainer}>
+        <div className={mainContainerClass}>
             { addingQuestion
                     ? <QuestionDetails numChoices={bank.numChoices} onCancelSubmit={handleCancelSubmit} onSubmit={handleSubmitQuestion} question={selectedQuestion}/>
                     :  <div className="container flex flex-col w-[61.4em]">
-                            <div className={formBox}>
-                                <h3 className={headingText}> {editingBank ? "Edit this question bank" : "Set up a new question bank"}</h3>
+                            <div className={formBoxClass}>
+                                <h3 className={headingTextClass}> {editingBank ? "Edit this question bank" : "Set up a new question bank"}</h3>
                                 <form className="py-2">
                                     <div className="container flex flex-col">
                                         <div className={labelDivClass}>
                                             <label
-                                                className={labelText}>
+                                                className={labelTextClass}>
                                                     Name
                                             </label>
                                             <input
@@ -198,9 +204,9 @@ export const BankDetails = () =>
                                             />
                                         </div>
                                         <div className={labelDivClass}>
-                                            <label className={labelText}> Visibility </label>
+                                            <label className={labelTextClass}> Visibility </label>
                                             <div>
-                                                <label className={labelText}>
+                                                <label className={labelTextClass}>
                                                     Public
                                                 </label>
                                                 <input
@@ -212,13 +218,13 @@ export const BankDetails = () =>
                                             </div>
                                         </div>
                                             <div className={labelDivClass}>
-                                                <label className={labelText}> Tags </label>
+                                                <label className={labelTextClass}> Tags </label>
                                                 <TagsInput value={bank.tags} onChange={(tags: string[]) => setBank({...bank, tags: tags })} />
                                             </div>
                                         </div>
                                         <div className={labelDivClass}>
                                             <label
-                                                className={labelText}>
+                                                className={labelTextClass}>
                                                     Choices per Question
                                             </label>
                                             <input
@@ -230,7 +236,7 @@ export const BankDetails = () =>
                                         </div>
                                         <div className="container mt-2 items-center flex flex-col justify-between">
                                             <div className="container flex flex-row items-center justify-between">
-                                                <h3 className={headingText}> Your questions </h3>
+                                                <h3 className={headingTextClass}> Your questions </h3>
                                                 <button className={`${actionButtonClass} mr-2 text-lg font-bold w-[10em]`} onClick={() => setAddingQuestion(true)}>
                                                     Add a question
                                                 </button>
