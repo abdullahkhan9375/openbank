@@ -6,6 +6,7 @@ export type TQuestion =
     name: string,
     statement: string,
     choices: TChoice[],
+    correctChoices: number,
 };
 
 export type TQuestionError =

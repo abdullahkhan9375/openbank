@@ -15,6 +15,7 @@ import  store from "./store";
 import { Provider } from 'react-redux';
 import { ShowTests } from './pages/Test/ShowTests';
 import { TestDetails } from './pages/Test/TestDetails';
+import { ShowExam } from './pages/Exam/ShowExam';
 
 const router = createBrowserRouter (
   [{
@@ -51,6 +52,16 @@ const router = createBrowserRouter (
       {
         path:"user",
         element: <ShowUser/>,
+      },
+      {
+        path:"exam",
+        children:
+        [
+          {
+            path: ":id",
+            element: <ShowExam/>
+          },
+        ]
       },
       {
         path: "banks",

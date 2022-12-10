@@ -55,10 +55,6 @@ export const QuestionDetails = (aQuestionDetailsProps: IQuestionDetailsProps) =>
                          || lBlankChoiceExists
                 });
         setHasChanged(!isEqual(question, aQuestionDetailsProps.question));
-        console.log("Questions: ", question);
-        console.log("Question Props: ", aQuestionDetailsProps.question);
-        // console.log("Errors: ", error);
-        console.log("Has Changed: ", hasChanged);
     }, [question, choiceQty])
 
     const handleSelectedChoice = (index: number) =>
@@ -82,11 +78,17 @@ export const QuestionDetails = (aQuestionDetailsProps: IQuestionDetailsProps) =>
         event.preventDefault();
         console.log("Error: ", error);
         if (lError) { return; }
+
+        let lCorrectSum = 0;
+        question.choices.forEach((aChoice: TChoice) => aChoice.correct ? lCorrectSum += 1 : lCorrectSum += 0)
+        const lMutlipleCorrect: boolean = lCorrectSum > 1
+
         const lEditedQuestion: TQuestion =
         {
             id: question.id,
             name: question.name,
             statement: question.statement,
+            correctChoices: lCorrectSum,
             choices: question.choices,
         };
 
@@ -110,7 +112,6 @@ export const QuestionDetails = (aQuestionDetailsProps: IQuestionDetailsProps) =>
             lChoices[choiceIndex] = aChoice;
             setQuestion({ ...question, choices: lChoices});
         }
-
         setSelectedChoice(aChoice);
     }
 

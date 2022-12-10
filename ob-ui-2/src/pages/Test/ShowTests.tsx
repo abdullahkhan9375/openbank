@@ -4,7 +4,7 @@ import { actionButtonClass } from "../../common/buttons/styles";
 import { mainContainerClass } from "../../common";
 import { useSelector, useDispatch } from 'react-redux';
 import { CellContext, createColumnHelper } from "@tanstack/react-table";
-import { BsFillPencilFill, BsFillTrashFill } from "react-icons/bs";
+import { BsFillPencilFill, BsFillTrashFill, BsFillCaretRightFill } from "react-icons/bs";
 import { Table } from "../../common/Table";
 import { TQuestion, TTest, TTestView } from "../../model";
 import { testDeleted } from "../../reducers/test";
@@ -50,6 +50,12 @@ export const ShowTests = () =>
         navigate("new");
     };
 
+    const handleShowExam = (info: CellContext<TTestView, boolean>) =>
+    {
+        const id = info.row.original.id;
+        navigate(`/exam/${id}`);
+    }
+
     const columnHelper = createColumnHelper<TTestView>();
     const columns = useMemo (() =>[
     columnHelper.accessor('name',
@@ -89,6 +95,7 @@ export const ShowTests = () =>
         header: () => "",
         cell: info => <div className="container flex flex-col mx-auto"> {info.getValue()
             ? <div className="container flex flex-row justify-around">
+            <BsFillCaretRightFill className="cursor-pointer" onClick={() => handleShowExam(info)}/>
             <BsFillPencilFill className="cursor-pointer" onClick={() => handleEditTest(info)}/>
             <BsFillTrashFill className="cursor-pointer" onClick={() => handleDeleteTest(info)}/>
             </div>
@@ -100,7 +107,7 @@ export const ShowTests = () =>
 
     return (
         <div className={mainContainerClass}>
-            <h1 className="font-normal"> Your Tests </h1>
+                <h1 className="font-normal"> Your Tests </h1>
                 <div className="container flex flex-row justify-end mt-5 w-[60em]">
                     <button className={`${actionButtonClass} font-bold`} onClick={handleCreateTest}> Create a test </button>
                 </div>

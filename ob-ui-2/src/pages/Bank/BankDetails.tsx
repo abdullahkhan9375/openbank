@@ -45,6 +45,7 @@ const lEmptyQuestion: TQuestion =
     id: uuidv4(),
     name: "",
     statement: "",
+    correctChoices: 4,
     choices: [lEmptyChoice],
 };
 
