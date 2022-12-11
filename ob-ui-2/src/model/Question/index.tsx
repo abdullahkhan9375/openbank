@@ -11,6 +11,7 @@ export type TQuestion =
 
 export type TQuestionError =
 {
+    invalidName: boolean,
     invalidChoices: boolean,
     invalidStatement: boolean,
     invalidQty: boolean,

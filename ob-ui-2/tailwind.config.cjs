@@ -1,4 +1,5 @@
 /** @type {import('tailwindcss').Config} */
+//'#4100FD' purple
 module.exports = {
   content: ["./index.html", "./src/**/*.{html,js,ts,tsx}"],
   theme: {
@@ -7,13 +8,16 @@ module.exports = {
     'gray-light': '#EBEBEB',
     'gray': '#BBBBBB',
     "red": "#E02626",
-    "purple": '#4100FD',
+    "purple": '#4361EE',
+    "purple-light": "#EEE9FE",
+    "purple-dark": "#220085",
     "pink": '#ff49db',
     "orange": '#ff7849',
-    "white": "#F1F1F1",
+    "white": "#FFF",
     "aqua": "#17BEBB",
-    "black": "#190628",
-    'green': '#13ce66',
+    "black": "#343F3E",
+    'green': '#67E11C',
+    'green-dark': '#357310',
     'yellow': '#ffc82c',
     'gray-dark': '#273444',
   },

@@ -3,7 +3,7 @@ import { formDivClass, labelDivClass, labelTextClass, textInputClass } from "../
 import { actioButtonDisabledClass, actionButtonClass } from "../../common/buttons/styles";
 import { TChoice, TQuestion, TQuestionError } from "../../model";
 import { ChoiceDetails } from "./ChoiceDetails";
-import { isEqual } from "lodash";
+import { isEqual, trimEnd } from "lodash";
 
 interface IQuestionDetailsProps
 {
@@ -22,6 +22,7 @@ export const QuestionDetails = (aQuestionDetailsProps: IQuestionDetailsProps) =>
     const [ hasChanged, setHasChanged ] = useState<boolean>(false);
     const [ error, setError ] = useState<TQuestionError>(
         {
+            invalidName: true,
             invalidChoices: false,
             invalidStatement: true,
             invalidQty: false,
@@ -33,6 +34,7 @@ export const QuestionDetails = (aQuestionDetailsProps: IQuestionDetailsProps) =>
                           || error.invalidCorrect
                           || error.invalidQty
                           || error.invalidStatement
+                          || error.invalidName
                           || !hasChanged;
 
     useEffect(() =>
@@ -47,6 +49,7 @@ export const QuestionDetails = (aQuestionDetailsProps: IQuestionDetailsProps) =>
         const lCorrectOptionDoesntExist = question.choices.findIndex((aChoice: TChoice) => aChoice.correct === true) === -1;
 
         setError({
+            invalidName: question.name === "",
             invalidQty: choiceQty === 0,
             invalidCorrect: lCorrectOptionDoesntExist,
             invalidStatement: question.statement === "",
@@ -76,7 +79,6 @@ export const QuestionDetails = (aQuestionDetailsProps: IQuestionDetailsProps) =>
     const handleSubmit = (event: FormEvent) =>
     {
         event.preventDefault();
-        console.log("Error: ", error);
         if (lError) { return; }
 
         let lCorrectSum = 0;
@@ -116,30 +118,36 @@ export const QuestionDetails = (aQuestionDetailsProps: IQuestionDetailsProps) =>
     }
 
     return (
-        <div className="container bg-gray-light flex flex-col mx-auto h-[33em] pt-3 px-[3em] border-2">
+        <div className="container flex flex-col mx-auto h-[33em] pt-3 px-[3em] mt-[10em] border-2">
             <form onSubmit={handleSubmit} action="">
                 <div
                 className="container flex flex-col h-full justify-around">
                     <div className={`${formDivClass} my-5 flex-col`}>
-                        <div className={"container flex flex-row px-2 justify-between w-full"}>
+                        <div className={"container flex flex-row px-2 justify-between w-full items-center"}>
                                 <label className={labelTextClass}> Name </label>
-                                <input type="text"
-                                    className={`${textInputClass} p-0 mt-2`}
-                                    value={question.name}
-                                    onChange={(event) => setQuestion({ ...question, name: event.target.value })}
-                                />
+                                <div className="container flex flex-col justify-center items-end">
+                                    <input type="text"
+                                        className={`${textInputClass} ${error.invalidName ? "border-b-red" : "border-b-green"}`}
+                                        value={question.name}
+                                        onChange={(event) => setQuestion({ ...question, name: event.target.value })}
+                                    />
+                                <p className={`text-red text-sm py-1 ${error.invalidName ? "opacity-1" : "opacity-0"}`}>You haven't entered a name</p>
+                                </div>
                             </div>
-                        <div className={"container flex flex-row px-2 justify-between w-full"}>
-                            <label className={labelTextClass}> Question Statement </label>
-                            <input type="text"
-                                className={`${textInputClass} w-[40em] h-[5em] p-0 mt-2`}
-                                value={question.statement}
-                                onChange={(event) => setQuestion({ ...question, statement: event.target.value })}
-                            />
+                        <div className={"container flex flex-row px-2 justify-between w-full items-center"}>
+                            <label className={`${labelTextClass} w-[15em]`}> Question Statement </label>
+                            <div className="container flex flex-col justify-center items-end">
+                                <input type="text"
+                                    className={`${textInputClass} w-[40em] h-[5em] p-0 mt-2 ${error.invalidStatement ? "border-b-red" : "border-b-green"}`}
+                                    value={question.statement}
+                                    onChange={(event) => setQuestion({ ...question, statement: event.target.value })}
+                                />
+                                <p className={`text-red text-sm py-1 ${error.invalidStatement ? "opacity-1" : "opacity-0"}`}>Every question needs a statement!</p>
+                            </div>
                         </div>
                     </div>
                     <div className={formDivClass}>
-                        <div className={`${textInputClass}container flex flex-col text-center pt-3 w-1/6 h-[197px] bg-white overflow-scroll`}>
+                        <div className={`border-2 border-black container flex flex-col text-center pt-3 w-1/6 h-[197px] bg-white overflow-scroll`}>
                             {
                                 Array(choiceQty).fill(0).map((_, index: number) =>
                                 {
@@ -149,13 +157,10 @@ export const QuestionDetails = (aQuestionDetailsProps: IQuestionDetailsProps) =>
                         </div>
                         <ChoiceDetails selectedChoice={selectedChoice} onSaveChoice={onChoiceSubmit}/>
                     </div>
-                    <div className="container flex flex-row mx-auto mt-4 items-center justify-around w-[20em]">
-                            <button className="border-0 bg-gray-light text-lg" onClick={aQuestionDetailsProps.onCancelSubmit}> Cancel </button>
+                    <div className="container flex flex-row mx-auto mt-4 items-center justify-around w-[25em]">
+                            <button className="border-0 rounded-sm text-lg" onClick={aQuestionDetailsProps.onCancelSubmit}> Cancel </button>
                             <button type="submit"
-                            className={`${lError ? actioButtonDisabledClass : actionButtonClass} w-[10em]`}> Submit </button>
-                    </div>
-                    <div className={`mx-auto text-red mt-2 ${lError ? "opacity-1": "opacity-0"}`}>
-                     {lError && " You haven't saved all choices and/or typed a question statement and/or nominated a correct choice."}
+                            className={`${lError ? actioButtonDisabledClass : actionButtonClass} w-[10em]`}><p className="font-bold text-white text-lg">Submit</p></button>
                     </div>
                 </div>
             </form>

@@ -6,7 +6,7 @@ type THoverOption =
 {
     name: string,
     link: string,
-}
+};
 
 interface IHoverBarProps
 {
@@ -19,9 +19,8 @@ const HoverBar = (aHoverBarProps: IHoverBarProps) =>
     const [ isHovering, setIsHovering ] = useState<boolean>(false);
     return (
         <div onMouseEnter={() => setIsHovering(true)}
-        onMouseLeave={() => setIsHovering(false)} className={`container flex absolute flex-col cursor-pointer top-1 text-black text-xl justify-start items-center ${isHovering ? "h-[5em]" : "h-[2em]"}  hover:bg-gray-light hover:text-black hover:border-2 w-[4em]`}>
-            <div className={`${isHovering ? "text-black" : "text-white"}`} >
-            
+        onMouseLeave={() => setIsHovering(false)} className={`container flex absolute flex-col cursor-pointer top-3 text-black text-xl justify-start items-center ${isHovering ? "h-[5em]" : "h-[2em]"}  hover:bg-purple hover:text-white w-[4em]`}>
+            <div className={`text-white`} >
                 {aHoverBarProps.children}
             </div>
             { isHovering &&
@@ -31,7 +30,7 @@ const HoverBar = (aHoverBarProps: IHoverBarProps) =>
                     {
                         return (
                             <div className="container flex flex-col justify-center">
-                                <Link to={`/${aHoverOption.link}`}> {aHoverOption.name} </Link>
+                                <Link to={`/${aHoverOption.link}`} className="text-gray hover:text-white"> {aHoverOption.name} </Link>
                             </div>
                         )
                     })
@@ -40,12 +39,12 @@ const HoverBar = (aHoverBarProps: IHoverBarProps) =>
             }
         </div>
     )
-}
+};
 
 export const NavPanel = () =>
 {
     return (
-        <div className="p-5">
+        <div className="py-10">
             <HoverBar options={[{ name: "Banks", link: "banks"}, {name: "Tests", link: "tests"}]}>
                 Prep
             </HoverBar>

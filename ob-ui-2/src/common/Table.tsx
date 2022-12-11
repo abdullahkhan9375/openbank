@@ -15,12 +15,12 @@ export const Table = (aTableProps: ITableProps) =>
     });
 
     return (
-        <table className="container mt-5 border-2 w-[60em] bg-gray-light">
+        <table className="container mt-5 border-2">
             <thead className="border-2">
             {table.getHeaderGroups().map(headerGroup => (
                 <tr className="" key={headerGroup.id}>
                 {headerGroup.headers.map((header, index) => (
-                    <th className={`${index % 2 === 0 ? "bg-white" : "bg-gray-light"}`} key={header.id}>
+                    <th className={`bg-purple text-white font-bold`} key={header.id}>
                     {header.isPlaceholder
                         ? null
                         : flexRender(

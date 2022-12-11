@@ -1,6 +1,6 @@
 export { Table } from "./Table";
 export { actionButtonClass, altActionButtonClass, actioButtonDisabledClass } from "./buttons/styles";
-export { SaveItemPanel } from "./Panels/SaveItemPanel";
+export { SaveItemPanel } from "./panels/SaveItemPanel";
 export {
         formBoxClass,
         labelDivClass,

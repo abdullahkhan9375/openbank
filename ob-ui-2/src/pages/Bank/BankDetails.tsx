@@ -27,7 +27,7 @@ const lEmptyBank: TBank =
     name: "",
     isPublic: false,
     tags: [],
-    numChoices: 0,
+    numChoices: 1,
     questions: [],
     createdAt: "",
 };
@@ -56,16 +56,14 @@ export const BankDetails = () =>
 
     const editingBank: TBank = useSelector((state: any) => state.bank.find((aBank: TBank) => aBank.id === id));
 
-    console.log("ID: ", id);
-
     const [ bank, setBank ] = useState<TBank>(editingBank ?? lEmptyBank);
     const [ addingQuestion, setAddingQuestion ] = useState<boolean>(false);
     const [ selectedQuestion, setSelectedQuestion ] = useState<TQuestion>(lEmptyQuestion);
     const [ questions, setQuestions ] = useState<TQuestion[]>(bank.questions);
     const [ error, setError ] = useState<TBankError>({ invalidName: bank.name==="", invalidQuestion: bank.questions.length === 0, emptyChoice: false });
-    const [hasChanged, setHasChanged] = useState<boolean>(false);
+    const [ hasChanged, setHasChanged ] = useState<boolean>(false);
+
     const navigate = useNavigate();
-    const [questionForDeletion, setQuestionForDeletion] = useState<CellContext<TQuestion, string> | undefined>(undefined);
 
     useEffect(() =>
     {
@@ -75,8 +73,6 @@ export const BankDetails = () =>
             invalidQuestion: questions.length === 0,
         });
         setHasChanged(!isEqual(bank, editingBank ?? lEmptyBank));
-        console.log("Errors on Bank Details: ", error);
-        console.log("Has Changed: ", hasChanged);
     }, [questions, bank]);
 
     const validateQuestions = () =>
@@ -94,7 +90,6 @@ export const BankDetails = () =>
 
     useEffect(() =>
     {
-        // console.log("Empty choice: ", error.emptyChoice);
         validateQuestions();
     }, [bank.numChoices, bank.questions]);
 
@@ -188,7 +183,7 @@ export const BankDetails = () =>
         <div className={mainContainerClass}>
             { addingQuestion
                     ? <QuestionDetails numChoices={bank.numChoices} onCancelSubmit={handleCancelSubmit} onSubmit={handleSubmitQuestion} question={selectedQuestion}/>
-                    :  <div className="container flex flex-col w-[61.4em]">
+                    :  <div className="container flex flex-col">
                             <div className={formBoxClass}>
                                 <h3 className={headingTextClass}> {editingBank ? "Edit this question bank" : "Set up a new question bank"}</h3>
                                 <form className="py-2">
@@ -198,11 +193,14 @@ export const BankDetails = () =>
                                                 className={labelTextClass}>
                                                     Name
                                             </label>
+                                            <div className="container flex flex-col justify-center items-end">
                                             <input
                                                 value={bank.name}
                                                 onChange={(event) => { setBank({ ...bank, name: event.target.value })}}
-                                                className={`${textInputClass} w-[30em]`} type={"text"}
+                                                className={`${textInputClass} w-[30em] ${error.invalidName ? "border-b-red" : "border-b-green"}`} type={"text"}
                                             />
+                                            <p className={`text-red text-sm py-1 ${error.invalidName ? "opacity-1" : "opacity-0"}`}>You haven't entered a name</p>
+                                            </div>
                                         </div>
                                         <div className={labelDivClass}>
                                             <label className={labelTextClass}> Visibility </label>
@@ -231,8 +229,9 @@ export const BankDetails = () =>
                                             <input
                                                 value={bank.numChoices}
                                                 type="number"
+                                                min={1}
                                                 onChange={(event) => { setBank({ ...bank, numChoices: Number(event.target.value)})}}
-                                                className={`${textInputClass} w-[5em]`}
+                                                className={`${textInputClass} w-[5em] ${bank.numChoices >= 1 ? "border-b-green" : "border-b-black"}`}
                                             />
                                         </div>
                                         <div className="container mt-2 items-center flex flex-col justify-between">
@@ -242,7 +241,7 @@ export const BankDetails = () =>
                                                     Add a question
                                                 </button>
                                             </div>
-                                            <div className="container flex flex-col h-[20em]">
+                                            <div className="container flex flex-col justify-between h-[20em]">
                                                 {
                                                     questions.length > 0
                                                     ? <Table data={data} columns={columns}/>
@@ -253,7 +252,7 @@ export const BankDetails = () =>
                                             </div>
                                         </div>
                                         <div className="container flex flex-row mx-auto w-full justify-center items-center">
-                                            <SaveItemPanel onSave={handleSaveBank} cancelLink={"/banks"} error={lSaveDisabled}/>
+                                            <SaveItemPanel saveText={"Save"} onSave={handleSaveBank} cancelLink={"/banks"} error={lSaveDisabled}/>
                                         </div>
                                 </form>
                             </div>

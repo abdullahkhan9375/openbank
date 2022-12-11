@@ -93,8 +93,8 @@ export const ShowBanks = () =>
 
     return (
         <div className={`${mainContainerClass}`}>
-                <h1 className="font-normal"> Your Banks </h1>
-                <div className="container flex flex-row justify-end mt-5 w-[60em]">
+                <h1 className="font-bold mt-4"> Your Banks </h1>
+                <div className="container flex flex-row justify-end mt-5">
                     <button className={`${actionButtonClass} font-bold`} onClick={handleCreateBank}> Create a bank </button>
                 </div>
                 {

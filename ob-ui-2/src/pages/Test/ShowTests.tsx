@@ -77,11 +77,11 @@ export const ShowTests = () =>
     }),
     columnHelper.accessor('isPublic', {
         header: () => "Visibility",
-        cell: info => <p> {`${info.getValue() ? "Public" : "Private"}`} </p>,
+        cell: info => <p className="text-center"> {`${info.getValue() ? "Public" : "Private"}`} </p>,
     }),
     columnHelper.accessor('timeLimit', {
         header: () => "Time Limit",
-        cell: info => <p> {`${info.getValue()}`} </p>,
+        cell: info => <p className="text-center"> {`${info.getValue()}`} </p>,
     }),
     columnHelper.accessor('numQuestions', {
         header: () => "Questions",
@@ -107,8 +107,8 @@ export const ShowTests = () =>
 
     return (
         <div className={mainContainerClass}>
-                <h1 className="font-normal"> Your Tests </h1>
-                <div className="container flex flex-row justify-end mt-5 w-[60em]">
+                <h1 className="font-bold mt-4"> Your Tests </h1>
+                <div className="container flex flex-row justify-end mt-5">
                     <button className={`${actionButtonClass} font-bold`} onClick={handleCreateTest}> Create a test </button>
                 </div>
                 {tests.length > 0

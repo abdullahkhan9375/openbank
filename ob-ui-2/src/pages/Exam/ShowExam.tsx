@@ -3,7 +3,8 @@ import { useState } from "react";
 import { useSelector } from "react-redux";
 import { useParams } from "react-router-dom";
 import { v4 as uuidv4 } from "uuid";
-import { mainContainerClass } from "../../common";
+import { mainContainerClass, SaveItemPanel } from "../../common";
+import Timer from "../../common/panels/Timer";
 import { TChoice, TQuestion, TTest } from "../../model";
 
 const alphabet = ["a", "b", "c", "d", "e", "f", "g", "h", "i", "j"];
@@ -131,7 +132,7 @@ export const ShowExam = () =>
             }
             else
             {
-            lSelectedChoices.push(aChoice);
+                lSelectedChoices.push(aChoice);
             }
         }
         else
@@ -169,32 +170,60 @@ export const ShowExam = () =>
         setSelectedChoices(lSelectedChoices);
     };
 
-    console.log(examAttempt);
+    const handleSaveTest = () =>
+    {
+        console.log(examAttempt);
+    }
+
+    const getQuestionStyle = (aQuestion: TQuestion, activeQuestion: boolean) =>
+    {
+        if (activeQuestion)
+        {
+            return "border-l-[0.5em] border-l-orange text-black";
+        }
+        const lQuestionAttempted: number = [...examAttempt.attempt].findIndex((aAttempt: TAttempt) =>
+            aAttempt.questionId === aQuestion.id && (aAttempt.selectedChoices.length !== 0));
+        const lReviewMode = false; // add this later.
+        if (lQuestionAttempted === -1)
+        {
+            return "border-l-[0.7em] border-l-black text-black";
+        }
+        else if (!lReviewMode && lQuestionAttempted !== -1)
+        {   
+            return "border-l-[0.7em] border-l-purple text-black";
+        }
+    }
 
     return (
         <div className={mainContainerClass}>
             <h1> {exam.testConfig.name} </h1>
-            <div className="container flex flex-row justify-start mt-5 w-[60em]">
-                <div className="container flex flex-col justify-start w-[10em] h-[40em] bg-gray-light border-2 border-black">
+            <div className="self-end">
+                <Timer timeInMinutes={exam.testConfig.timeLimit} onTimeUp={(aMinutes: number) => console.log(aMinutes)}/>
+            </div>
+            <div className="container flex flex-row justify-start mt-5">
+                <div className="container flex flex-col justify-start w-1/6 h-[40em] border-r-2 border-black">
                     {exam.testConfig.subscribedQuestions.map((aQuestion: TQuestion, lIndex: number) =>
                     {
-                        return <div onClick={() => handleSelectQuestion(lIndex)} className={`text-center py-2 text-md cursor-pointer
-                        ${lIndex === index ? "bg-orange text-white" : "bg-gray text-black"}`}> Question {lIndex + 1} </div>
+                        return <div onClick={() => handleSelectQuestion(lIndex)}
+                        className={`text-center font-bold py-2 text-md rounded-sm cursor-pointer ${getQuestionStyle(aQuestion, lIndex === index)}`}> Question {lIndex + 1} </div>
                     })}
                 </div>
-                <div className="container flex p-6 flex-col justify-start w-[50em] h-[40em] bg-gray-light">
+                <div className="container flex p-6 flex-col justify-start w-5/6 h-[40em]">
                     <h2 className="font-bold text-2xl text-black">{displayedQuestion.statement}</h2>
                     { displayedQuestion.choices.map((aChoice: TChoice, index: number) =>
                     {
                         return (
                             <div
                                 onClick={() => handleSelectChoice(aChoice, displayedQuestion)}
-                                className={`cursor-pointer ${selectedChoices.find((lChoice: TChoice) => lChoice.id === aChoice.id) !== undefined ? "bg-purple text-white" : "bg-white"}`}>
-                                <p className="text-lg py-2 px-2"> {alphabet[index]}. {aChoice.body} </p>
+                                className={`cursor-pointer mt-3 rounded-sm ${selectedChoices.find((lChoice: TChoice) => lChoice.id === aChoice.id) !== undefined ? "border-2 border-l-[0.7em] border-purple text-black" : ""}`}>
+                                <p className="text-lg py-2 px-3"> {alphabet[index]}. {aChoice.body} </p>
                             </div>
                         );
                     })}
                 </div>
+            </div>
+            <div className="mt-2">
+                <SaveItemPanel saveText="Submit" cancelLink="/tests" onSave={() => {}} error={false}/>
             </div>
         </div>
     );
