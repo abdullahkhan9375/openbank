@@ -87,6 +87,7 @@ export const ShowExam = () =>
     const [ selectedChoices, setSelectedChoices ] = useState<TChoice[]>([]);
     const [ examAttempt,setExamAttempt ] = useState<TExamAttempt>(lExamAttempt);
     const [ index, setIndex ] = useState<number>(0);
+    const [ reviewMode, setReviewMode ] = useState<boolean>(false);
 
     const checkCorrectness = (aChoices: TChoice[], aDisplayedQuestion: TQuestion) =>
     {
@@ -177,22 +178,60 @@ export const ShowExam = () =>
 
     const getQuestionStyle = (aQuestion: TQuestion, activeQuestion: boolean) =>
     {
-        if (activeQuestion)
+        if (activeQuestion && !reviewMode)
         {
             return "border-l-[0.5em] border-l-orange text-black";
         }
-        const lQuestionAttempted: number = [...examAttempt.attempt].findIndex((aAttempt: TAttempt) =>
+        const lExamAttempt = [...examAttempt.attempt];
+        const lQuestionAttemptedIndex: number = lExamAttempt.findIndex((aAttempt: TAttempt) =>
             aAttempt.questionId === aQuestion.id && (aAttempt.selectedChoices.length !== 0));
-        const lReviewMode = false; // add this later.
-        if (lQuestionAttempted === -1)
+        const lActiveChoice = activeQuestion ? "border-l-[0.5em]" : "border-l-[0.7em]";
+        if (!reviewMode)
         {
-            return "border-l-[0.7em] border-l-black text-black";
+            return lQuestionAttemptedIndex === -1
+                ? "border-l-[0.7em] border-l-black text-black"
+                : "border-l-[0.7em] border-l-purple text-black";
         }
-        else if (!lReviewMode && lQuestionAttempted !== -1)
-        {   
-            return "border-l-[0.7em] border-l-purple text-black";
+        else
+        {
+            if (lQuestionAttemptedIndex === -1)
+            {
+                return `${lActiveChoice} border-l-red text-black`;
+            }
+            else if (!lExamAttempt[lQuestionAttemptedIndex].correct)
+            {
+                return `${lActiveChoice} border-l-red text-black`;
+            }
+            else
+            {
+                return `${lActiveChoice} border-l-green text-black`;
+            }
         }
     }
+
+    const getChoiceStyle = (aChoiceId: number, aDisplayedQuestionId: string) =>
+    {
+        const IsSelectedChoice: boolean = selectedChoices.find((lChoice: TChoice) => lChoice.id === aChoiceId) !== undefined;
+        if (reviewMode)
+        {
+            const lAttemptedQuestion = [...examAttempt.attempt].find((aAttempt: TAttempt) => aAttempt.questionId === aDisplayedQuestionId);
+            if (lAttemptedQuestion === undefined)
+            {
+                return "border-2 border-l-[0.7em] text-black border-red";
+            }
+            else if (!lAttemptedQuestion.correct && IsSelectedChoice)
+            {
+                return "border-2 border-l-[0.7em] text-black border-red";
+            } else if (lAttemptedQuestion.correct && IsSelectedChoice)
+            {
+                return "border-2 border-l-[0.7em] text-black border-green";
+            }
+            return "";
+        }
+       return selectedChoices.find((lChoice: TChoice) => lChoice.id === aChoiceId) !== undefined
+            ? "border-2 border-l-[0.7em] border-purple text-black"
+            : "";
+    };
 
     return (
         <div className={mainContainerClass}>
@@ -205,7 +244,7 @@ export const ShowExam = () =>
                     {exam.testConfig.subscribedQuestions.map((aQuestion: TQuestion, lIndex: number) =>
                     {
                         return <div onClick={() => handleSelectQuestion(lIndex)}
-                        className={`text-center font-bold py-2 text-md rounded-sm cursor-pointer ${getQuestionStyle(aQuestion, lIndex === index)}`}> Question {lIndex + 1} </div>
+                        className={`text-center font-bold py-2 text-md cursor-pointer ${getQuestionStyle(aQuestion, lIndex === index)}`}> Question {lIndex + 1} </div>
                     })}
                 </div>
                 <div className="container flex p-6 flex-col justify-start w-5/6 h-[40em]">
@@ -217,8 +256,8 @@ export const ShowExam = () =>
                     {
                         return (
                             <div
-                                onClick={() => handleSelectChoice(aChoice, displayedQuestion)}
-                                className={`cursor-pointer mt-3 rounded-sm ${selectedChoices.find((lChoice: TChoice) => lChoice.id === aChoice.id) !== undefined ? "border-2 border-l-[0.7em] border-purple text-black" : ""}`}>
+                                onClick={() => reviewMode ? {} : handleSelectChoice(aChoice, displayedQuestion)}
+                                className={`cursor-pointer mt-3 rounded-sm ${getChoiceStyle(aChoice.id, displayedQuestion.id)}`}>
                                 <p className="text-lg py-2 px-3"> {alphabet[index]}. {aChoice.body} </p>
                             </div>
                         );
@@ -226,7 +265,7 @@ export const ShowExam = () =>
                 </div>
             </div>
             <div className="mt-2">
-                <SaveItemPanel saveText="Submit" cancelLink="/tests" onSave={() => {}} error={false}/>
+                <SaveItemPanel saveText="Submit" cancelLink="/tests" onSave={() =>(setReviewMode(true))} error={false}/>
             </div>
         </div>
     );

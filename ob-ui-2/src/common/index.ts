@@ -8,5 +8,7 @@ export {
         headingTextClass,
         textInputClass,
         mainContainerClass,
-        formDivClass
+        formDivClass,
+        flexColClass,
+        flexRowClass,
     } from "./CommonStyling";

@@ -1,5 +1,5 @@
 import { FormEvent, useEffect, useState } from "react";
-import { formDivClass, labelDivClass, labelTextClass, textInputClass } from "../../common/CommonStyling";
+import { flexColClass, flexRowClass, formDivClass, labelDivClass, labelTextClass, textInputClass } from "../../common/CommonStyling";
 import { actioButtonDisabledClass, actionButtonClass } from "../../common/buttons/styles";
 import { TChoice, TQuestion, TQuestionError } from "../../model";
 import { ChoiceDetails } from "./ChoiceDetails";
@@ -118,14 +118,14 @@ export const QuestionDetails = (aQuestionDetailsProps: IQuestionDetailsProps) =>
     }
 
     return (
-        <div className="container flex flex-col mx-auto h-[33em] pt-3 px-[3em] mt-[10em] border-2">
+        <div className={`${flexColClass} mx-auto h-[33em] pt-3 px-[3em] mt-[10em] border-2`}>
             <form onSubmit={handleSubmit} action="">
                 <div
-                className="container flex flex-col h-full justify-around">
+                className={`${flexColClass} h-full justify-around`}>
                     <div className={`${formDivClass} my-5 flex-col`}>
-                        <div className={"container flex flex-row px-2 justify-between w-full items-center"}>
+                        <div className={`${flexRowClass} px-2 justify-between w-full items-center`}>
                                 <label className={labelTextClass}> Name </label>
-                                <div className="container flex flex-col justify-center items-end">
+                                <div className={`${flexColClass} justify-center items-end`}>
                                     <input type="text"
                                         className={`${textInputClass} ${error.invalidName ? "border-b-red" : "border-b-green"}`}
                                         value={question.name}
@@ -134,9 +134,9 @@ export const QuestionDetails = (aQuestionDetailsProps: IQuestionDetailsProps) =>
                                 <p className={`text-red text-sm py-1 ${error.invalidName ? "opacity-1" : "opacity-0"}`}>You haven't entered a name</p>
                                 </div>
                             </div>
-                        <div className={"container flex flex-row px-2 justify-between w-full items-center"}>
+                        <div className={`${flexRowClass} justify-between items-center px-2 w-full`}>
                             <label className={`${labelTextClass} w-[15em]`}> Question Statement </label>
-                            <div className="container flex flex-col justify-center items-end">
+                            <div className={`${flexColClass} justify-center items-end`}>
                                 <input type="text"
                                     className={`${textInputClass} w-[40em] h-[5em] p-0 mt-2 ${error.invalidStatement ? "border-b-red" : "border-b-green"}`}
                                     value={question.statement}
@@ -147,7 +147,7 @@ export const QuestionDetails = (aQuestionDetailsProps: IQuestionDetailsProps) =>
                         </div>
                     </div>
                     <div className={formDivClass}>
-                        <div className={`border-2 border-black container flex flex-col text-center pt-3 w-1/6 h-[197px] bg-white overflow-scroll`}>
+                        <div className={`${flexColClass} border-2 border-black text-center pt-3 w-1/6 h-[197px] bg-white overflow-scroll`}>
                             {
                                 Array(choiceQty).fill(0).map((_, index: number) =>
                                 {
@@ -157,7 +157,7 @@ export const QuestionDetails = (aQuestionDetailsProps: IQuestionDetailsProps) =>
                         </div>
                         <ChoiceDetails selectedChoice={selectedChoice} onSaveChoice={onChoiceSubmit}/>
                     </div>
-                    <div className="container flex flex-row mx-auto mt-4 items-center justify-around w-[25em]">
+                    <div className={`${flexRowClass} items-center justify-around mx-auto mt-4 w-[25em]"`}>
                             <button className="border-0 rounded-sm text-lg" onClick={aQuestionDetailsProps.onCancelSubmit}> Cancel </button>
                             <button type="submit"
                             className={`${lError ? actioButtonDisabledClass : actionButtonClass} w-[10em]`}><p className="font-bold text-white text-lg">Submit</p></button>

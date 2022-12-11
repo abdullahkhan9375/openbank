@@ -8,7 +8,7 @@ import
     getCoreRowModel,
     useReactTable,
 } from '@tanstack/react-table';
-import { actionButtonClass, mainContainerClass } from "../../common";
+import { actionButtonClass, flexColClass, flexRowClass, mainContainerClass } from "../../common";
 import { BankDetails } from "./BankDetails";
 import { useSelector, useDispatch } from 'react-redux'
 import { bankAdded, bankDeleted } from "../../reducers/bank";
@@ -80,8 +80,8 @@ export const ShowBanks = () =>
     }),
     columnHelper.accessor("id",{
         header: () => "",
-        cell: info => <div className="container flex flex-col mx-auto"> {info.renderValue()
-            ? <div className="container flex flex-row justify-around">
+        cell: info => <div className={`${flexColClass} mx-auto`}> {info.renderValue()
+            ? <div className={`${flexRowClass} justify-around`}>
             <BsFillPencilFill className="cursor-pointer" onClick={() => handleBankEdit(info)}/>
             <BsFillTrashFill className="cursor-pointer" onClick={() => handleDeleteBank(info)}/>
             </div>
@@ -94,7 +94,7 @@ export const ShowBanks = () =>
     return (
         <div className={`${mainContainerClass}`}>
                 <h1 className="font-bold mt-4"> Your Banks </h1>
-                <div className="container flex flex-row justify-end mt-5">
+                <div className={`${flexRowClass} justify-end mt-5`}>
                     <button className={`${actionButtonClass} font-bold`} onClick={handleCreateBank}> Create a bank </button>
                 </div>
                 {

@@ -8,3 +8,7 @@ export const mainContainerClass = "container mx-auto flex flex-col items-center 
 
 // Form Styles
 export const formDivClass = "container flex w-6/6 flex-row px-2";
+
+// Layout styles
+export const flexColClass = "container flex flex-col";
+export const flexRowClass = "container flex flex-row";

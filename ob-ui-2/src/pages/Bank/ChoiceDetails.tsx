@@ -1,6 +1,6 @@
 import { isEqual } from "lodash";
 import { FormEvent, useEffect, useState } from "react";
-import { actioButtonDisabledClass, actionButtonClass } from "../../common";
+import { actioButtonDisabledClass, actionButtonClass, flexColClass, flexRowClass } from "../../common";
 import { labelTextClass, textInputClass } from "../../common";
 import { TChoice } from "../../model";
 
@@ -41,8 +41,8 @@ export const ChoiceDetails = (aChoiceProps: IChoiceProps) =>
                     <div className="">
                         <label className={labelTextClass}> Choice #{choice.id} </label>
                     </div>
-                    <div className="mb-1 container flex flex-col justify-center items-start">
-                        <div className="container flex flex-row justify-between">
+                    <div className={`${flexColClass} justify-center mb-1 items-start`}>
+                        <div className={`${flexRowClass} justify-between"`}>
                             <input type="text" className={`${textInputClass} w-4/5 ${error ? "border-b-red" : "border-b-green"}`} value={choice.body} onChange={(event) => {setChoice({...choice, body: event.target.value })}
                             }/>
                             <div>
@@ -56,7 +56,7 @@ export const ChoiceDetails = (aChoiceProps: IChoiceProps) =>
                     <div className="">
                         <label className={labelTextClass}> Explanation </label>
                     </div>
-                    <div className="container flex flex-row">
+                    <div className={flexRowClass}>
                         <input className={`border-b-2 px-3 focus:outline-none w-full h-[80px]`} value={choice.explanation} onChange={(event) => {setChoice({...choice, explanation: event.target.value })}} type="text"/>
                         <button type="button" className={`h-[3em] self-end ${lSaveDisabled ? actioButtonDisabledClass : actionButtonClass} ml-2`} onClick={handleSubmit}><p className="text-lg font-bold"> save </p></button>
                     </div>

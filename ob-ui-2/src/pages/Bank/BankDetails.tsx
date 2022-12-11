@@ -1,5 +1,7 @@
 import { useCallback, useEffect, useMemo, useState } from "react";
 import {
+    flexColClass,
+        flexRowClass,
         formBoxClass,
         headingTextClass,
         labelDivClass,
@@ -178,22 +180,21 @@ export const BankDetails = () =>
     const data = useMemo(() => questions, [questions]);
     const lSaveDisabled = (error.invalidName || error.invalidQuestion || error.emptyChoice) || !hasChanged;
     console.log("Save disabled: ", lSaveDisabled);
-
     return (
         <div className={mainContainerClass}>
             { addingQuestion
                     ? <QuestionDetails numChoices={bank.numChoices} onCancelSubmit={handleCancelSubmit} onSubmit={handleSubmitQuestion} question={selectedQuestion}/>
-                    :  <div className="container flex flex-col">
+                    :  <div className={flexColClass}>
                             <div className={formBoxClass}>
                                 <h3 className={headingTextClass}> {editingBank ? "Edit this question bank" : "Set up a new question bank"}</h3>
                                 <form className="py-2">
-                                    <div className="container flex flex-col">
+                                    <div className={flexColClass}>
                                         <div className={labelDivClass}>
                                             <label
                                                 className={labelTextClass}>
                                                     Name
                                             </label>
-                                            <div className="container flex flex-col justify-center items-end">
+                                            <div className={`${flexColClass} justify-center items-end`}>
                                             <input
                                                 value={bank.name}
                                                 onChange={(event) => { setBank({ ...bank, name: event.target.value })}}
@@ -234,14 +235,14 @@ export const BankDetails = () =>
                                                 className={`${textInputClass} w-[5em] ${bank.numChoices >= 1 ? "border-b-green" : "border-b-black"}`}
                                             />
                                         </div>
-                                        <div className="container mt-2 items-center flex flex-col justify-between">
-                                            <div className="container flex flex-row items-center justify-between">
+                                        <div className={`${flexColClass} justify-between items-center mt-2`}>
+                                            <div className={`${flexRowClass} items-center justify-between`}>
                                                 <h3 className={headingTextClass}> Your questions </h3>
                                                 <button className={`${actionButtonClass} mr-2 text-lg font-bold w-[10em]`} onClick={() => setAddingQuestion(true)}>
                                                     Add a question
                                                 </button>
                                             </div>
-                                            <div className="container flex flex-col justify-between h-[20em]">
+                                            <div className={`${flexColClass} justify-between h-[20em]`}>
                                                 {
                                                     questions.length > 0
                                                     ? <Table data={data} columns={columns}/>
@@ -251,7 +252,7 @@ export const BankDetails = () =>
                                                 }
                                             </div>
                                         </div>
-                                        <div className="container flex flex-row mx-auto w-full justify-center items-center">
+                                        <div className={`${flexRowClass} mx-auto w-full justify-center items-center`}>
                                             <SaveItemPanel saveText={"Save"} onSave={handleSaveBank} cancelLink={"/banks"} error={lSaveDisabled}/>
                                         </div>
                                 </form>
