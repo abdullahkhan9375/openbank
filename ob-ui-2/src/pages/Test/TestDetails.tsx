@@ -7,7 +7,7 @@ import {
         mainContainerClass,
         textInputClass
     } from "../../common";
-import { TQuestion, TTest } from "../../model";
+import { TBank, TQuestion, TTest } from "../../model";
 import TagsInput from "react-tagsinput";
 import { QuestionSubscription } from "./QuestionSubscription";
 import { Link, Navigate, useNavigate, useParams } from "react-router-dom";
@@ -64,21 +64,27 @@ export const TestDetails = () =>
         console.log(error);
     }, [test, subscribedQuestions])
 
-    const handleSubscribeQuestion = (event: any, aQuestion: TQuestion) =>
+    const handleSubscribeQuestion = (event: any, aQuestion: TQuestion, aSelectedBank: TBank) =>
     {
+        console.log(event);
         let lSubbedQuestions = [...subscribedQuestions];
-        if (event.target.checked)
+        const lQuestionIndex = lSubbedQuestions.findIndex((lQuestion: TQuestion) => lQuestion.id === aQuestion.id);
+        if (event.detail === 2)
         {
-            const lQuestionIndex = lSubbedQuestions.findIndex((lQuestion: TQuestion) => lQuestion.id === aQuestion.id);
+            setSubscribedQuestions([...new Set([...subscribedQuestions, ...aSelectedBank.questions])]);
+            return;
+        }
+        else
+        {
             if (lQuestionIndex === -1)
             {
                 setSubscribedQuestions([...subscribedQuestions, aQuestion]);
             }
-        }
-        else
-        {
-            lSubbedQuestions = lSubbedQuestions.filter((lQuestion: TQuestion) => lQuestion.id !== aQuestion.id);
-            setSubscribedQuestions(lSubbedQuestions);
+            else
+            {
+                lSubbedQuestions = lSubbedQuestions.filter((lQuestion: TQuestion) => lQuestion.id !== aQuestion.id);
+                setSubscribedQuestions(lSubbedQuestions);
+            }
         }
     };
 

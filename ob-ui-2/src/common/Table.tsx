@@ -20,7 +20,7 @@ export const Table = (aTableProps: ITableProps) =>
             {table.getHeaderGroups().map(headerGroup => (
                 <tr className="" key={headerGroup.id}>
                 {headerGroup.headers.map((header, index) => (
-                    <th className={`bg-purple text-white font-bold`} key={header.id}>
+                    <th className={`bg-purple text-white font-bold text-lg py-1`} key={header.id}>
                     {header.isPlaceholder
                         ? null
                         : flexRender(
@@ -36,7 +36,7 @@ export const Table = (aTableProps: ITableProps) =>
                 {table.getRowModel().rows.map(row => (
                     <tr key={row.id}>
                     {row.getVisibleCells().map((cell, index) => (
-                        <td className={`${index % 2 === 0 ? "bg-white" : "bg-gray-light"}`} key={cell.id}>
+                        <td className={` text-lg py-1 ${index % 2 === 0 ? "bg-white" : "bg-gray-light"}`} key={cell.id}>
                         {flexRender(cell.column.columnDef.cell, cell.getContext())}
                         </td>
                     ))}

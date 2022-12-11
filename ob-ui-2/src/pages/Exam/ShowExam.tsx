@@ -209,7 +209,10 @@ export const ShowExam = () =>
                     })}
                 </div>
                 <div className="container flex p-6 flex-col justify-start w-5/6 h-[40em]">
-                    <h2 className="font-bold text-2xl text-black">{displayedQuestion.statement}</h2>
+                    <div className="flex flex-row justify-between items-center">
+                        <h2 className="font-bold text-2xl text-black">{displayedQuestion.statement}</h2>
+                        <p> Choose ({selectedChoices.length}/{displayedQuestion.correctChoices})</p>
+                    </div>
                     { displayedQuestion.choices.map((aChoice: TChoice, index: number) =>
                     {
                         return (

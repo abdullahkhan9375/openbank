@@ -19,7 +19,7 @@ const lEmptyChoice: TChoice =
 interface IQuestionSubscriptionProps
 {
     subscribedQuestions: TQuestion[],
-    onSubscribeQuestion: (event: any, aQuestion: TQuestion) => void;
+    onSubscribeQuestion: (event: any, aQuestion: TQuestion, aSelectedBank: TBank) => void;
     onDeleteQuestion: (id: string) => void;
     error: boolean;
 }
@@ -33,8 +33,7 @@ export const QuestionSubscription = (aSubProps: IQuestionSubscriptionProps) =>
    
     const checkQuestionExists = (id: string) =>
     {
-        const lFindQuestion = aSubProps.subscribedQuestions.findIndex((aQuestion: any) => aQuestion.id === id);
-        return lFindQuestion !== -1
+        return aSubProps.subscribedQuestions.findIndex((lQuestion: TQuestion) => lQuestion.id === id) !== -1
     };
 
     return (
@@ -57,14 +56,13 @@ export const QuestionSubscription = (aSubProps: IQuestionSubscriptionProps) =>
                 <div className={lSubscriptionBoxClass}>
                     {selectedBank?.questions.map((aQuestion: TQuestion) =>
                     {
+                        const lIsSubscribed = checkQuestionExists(aQuestion.id);
                         return (
-                            <div className="container flex flex-row w-1/3 justify-between mx-auto items-center">
-                                <p className={"text-md py-1"} onClick={() => {}}> {aQuestion.name}</p>
-                                <input
-                                    type="checkbox"
-                                    className="bg-gray-light"
-                                    checked={aSubProps.subscribedQuestions.findIndex((lQuestion: TQuestion) => lQuestion.id === aQuestion.id) !== -1}
-                                    onChange={(event) => aSubProps.onSubscribeQuestion(event, aQuestion)}/>
+                            <div
+                                onClick={(event) => aSubProps.onSubscribeQuestion(event, aQuestion, selectedBank)}
+                                className={`container flex flex-row mx-auto justify-center
+                                    ${lIsSubscribed ? "bg-purple text-white": "bg-gray-light"}`}>
+                                <p className={"text-lg py-1"} onClick={() => {}}> {aQuestion.name}</p>
                             </div>
                         );
                     })}

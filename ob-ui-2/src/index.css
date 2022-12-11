@@ -74,8 +74,8 @@ button:focus-visible {
 }
 
 .react-tagsinput {
-background-color: #EBEBEB;
 border: 2px solid #190628;
+background-color: #FFF;
 overflow: hidden;
 padding-left: 5px;
 padding-top: 5px;
@@ -105,14 +105,15 @@ font-weight: bold;
 }
 
 .react-tagsinput-tag a::before {
-content: " ×";
+content: "  ×";
 color: #F1F1F1;
 }
 
 .react-tagsinput-input {
 background: transparent;
 border: 0;
-color: #777;
+color: #000;
+background-color: #FFF;
 font-family: Helvetica, Avenir, Arial, sans-serif;
 font-size: 15px;
 font-weight: 400;
