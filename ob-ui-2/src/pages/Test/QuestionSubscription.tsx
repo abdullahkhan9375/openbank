@@ -27,7 +27,7 @@ interface IQuestionSubscriptionProps
 export const QuestionSubscription = (aSubProps: IQuestionSubscriptionProps) =>
 {
     const lSubscribedBanks: TBank[] = useSelector((state: any) => state.bank);
-    console.log("Subscribed banks: ", lSubscribedBanks);
+    // console.log("Subscribed banks: ", lSubscribedBanks);
 
     const [selectedBank, setSelectedBank] = useState<TBank | undefined>(undefined);
    

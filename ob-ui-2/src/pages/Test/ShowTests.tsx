@@ -6,13 +6,17 @@ import { useSelector, useDispatch } from 'react-redux';
 import { CellContext, createColumnHelper } from "@tanstack/react-table";
 import { BsFillPencilFill, BsFillTrashFill, BsFillCaretRightFill } from "react-icons/bs";
 import { Table } from "../../common/Table";
-import { TQuestion, TTest, TTestView } from "../../model";
+import { TExamAttempt, TQuestion, TTest, TTestView } from "../../model";
 import { testDeleted } from "../../reducers/test";
 // TODO: publish/subscribe system.
 
 export const ShowTests = () =>
 {
     const tests: TTest[] = useSelector((state: any) => state.test);
+    const results: any = useSelector((state: any) => state.result);
+
+    console.log("Results: ", results);
+
     const navigate = useNavigate();
     const dispatch = useDispatch();
 

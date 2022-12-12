@@ -53,7 +53,7 @@ export const TestDetails = () =>
 
     useEffect(() =>
     {
-        console.log(subscribedQuestions);
+        // console.log(subscribedQuestions);
         setError({
         invalidName: test.name === "",
         invalidTimeLimit: test.timeLimit > 360 || test.timeLimit <= 0,
@@ -61,12 +61,12 @@ export const TestDetails = () =>
         invalidPassingScore: test.passingScore <= 0,
         });
         setHasChanged(!isEqual(test, editingTest ?? lEmptyTest));
-        console.log(error);
+        // console.log(error);
     }, [test, subscribedQuestions])
 
     const handleSubscribeQuestion = (event: any, aQuestion: TQuestion, aSelectedBank: TBank) =>
     {
-        console.log(event);
+        // console.log(event);
         let lSubbedQuestions = [...subscribedQuestions];
         const lQuestionIndex = lSubbedQuestions.findIndex((lQuestion: TQuestion) => lQuestion.id === aQuestion.id);
         if (event.detail === 2)
@@ -90,7 +90,7 @@ export const TestDetails = () =>
 
     const handleSaveTest = () =>
     {
-        console.log("Saved Test: ", test);
+        // console.log("Saved Test: ", test);
 
         const lTest: TTest =
         {

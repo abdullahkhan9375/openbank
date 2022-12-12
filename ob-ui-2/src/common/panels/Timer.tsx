@@ -1,40 +1,62 @@
 import React from 'react';
 import { useState, useEffect } from 'react';
+import { TTime } from '../../pages/Exam/ShowExam';
 
 interface ITimerProps
 {
-    timeInMinutes: number;
-    onTimeUp: ((aMinute: number) => void);
+  time: TTime;
+  onTimeChange: (aTime: TTime) => void;
+  pauseTime: boolean;
 }
 
-export const Timer = (aTimerProps: ITimerProps) => {
-  const [ minutes, setMinutes ] = useState<number>(aTimerProps.timeInMinutes);
-  const [ seconds, setSeconds ] = useState<number>(0);
+export const Timer = (aTimerProps: ITimerProps) =>
+{
+  const lTime = aTimerProps.time;
+  const onTimeChange = aTimerProps.onTimeChange;
+
   const [ timeUp, setTimeUp ] = useState<boolean>(false);
 
-  const lNow: number = Date.now();
-  const deadline = lNow + aTimerProps.timeInMinutes * 60 * 1000;
+  const lNowInSeconds: number = Math.floor(Date.now()/1000);
+  const lDeadline = lNowInSeconds + (lTime.minutes * 60);
 
   const getTime = () => {
-    const time: number = deadline - Date.now();
-    setMinutes(Math.floor((time / 1000 / 60) % 60));
-    setSeconds(Math.floor((time / 1000) % 60));
+    if (timeUp)
+    {
+      return;
+    }
+    const time: number = lDeadline - Math.floor(Date.now()/1000);
+    // console.log("Time: ", time);
+    onTimeChange({
+      minutes: Math.floor((time / 60) % 60),
+      seconds: Math.floor(time % 60)
+    });
   };
 
   useEffect(() => {
-    const interval = setInterval(() => getTime(), 1000);
-    setTimeUp(seconds <= 0 && minutes <= 0);
-    return () => clearInterval(interval);
-  }, []);
+    if (!aTimerProps.pauseTime)
+    {
+      const interval = setInterval(() => getTime(), 1000);
+      return () => clearInterval(interval);
+    }
+  }, [aTimerProps.pauseTime]);
 
-  useEffect(() =>
+  if (aTimerProps.pauseTime)
   {
-    if (timeUp) aTimerProps.onTimeUp(minutes + Math.floor((seconds / 60)))
-  }, [timeUp]);
-
+    return (
+      <p className={`text-lg border-gray rounded-sm border-r-4 px-3 py-2 font-bold`}>
+        Remaining time: {lTime.minutes}:{lTime.seconds} </p>
+    )
+  }
+  else
+  {
+    // console.log(lTime);
   return (
-    <p className={`text-lg border-gray rounded-sm border-r-4 px-3 py-2 font-bold ${minutes < 1 ? " border-red text-red" : " border-black text-black "}`}> {!(seconds <= 0 && minutes <= 0) ? `Remaining time ${minutes}:${seconds}` : "Time Over"}</p>
+    <p className={`text-lg border-gray rounded-sm border-r-4 px-3 py-2 font-bold
+    ${lTime.minutes < 1 ? " border-red text-red" : " border-black text-black "}`}>
+      {(lTime.seconds > 0 && lTime.minutes > 0) ? `Remaining time
+      ${lTime.minutes}:${lTime.seconds}` : "Time Over"}</p>
   );
+  }
 };
 
 export default Timer;
