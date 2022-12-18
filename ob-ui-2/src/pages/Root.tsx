@@ -5,7 +5,7 @@ export const Root = () =>
 {
     return (
         <div className="w-screen mx-auto h-screen">
-            <div id="panel" className="container bg-purple flex flex-col rounded-sm border-b-2 items-start justify-center w-[70em] h-[5vh] mx-auto">
+            <div id="panel" className="container bg-purple flex flex-col rounded-sm items-start justify-center w-[70em] h-[5vh] mx-auto">
                 <NavPanel/>
             </div>
             <Outlet/>

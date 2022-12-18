@@ -14,7 +14,7 @@ export const ChoiceDetails = (aChoiceProps: IChoiceProps) =>
 {
     const [ choice, setChoice ] = useState<TChoice>(aChoiceProps.selectedChoice);
     const [ error, setError ] = useState<boolean>(aChoiceProps.selectedChoice.body === "");
-    const [hasChanged, setHasChanged] = useState<boolean>(false);
+    const [ hasChanged, setHasChanged ] = useState<boolean>(false);
 
     const handleSubmit = (event: FormEvent) =>
     {
@@ -24,14 +24,14 @@ export const ChoiceDetails = (aChoiceProps: IChoiceProps) =>
 
     useEffect(() =>
     {
-       setError(aChoiceProps.selectedChoice.body === "");
-       setHasChanged(!isEqual(aChoiceProps.selectedChoice, choice));
-    }, [aChoiceProps, choice]);
+       setChoice(aChoiceProps.selectedChoice)
+    }, [aChoiceProps]);
 
     useEffect(() =>
     {
-        setError(choice.body === "" || choice.body === aChoiceProps.selectedChoice.body);
-    }, [choice]);
+        setHasChanged(!isEqual(aChoiceProps.selectedChoice, choice));
+        setError(choice.body === "");
+    }, [choice, aChoiceProps]);
 
     const lSaveDisabled: boolean = error || !hasChanged;
 

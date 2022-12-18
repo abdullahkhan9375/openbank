@@ -37,7 +37,7 @@ export const QuestionSubscription = (aSubProps: IQuestionSubscriptionProps) =>
     };
 
     return (
-        <div className={`container flex flex-row mx-auto w-[${lSubscriptionWidth}em] justify-around`}>
+        <div className={`container flex flex-row mt-10 mx-auto w-[${lSubscriptionWidth}em] justify-around`}>
             <div className="container flex flex-col items-center">
                 <h3 className={`${labelTextClass} text-center`}> Subscribed Banks </h3>
                 <div className={lSubscriptionBoxClass}>
@@ -69,7 +69,7 @@ export const QuestionSubscription = (aSubProps: IQuestionSubscriptionProps) =>
                 </div>
             </div>
             <div className={`container flex flex-col items-center`}>
-                <h3 className={`${labelTextClass} text-center` }> Subscribed Questions </h3>
+                <h3 className={`${labelTextClass} text-center w-[15em]` }> Subscribed Questions </h3>
                 <div className={`${lSubscriptionBoxClass}`}>
                     { aSubProps.subscribedQuestions.map((aQuestion: TQuestion) =>
                     {

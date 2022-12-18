@@ -2,7 +2,7 @@ import { createSlice } from '@reduxjs/toolkit'
 import { isEmpty, isEqual } from 'lodash';
 import { TExamAttempt, TTest } from '../model';
 
-type TExamAttemptState = { testId: string, attempts: TExamAttempt[]};
+export type TExamAttemptState = { testId: string, attempts: TExamAttempt[]};
 
 export const resultSlice = createSlice({
   name: 'result',

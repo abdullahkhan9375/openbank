@@ -74,6 +74,7 @@ export const QuestionDetails = (aQuestionDetailsProps: IQuestionDetailsProps) =>
         {
             setSelectedChoice({...question.choices[lIndex]})
         }
+        console.log("Selected choice: ", selectedChoice);
     };
 
     const handleSubmit = (event: FormEvent) =>
@@ -123,22 +124,22 @@ export const QuestionDetails = (aQuestionDetailsProps: IQuestionDetailsProps) =>
                 <div
                 className={`${flexColClass} h-full justify-around`}>
                     <div className={`${formDivClass} my-5 flex-col`}>
-                        <div className={`${flexRowClass} px-2 justify-between w-full items-center`}>
+                        <div className={`${flexColClass} px-2 justify-between`}>
                                 <label className={labelTextClass}> Name </label>
-                                <div className={`${flexColClass} justify-center items-end`}>
+                                <div className={`${flexColClass} justify-center`}>
                                     <input type="text"
-                                        className={`${textInputClass} ${error.invalidName ? "border-b-red" : "border-b-green"}`}
+                                        className={`${textInputClass} w-[15em] ${error.invalidName ? "border-b-red" : "border-b-green"}`}
                                         value={question.name}
                                         onChange={(event) => setQuestion({ ...question, name: event.target.value })}
                                     />
                                 <p className={`text-red text-sm py-1 ${error.invalidName ? "opacity-1" : "opacity-0"}`}>You haven't entered a name</p>
                                 </div>
                             </div>
-                        <div className={`${flexRowClass} justify-between items-center px-2 w-full`}>
+                        <div className={`${flexColClass} justify-between px-2 w-full`}>
                             <label className={`${labelTextClass} w-[15em]`}> Question Statement </label>
-                            <div className={`${flexColClass} justify-center items-end`}>
+                            <div className={`${flexColClass} justify-center`}>
                                 <input type="text"
-                                    className={`${textInputClass} w-[40em] h-[5em] p-0 mt-2 ${error.invalidStatement ? "border-b-red" : "border-b-green"}`}
+                                    className={`${textInputClass} w-[40em] p-0 mt-2 ${error.invalidStatement ? "border-b-red" : "border-b-green"}`}
                                     value={question.statement}
                                     onChange={(event) => setQuestion({ ...question, statement: event.target.value })}
                                 />
@@ -151,14 +152,14 @@ export const QuestionDetails = (aQuestionDetailsProps: IQuestionDetailsProps) =>
                             {
                                 Array(choiceQty).fill(0).map((_, index: number) =>
                                 {
-                                    return <a onClick={() => handleSelectedChoice(index)}> Choice #{index} </a>
+                                    return <div onClick={() => handleSelectedChoice(index)}><p> Choice #{index} </p></div>
                                 })
                             }
                         </div>
                         <ChoiceDetails selectedChoice={selectedChoice} onSaveChoice={onChoiceSubmit}/>
                     </div>
-                    <div className={`${flexRowClass} items-center justify-around mx-auto mt-4 w-[25em]"`}>
-                            <button className="border-0 rounded-sm text-lg" onClick={aQuestionDetailsProps.onCancelSubmit}> Cancel </button>
+                    <div className={`${flexRowClass} items-center h-20 w-[65em] justify-center`}>
+                            <button className="border-0 mr-4 rounded-sm text-lg" onClick={aQuestionDetailsProps.onCancelSubmit}> Cancel </button>
                             <button type="submit"
                             className={`${lError ? actioButtonDisabledClass : actionButtonClass} w-[10em]`}><p className="font-bold text-white text-lg">Submit</p></button>
                     </div>

@@ -5,8 +5,8 @@ import { useNavigate, useParams } from "react-router-dom";
 import { v4 as uuidv4 } from "uuid";
 import { mainContainerClass, SaveItemPanel } from "../../common";
 import Timer from "../../common/panels/Timer";
-import { TAttempt, TChoice, TExam, TExamAttempt, TQuestion, TResult, TTest } from "../../model";
-import { resultAdded } from "../../reducers/result";
+import { TQuestionAttempt, TChoice, TExam, TExamAttempt, TQuestion, TResult, TTest } from "../../model";
+import { resultAdded, TExamAttemptState } from "../../reducers/result";
 
 const alphabet = ["a", "b", "c", "d", "e", "f", "g", "h", "i", "j"];
 
@@ -44,7 +44,7 @@ const lResult: TResult =
     timeTaken: -1,
 };
 
-const lExamAttempt: TExamAttempt =
+const lEmptyExamAttempt: TExamAttempt =
 {
     id: uuidv4(),
     testId: lNewExam.testConfig.id,
@@ -62,16 +62,22 @@ export type TTime =
 
 export const ShowExam = () =>
 {
-    const { id } = useParams();
+    const { id, type } = useParams();
+    console.log("Type: ", type);
+    const lIsReviewMode = type === "reviewMode";
 
     const lTest: TTest = useSelector((state: any) => state.test.find((aTest: TTest) => aTest.id === id));
+    const lResults: TExamAttemptState = useSelector((state: any) => state.result.find((aExamAttempt: TExamAttemptState) => aExamAttempt.testId === lTest.id));
+    const lExamAttempt: TExamAttempt = lIsReviewMode ? lResults.attempts[lResults.attempts.length - 1] : lEmptyExamAttempt;
+    const lMostRecentAttempt: TQuestionAttempt = lExamAttempt.attempt[lExamAttempt.attempt.length - 1];
 
     const [ exam, setExam ] = useState<TExam>({...lNewExam, testConfig: lTest });
-    const [ displayedQuestion, setDisplayedQuestion ] = useState<TQuestion>(exam.testConfig.subscribedQuestions[0]);
-    const [ selectedChoices, setSelectedChoices ] = useState<TChoice[]>([]);
-    const [ examAttempt,setExamAttempt ] = useState<TExamAttempt>(lExamAttempt);
+    const [ displayedQuestion, setDisplayedQuestion ] = useState<TQuestion>(lIsReviewMode ? lMostRecentAttempt.question : exam.testConfig.subscribedQuestions[0]);
+    const [ selectedChoices, setSelectedChoices ] = useState<TChoice[]>(lIsReviewMode ? lMostRecentAttempt.selectedChoices
+            : []);
+    const [ examAttempt, setExamAttempt ] = useState<TExamAttempt>(lExamAttempt);
     const [ index, setIndex ] = useState<number>(0);
-    const [ reviewMode, setReviewMode ] = useState<boolean>(false);
+    const [ reviewMode, setReviewMode ] = useState<boolean>(lIsReviewMode);
     const [ time, setTime ] = useState<TTime>({ minutes: exam.testConfig.timeLimit, seconds: 0 });
 
     const dispatch = useDispatch();
@@ -94,7 +100,7 @@ export const ShowExam = () =>
         const lSelectedQuestion = exam.testConfig.subscribedQuestions[aIndex];
         setIndex(aIndex);
         setDisplayedQuestion(lSelectedQuestion);
-        const lSelectedAttempt: TAttempt | undefined = examAttempt.attempt.find((aAttempt: TAttempt) => aAttempt.questionId === lSelectedQuestion.id);
+        const lSelectedAttempt: TQuestionAttempt | undefined = examAttempt.attempt.find((aAttempt: TQuestionAttempt) => aAttempt.question.id === lSelectedQuestion.id);
         if (lSelectedAttempt === undefined)
         {
             setSelectedChoices([]);
@@ -130,12 +136,12 @@ export const ShowExam = () =>
         }
 
         const lExamAttempt = [...examAttempt.attempt];
-        const lAttemptedQuestionIndex = lExamAttempt.findIndex((aAttempt: TAttempt) => aAttempt.questionId === aDisplayedQuestion.id);
+        const lAttemptedQuestionIndex = lExamAttempt.findIndex((aAttempt: TQuestionAttempt) => aAttempt.question.id === aDisplayedQuestion.id);
         if (lAttemptedQuestionIndex === -1)
         {
             lExamAttempt.push(
                 {
-                    questionId: aDisplayedQuestion.id,
+                    question: aDisplayedQuestion,
                     selectedChoices: lSelectedChoices,
                     correct: checkCorrectness(lSelectedChoices, aDisplayedQuestion),
                 }
@@ -159,10 +165,10 @@ export const ShowExam = () =>
         setSelectedChoices(lSelectedChoices);
     };
 
-    const calculateScore = (aAttempt: TAttempt[]) =>
+    const calculateScore = (aAttempt: TQuestionAttempt[]) =>
     {
         let lScore = 0;
-        aAttempt.forEach((aAttempt: TAttempt) => lScore += aAttempt.correct ? 1 : 0);
+        aAttempt.forEach((aAttempt: TQuestionAttempt) => lScore += aAttempt.correct ? 1 : 0);
         const lTotalScore = exam.testConfig.subscribedQuestions.length;
         return (lScore / lTotalScore) * 100;
     }
@@ -213,8 +219,8 @@ export const ShowExam = () =>
             return "border-l-[0.5em] border-l-orange text-black";
         }
         const lExamAttempt = [...examAttempt.attempt];
-        const lQuestionAttemptedIndex: number = lExamAttempt.findIndex((aAttempt: TAttempt) =>
-            aAttempt.questionId === aQuestion.id && (aAttempt.selectedChoices.length !== 0));
+        const lQuestionAttemptedIndex: number = lExamAttempt.findIndex((aAttempt: TQuestionAttempt) =>
+            aAttempt.question.id === aQuestion.id && (aAttempt.selectedChoices.length !== 0));
         const lActiveChoice = activeQuestion ? "border-l-[0.5em]" : "border-l-[0.7em]";
         if (!reviewMode)
         {
@@ -244,23 +250,26 @@ export const ShowExam = () =>
         const IsSelectedChoice: boolean = selectedChoices.find((lChoice: TChoice) => lChoice.id === aChoiceId) !== undefined;
         if (reviewMode)
         {
-            const lAttemptedQuestion = [...examAttempt.attempt].find((aAttempt: TAttempt) => aAttempt.questionId === aDisplayedQuestion.id);
+            const lAttemptedQuestion = [...examAttempt.attempt].find((aAttempt: TQuestionAttempt) => aAttempt.question.id === aDisplayedQuestion.id);
+            let lStyleString = `${aDisplayedQuestion.choices.find((aChoice: TChoice) => aChoice.id === aChoiceId)?.correct
+                ? "font-bold text-green"
+                : "font-bold text-red"}`;
+        
             if (lAttemptedQuestion === undefined)
             {
-                if (aDisplayedQuestion.choices.find((lChoice: TChoice) => lChoice.id === aChoiceId)?.correct)
+                return lStyleString;
+            }
+            else
+            {
+                if (lAttemptedQuestion.correct)
                 {
-                    return "border-2 border-l-[0.7em] text-black border-green";
+                    return `${lStyleString} ${IsSelectedChoice ? "border-2 border-purple border-l-[0.7em]" : "text-black"}`;
                 }
-                return "border-2 border-l-[0.7em] text-black border-red";
+                else
+                {
+                    return `${lStyleString} ${IsSelectedChoice ? "border-2 border-purple border-l-[0.7em]" : "text-black"}`;
+                }
             }
-            else if (!lAttemptedQuestion.correct && IsSelectedChoice)
-            {
-                return "border-2 border-l-[0.7em] text-black border-red";
-            } else if (lAttemptedQuestion.correct && IsSelectedChoice)
-            {
-                return "border-2 border-l-[0.7em] text-black border-green";
-            }
-            return "border-2 border-l-[0.7em] text-black border-white";
         }
        return selectedChoices.find((lChoice: TChoice) => lChoice.id === aChoiceId) !== undefined
             ? "border-2 border-l-[0.7em] border-purple text-black"
@@ -271,7 +280,7 @@ export const ShowExam = () =>
         <div className={mainContainerClass}>
             <h1> {exam.testConfig.name} </h1>
             <div className="self-end">
-            { time.minutes >= 0 && time.seconds >= 0
+            { time.minutes >= 0 && time.seconds >= 0 && !lIsReviewMode
                 ? <Timer
                     time={time}
                     onTimeChange={setTime}
@@ -307,7 +316,7 @@ export const ShowExam = () =>
                 </div>
             </div>
             <div className="mt-2">
-                <SaveItemPanel saveText="Submit" cancelLink="/tests" onSave={handleSubmitExam} error={false}/>
+                <SaveItemPanel saveText="Submit" cancelLink="/tests" onSave={handleSubmitExam} error={lIsReviewMode}/>
             </div>
         </div>
     );

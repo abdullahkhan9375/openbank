@@ -59,7 +59,14 @@ const router = createBrowserRouter (
         [
           {
             path: ":id",
-            element: <ShowExam/>
+            element: <ShowExam/>,
+            children:
+            [
+              {
+                path: ":type",
+                element: <ShowExam/>
+              }
+            ]
           },
         ]
       },

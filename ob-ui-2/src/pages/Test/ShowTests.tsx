@@ -4,17 +4,19 @@ import { actionButtonClass } from "../../common/buttons/styles";
 import { mainContainerClass } from "../../common";
 import { useSelector, useDispatch } from 'react-redux';
 import { CellContext, createColumnHelper } from "@tanstack/react-table";
-import { BsFillPencilFill, BsFillTrashFill, BsFillCaretRightFill } from "react-icons/bs";
+import { BsFillPencilFill, BsFillTrashFill, BsFillBookFill, BsFillCaretRightFill } from "react-icons/bs";
 import { Table } from "../../common/Table";
 import { TExamAttempt, TQuestion, TTest, TTestView } from "../../model";
 import { testDeleted } from "../../reducers/test";
+import { TExamAttemptState } from "../../reducers/result";
 // TODO: publish/subscribe system.
 
 export const ShowTests = () =>
 {
     const tests: TTest[] = useSelector((state: any) => state.test);
-    const results: any = useSelector((state: any) => state.result);
+    const results: TExamAttemptState[] = useSelector((state: any) => state.result);
 
+    console.log("Tests: ", tests);
     console.log("Results: ", results);
 
     const navigate = useNavigate();
@@ -22,6 +24,17 @@ export const ShowTests = () =>
 
     const lTestsData: TTestView[] = tests.map((aTest: TTest) =>
     {
+        const lExamAttempt = results.find((aAttempt: TExamAttemptState) => aAttempt.testId === aTest.id);
+        console.log("Exam attempt: ", lExamAttempt);
+        let lAttempt = undefined;
+        let lStatus = false;
+        let lRecentScore = 0;
+        if (lExamAttempt !== undefined)
+        {
+            lAttempt = lExamAttempt.attempts[lExamAttempt.attempts.length - 1];
+            lStatus = lAttempt.result.pass;
+            lRecentScore = lAttempt.result.score;
+        }
         return (
         {
             id: aTest.id,
@@ -31,6 +44,9 @@ export const ShowTests = () =>
             description: aTest.description,
             tags: aTest.tags,
             timeLimit: aTest.timeLimit,
+            status: lStatus,
+            recentScore: lRecentScore,
+            result: lAttempt !== undefined,
             numQuestions: aTest.subscribedQuestions.length,
             passingScore: aTest.passingScore,
             editable: true, // Change with user priv
@@ -57,7 +73,13 @@ export const ShowTests = () =>
     const handleShowExam = (info: CellContext<TTestView, boolean>) =>
     {
         const id = info.row.original.id;
-        navigate(`/exam/${id}`);
+        navigate(`/exam/${id}/examMode`);
+    }
+
+    const handleShowReview = (info: CellContext<TTestView, boolean>) =>
+    {
+        const id = info.row.original.id;
+        navigate(`/exam/${id}/reviewMode`)
     }
 
     const columnHelper = createColumnHelper<TTestView>();
@@ -73,7 +95,7 @@ export const ShowTests = () =>
     }),
     columnHelper.accessor('description', {
         header:() => "Description",
-        cell: info => <p className="text-center"> {info.getValue() ? "Public" :"Private"} </p>,
+        cell: info => <p className="text-center"> {info.getValue()} </p>,
     }),
     columnHelper.accessor('tags', {
         header: () => "Tags",
@@ -94,6 +116,27 @@ export const ShowTests = () =>
     columnHelper.accessor('passingScore', {
         header: () => "Passing Score",
         cell: info => <p className="text-center"> {info.getValue()} </p>
+    }),
+    columnHelper.accessor('status', {
+        header: () => "Status",
+        cell: info => <p className="text-center"> {info.row.original.result ?
+                    info.getValue() ? "Pass" : "Fail"
+                : "No Attempts"} </p>
+    }),
+    columnHelper.accessor('recentScore', {
+        header: () => "Recent Score",
+        cell: info => <p className="text-center"> { info.row.original.result ?
+                info.getValue()
+            :   "N/A"}
+                 </p>
+    }),
+    columnHelper.accessor('result', {
+        header: () => "Review",
+        cell: info => <div className="container flex flex-col items-center justify-center">
+                        <BsFillBookFill
+                            onClick={() => info.getValue() ? handleShowReview(info) : {}}
+                            className={`${ info.getValue() ? "text-black cursor-pointer" : "text-gray cursor-not-allowed"}`}/>
+                       </div>
     }),
     columnHelper.accessor("editable",{
         header: () => "",

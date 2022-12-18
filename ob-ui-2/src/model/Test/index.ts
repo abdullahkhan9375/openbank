@@ -1,3 +1,4 @@
+import { TAttempt } from "../Attempt";
 import { TQuestion } from "../Question";
 
 type TTestBase =
@@ -20,6 +21,9 @@ export type TTest =
 export type TTestView =
 {
     numQuestions: number,
+    status?: boolean,
+    recentScore?: number,
+    result: boolean,
     editable: boolean,
 } & TTestBase;
 

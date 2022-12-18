@@ -4,6 +4,7 @@ type TBankBase =
 {
     id: string,
     name: string,
+    description?: string,
     isPublic: boolean,
     tags: string[],
     createdAt: string,

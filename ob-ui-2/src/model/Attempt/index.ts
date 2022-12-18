@@ -1,8 +1,9 @@
 import { TChoice } from "../Choice";
+import { TQuestion } from "../Question";
 
-export type TAttempt =
+export type TQuestionAttempt =
 {
-    questionId: string,
+    question: TQuestion,
     selectedChoices: TChoice[],
     correct: boolean,
 };
@@ -13,7 +14,7 @@ export type TExamAttempt =
     examId: string,
     testId: string,
     createdAt: number,
-    attempt: TAttempt[],
+    attempt: TQuestionAttempt[],
     result: TResult,
 };
 
