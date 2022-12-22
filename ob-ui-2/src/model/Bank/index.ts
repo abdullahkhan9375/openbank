@@ -7,7 +7,7 @@ type TBankBase =
     description?: string,
     isPublic: boolean,
     tags: string[],
-    createdAt: string,
+    createdAt: number,
 };
 
 export type TBank =

@@ -14,8 +14,7 @@ export type TExamAttempt =
     examId: string,
     testId: string,
     createdAt: number,
-    attempt: TQuestionAttempt[],
-    result: TResult,
+    results: TResult[],
 };
 
 export type TResult =
@@ -24,4 +23,5 @@ export type TResult =
     score: number,
     pass: boolean,
     timeTaken: number,
+    attempt: TQuestionAttempt[]
 };

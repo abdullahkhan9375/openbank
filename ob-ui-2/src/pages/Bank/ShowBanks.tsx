@@ -16,6 +16,7 @@ import { useNavigate } from "react-router-dom";
 import { useMemo } from "react";
 import { Table } from "../../common/Table";
 import { TBank, TBankView } from "../../model";
+import moment from "moment";
 
 export const ShowBanks = () =>
 {
@@ -64,7 +65,7 @@ export const ShowBanks = () =>
     columnHelper.accessor('createdAt',
     {
         header: () => "Created At",
-        cell: info => <p className="text-center"> {info.getValue()} </p>,
+        cell: info => <p className="text-center"> {moment.unix(info.getValue()).format("DD/MM/YYYY")}</p>
     }),
     columnHelper.accessor('isPublic', {
         header:() => "Visibility",

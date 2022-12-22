@@ -9,6 +9,7 @@ import { Table } from "../../common/Table";
 import { TExamAttempt, TQuestion, TTest, TTestView } from "../../model";
 import { testDeleted } from "../../reducers/test";
 import { TExamAttemptState } from "../../reducers/result";
+import moment from "moment";
 // TODO: publish/subscribe system.
 
 export const ShowTests = () =>
@@ -24,16 +25,17 @@ export const ShowTests = () =>
 
     const lTestsData: TTestView[] = tests.map((aTest: TTest) =>
     {
-        const lExamAttempt = results.find((aAttempt: TExamAttemptState) => aAttempt.testId === aTest.id);
-        console.log("Exam attempt: ", lExamAttempt);
-        let lAttempt = undefined;
+        const lExamAttemptState = results.find((aAttempt: TExamAttemptState) => aAttempt.testId === aTest.id);
+        console.log("Exam attempt: ", lExamAttemptState );
+        let lExamAttempt = undefined;
         let lStatus = false;
         let lRecentScore = 0;
-        if (lExamAttempt !== undefined)
+        if (lExamAttemptState !== undefined)
         {
-            lAttempt = lExamAttempt.attempts[lExamAttempt.attempts.length - 1];
-            lStatus = lAttempt.result.pass;
-            lRecentScore = lAttempt.result.score;
+
+            lExamAttempt = lExamAttemptState.attempts[lExamAttemptState.attempts.length - 1];
+            lStatus = lExamAttempt.results[lExamAttempt.results.length - 1].pass;
+            lRecentScore = lExamAttempt.results[lExamAttempt.results.length - 1].score;
         }
         return (
         {
@@ -46,7 +48,7 @@ export const ShowTests = () =>
             timeLimit: aTest.timeLimit,
             status: lStatus,
             recentScore: lRecentScore,
-            result: lAttempt !== undefined,
+            result: lExamAttempt !== undefined,
             numQuestions: aTest.subscribedQuestions.length,
             passingScore: aTest.passingScore,
             editable: true, // Change with user priv
@@ -92,6 +94,7 @@ export const ShowTests = () =>
     columnHelper.accessor('createdAt',
     {
         header: () => "Created At",
+        cell: info => <p className="text-center"> {moment.unix(info.getValue()).format("DD/MM/YYYY")}</p>
     }),
     columnHelper.accessor('description', {
         header:() => "Description",
@@ -126,7 +129,7 @@ export const ShowTests = () =>
     columnHelper.accessor('recentScore', {
         header: () => "Recent Score",
         cell: info => <p className="text-center"> { info.row.original.result ?
-                info.getValue()
+                Math.round(info.getValue()!)
             :   "N/A"}
                  </p>
     }),

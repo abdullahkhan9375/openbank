@@ -22,6 +22,7 @@ import { Table } from "../../common/Table";
 import { BsFillPencilFill, BsFillTrashFill } from "react-icons/bs";
 import { TBank, TBankError, TChoice, TQuestion } from "../../model";
 import { SaveItemPanel } from "../../common";
+import moment from "moment";
 
 const lEmptyBank: TBank =
 {
@@ -31,7 +32,7 @@ const lEmptyBank: TBank =
     tags: [],
     numChoices: 1,
     questions: [],
-    createdAt: "",
+    createdAt: 0,
 };
 
 const lEmptyChoice: TChoice =
@@ -42,19 +43,19 @@ const lEmptyChoice: TChoice =
     explanation: "",
 };
 
-const lEmptyQuestion: TQuestion =
-{
-    id: uuidv4(),
-    name: "",
-    statement: "",
-    correctChoices: 4,
-    choices: [lEmptyChoice],
-};
-
 export const BankDetails = () =>
 {
     const dispatch = useDispatch();
     const { id } = useParams();
+
+    const lEmptyQuestion: TQuestion =
+    {
+        id: uuidv4(),
+        name: "",
+        statement: "",
+        correctChoices: 1,
+        choices: [lEmptyChoice],
+    };
 
     const editingBank: TBank = useSelector((state: any) => state.bank.find((aBank: TBank) => aBank.id === id));
 
@@ -128,7 +129,7 @@ export const BankDetails = () =>
         {
             ...bank,
             questions: questions,
-            createdAt: String(Date.now()),
+            createdAt: bank.createdAt === 0 ? moment.now() : bank.createdAt,
             id: bank.id !== "" ? bank.id : uuidv4(),
         };
 
@@ -259,7 +260,7 @@ export const BankDetails = () =>
                                                 Add a question
                                             </button>
                                         </div>
-                                        <div className={`${flexColClass} justify-between h-[20em]`}>
+                                        <div className={`${flexColClass} justify-between h-[20em] overflow-scroll`}>
                                             {
                                                 questions.length > 0
                                                 ? <Table data={data} columns={columns}/>
@@ -275,7 +276,7 @@ export const BankDetails = () =>
                                 </form>
                             </div>
                         </div>
-            }
+                }
 
     <style>
     </style>

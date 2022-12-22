@@ -40,7 +40,7 @@ export const QuestionSubscription = (aSubProps: IQuestionSubscriptionProps) =>
         <div className={`container flex flex-row mt-10 mx-auto w-[${lSubscriptionWidth}em] justify-around`}>
             <div className="container flex flex-col items-center">
                 <h3 className={`${labelTextClass} text-center`}> Subscribed Banks </h3>
-                <div className={lSubscriptionBoxClass}>
+                <div className={`${lSubscriptionBoxClass} overflow-scroll`}>
                     {lSubscribedBanks.map((aBank: TBank) =>
                     {
                         return (
@@ -53,7 +53,7 @@ export const QuestionSubscription = (aSubProps: IQuestionSubscriptionProps) =>
             </div>
             <div className="container flex flex-col items-center">
                 <h3 className={`${labelTextClass} text-center`}> Questions </h3>
-                <div className={lSubscriptionBoxClass}>
+                <div className={`${lSubscriptionBoxClass} overflow-scroll`}>
                     {selectedBank?.questions.map((aQuestion: TQuestion) =>
                     {
                         const lIsSubscribed = checkQuestionExists(aQuestion.id);
@@ -70,7 +70,7 @@ export const QuestionSubscription = (aSubProps: IQuestionSubscriptionProps) =>
             </div>
             <div className={`container flex flex-col items-center`}>
                 <h3 className={`${labelTextClass} text-center w-[15em]` }> Subscribed Questions </h3>
-                <div className={`${lSubscriptionBoxClass}`}>
+                <div className={`${lSubscriptionBoxClass} overflow-scroll`}>
                     { aSubProps.subscribedQuestions.map((aQuestion: TQuestion) =>
                     {
                         return (

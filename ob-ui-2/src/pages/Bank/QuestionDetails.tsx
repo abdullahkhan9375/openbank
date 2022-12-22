@@ -77,9 +77,8 @@ export const QuestionDetails = (aQuestionDetailsProps: IQuestionDetailsProps) =>
         console.log("Selected choice: ", selectedChoice);
     };
 
-    const handleSubmit = (event: FormEvent) =>
+    const handleSubmit = () =>
     {
-        event.preventDefault();
         if (lError) { return; }
 
         let lCorrectSum = 0;
@@ -120,7 +119,7 @@ export const QuestionDetails = (aQuestionDetailsProps: IQuestionDetailsProps) =>
 
     return (
         <div className={`${flexColClass} mx-auto h-[33em] pt-3 px-[3em] mt-[10em] border-2`}>
-            <form onSubmit={handleSubmit} action="">
+            <form>
                 <div
                 className={`${flexColClass} h-full justify-around`}>
                     <div className={`${formDivClass} my-5 flex-col`}>
@@ -160,8 +159,10 @@ export const QuestionDetails = (aQuestionDetailsProps: IQuestionDetailsProps) =>
                     </div>
                     <div className={`${flexRowClass} items-center h-20 w-[65em] justify-center`}>
                             <button className="border-0 mr-4 rounded-sm text-lg" onClick={aQuestionDetailsProps.onCancelSubmit}> Cancel </button>
-                            <button type="submit"
-                            className={`${lError ? actioButtonDisabledClass : actionButtonClass} w-[10em]`}><p className="font-bold text-white text-lg">Submit</p></button>
+                            <button
+                                type="button"
+                                onClick={handleSubmit}
+                                className={`${lError ? actioButtonDisabledClass : actionButtonClass} w-[10em]`}><p className="font-bold text-white text-lg">Submit</p></button>
                     </div>
                 </div>
             </form>

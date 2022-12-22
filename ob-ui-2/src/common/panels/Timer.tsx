@@ -32,6 +32,9 @@ export const Timer = (aTimerProps: ITimerProps) =>
     });
   };
 
+  const lTimeString = `${lTime.minutes.toString().length > 1
+      ? `${lTime.minutes}`
+      : `0${lTime.minutes}`}: ${lTime.seconds.toString().length > 1 ? `${lTime.seconds}` : `0${lTime.seconds}`}`;
   useEffect(() => {
     if (!aTimerProps.pauseTime)
     {
@@ -44,7 +47,7 @@ export const Timer = (aTimerProps: ITimerProps) =>
   {
     return (
       <p className={`text-lg border-gray rounded-sm border-r-4 px-3 py-2 font-bold`}>
-        Remaining time: {lTime.minutes}:{lTime.seconds} </p>
+        Remaining time: {lTimeString} </p>
     )
   }
   else
@@ -54,7 +57,7 @@ export const Timer = (aTimerProps: ITimerProps) =>
     <p className={`text-lg border-gray rounded-sm border-r-4 px-3 py-2 font-bold
     ${lTime.minutes < 1 ? " border-red text-red" : " border-black text-black "}`}>
       {(lTime.seconds > 0 && lTime.minutes > 0) ? `Remaining time
-      ${lTime.minutes}:${lTime.seconds}` : "Time Over"}</p>
+      ${lTimeString}` : "Time Over"}</p>
   );
   }
 };

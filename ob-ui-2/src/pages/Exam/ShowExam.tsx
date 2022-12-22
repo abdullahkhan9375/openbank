@@ -27,7 +27,7 @@ const lNewExam: TExam =
         id: "",
         name: "",
         isPublic: false,
-        createdAt: "",
+        createdAt: 0,
         description: "",
         tags: [],
         timeLimit: 0,
@@ -42,6 +42,7 @@ const lResult: TResult =
     score: 0,
     pass: false,
     timeTaken: -1,
+    attempt: [],
 };
 
 const lEmptyExamAttempt: TExamAttempt =
@@ -50,8 +51,7 @@ const lEmptyExamAttempt: TExamAttempt =
     testId: lNewExam.testConfig.id,
     examId: lNewExam.id,
     createdAt: 0,
-    attempt: [],
-    result: lResult,
+    results: [],
 };
 
 export type TTime =
@@ -69,13 +69,16 @@ export const ShowExam = () =>
     const lTest: TTest = useSelector((state: any) => state.test.find((aTest: TTest) => aTest.id === id));
     const lResults: TExamAttemptState = useSelector((state: any) => state.result.find((aExamAttempt: TExamAttemptState) => aExamAttempt.testId === lTest.id));
     const lExamAttempt: TExamAttempt = lIsReviewMode ? lResults.attempts[lResults.attempts.length - 1] : lEmptyExamAttempt;
-    const lMostRecentAttempt: TQuestionAttempt = lExamAttempt.attempt[lExamAttempt.attempt.length - 1];
+    const lMostRecentResult: TResult = lIsReviewMode ? lExamAttempt.results[lExamAttempt.results.length -1 ] : lResult;
+    const lMostRecentAttempt: TQuestionAttempt = lMostRecentResult.attempt[lMostRecentResult.attempt.length - 1];
 
     const [ exam, setExam ] = useState<TExam>({...lNewExam, testConfig: lTest });
     const [ displayedQuestion, setDisplayedQuestion ] = useState<TQuestion>(lIsReviewMode ? lMostRecentAttempt.question : exam.testConfig.subscribedQuestions[0]);
     const [ selectedChoices, setSelectedChoices ] = useState<TChoice[]>(lIsReviewMode ? lMostRecentAttempt.selectedChoices
             : []);
     const [ examAttempt, setExamAttempt ] = useState<TExamAttempt>(lExamAttempt);
+    const [ questionAttempts, setQuestionAttempts] = useState<TQuestionAttempt[]>(lIsReviewMode ? lMostRecentResult.attempt : []);
+
     const [ index, setIndex ] = useState<number>(0);
     const [ reviewMode, setReviewMode ] = useState<boolean>(lIsReviewMode);
     const [ time, setTime ] = useState<TTime>({ minutes: exam.testConfig.timeLimit, seconds: 0 });
@@ -100,7 +103,7 @@ export const ShowExam = () =>
         const lSelectedQuestion = exam.testConfig.subscribedQuestions[aIndex];
         setIndex(aIndex);
         setDisplayedQuestion(lSelectedQuestion);
-        const lSelectedAttempt: TQuestionAttempt | undefined = examAttempt.attempt.find((aAttempt: TQuestionAttempt) => aAttempt.question.id === lSelectedQuestion.id);
+        const lSelectedAttempt: TQuestionAttempt | undefined = questionAttempts.find((aAttempt: TQuestionAttempt) => aAttempt.question.id === lSelectedQuestion.id);
         if (lSelectedAttempt === undefined)
         {
             setSelectedChoices([]);
@@ -135,11 +138,11 @@ export const ShowExam = () =>
             lSelectedChoices = [aChoice];
         }
 
-        const lExamAttempt = [...examAttempt.attempt];
-        const lAttemptedQuestionIndex = lExamAttempt.findIndex((aAttempt: TQuestionAttempt) => aAttempt.question.id === aDisplayedQuestion.id);
+        const lQuestionAttempts: TQuestionAttempt[] = [...questionAttempts];
+        const lAttemptedQuestionIndex = lQuestionAttempts.findIndex((aAttempt: TQuestionAttempt) => aAttempt.question.id === aDisplayedQuestion.id);
         if (lAttemptedQuestionIndex === -1)
         {
-            lExamAttempt.push(
+            lQuestionAttempts.push(
                 {
                     question: aDisplayedQuestion,
                     selectedChoices: lSelectedChoices,
@@ -149,19 +152,15 @@ export const ShowExam = () =>
         }
         else
         {
-            lExamAttempt[lAttemptedQuestionIndex] =
+            lQuestionAttempts[lAttemptedQuestionIndex] =
             {
-                ...lExamAttempt[lAttemptedQuestionIndex],
+                ...lQuestionAttempts[lAttemptedQuestionIndex],
                 selectedChoices: lSelectedChoices,
                 correct: checkCorrectness(lSelectedChoices, aDisplayedQuestion),
             }
         }
-        setExamAttempt(
-            {
-                ...examAttempt,
-                attempt: lExamAttempt,
-            }
-        );
+
+        setQuestionAttempts(lQuestionAttempts);
         setSelectedChoices(lSelectedChoices);
     };
 
@@ -176,12 +175,12 @@ export const ShowExam = () =>
     const handleSubmitExam = () =>
     {
         setReviewMode(true);
-        const lExamAttempt = [...examAttempt.attempt];
-        const lExamScore = calculateScore(lExamAttempt);
+        const lQuestionAttempt = [...questionAttempts];
+        const lExamScore = calculateScore(lQuestionAttempt);
         const lPass = exam.testConfig.passingScore <= lExamScore;
         const lTimeTaken = exam.testConfig.timeLimit * 60 - ((time.minutes * 60) + time.seconds);
         let lStatus = undefined;
-        if (lExamAttempt.length === exam.testConfig.subscribedQuestions.length)
+        if (lQuestionAttempt.length === exam.testConfig.subscribedQuestions.length)
         {
             lStatus = "COMPLETE";
         }
@@ -190,18 +189,20 @@ export const ShowExam = () =>
             lStatus = "INCOMPLETE";
         }
 
+        const lResult: TResult =
+        {   status: lStatus,
+            score: lExamScore,
+            pass: lPass,
+            timeTaken: lTimeTaken,
+            attempt: lQuestionAttempt,
+        }
+
         const lNewExamAttempt: TExamAttempt =
         {
             ...examAttempt,
             testId: exam.testConfig.id,
             createdAt: Date.now(),
-            result:
-            {
-                status: lStatus,
-                score: lExamScore,
-                pass: lPass,
-                timeTaken: lTimeTaken,
-            }
+            results: [...examAttempt.results, lResult],
         };
 
         setExamAttempt(lNewExamAttempt);
@@ -218,8 +219,8 @@ export const ShowExam = () =>
         {
             return "border-l-[0.5em] border-l-orange text-black";
         }
-        const lExamAttempt = [...examAttempt.attempt];
-        const lQuestionAttemptedIndex: number = lExamAttempt.findIndex((aAttempt: TQuestionAttempt) =>
+        const lQuestionAttempt = [...questionAttempts];
+        const lQuestionAttemptedIndex: number = lQuestionAttempt.findIndex((aAttempt: TQuestionAttempt) =>
             aAttempt.question.id === aQuestion.id && (aAttempt.selectedChoices.length !== 0));
         const lActiveChoice = activeQuestion ? "border-l-[0.5em]" : "border-l-[0.7em]";
         if (!reviewMode)
@@ -234,7 +235,7 @@ export const ShowExam = () =>
             {
                 return `${lActiveChoice} border-l-red text-black`;
             }
-            else if (!lExamAttempt[lQuestionAttemptedIndex].correct)
+            else if (!lQuestionAttempt[lQuestionAttemptedIndex].correct)
             {
                 return `${lActiveChoice} border-l-red text-black`;
             }
@@ -250,7 +251,7 @@ export const ShowExam = () =>
         const IsSelectedChoice: boolean = selectedChoices.find((lChoice: TChoice) => lChoice.id === aChoiceId) !== undefined;
         if (reviewMode)
         {
-            const lAttemptedQuestion = [...examAttempt.attempt].find((aAttempt: TQuestionAttempt) => aAttempt.question.id === aDisplayedQuestion.id);
+            const lAttemptedQuestion = [...questionAttempts].find((aAttempt: TQuestionAttempt) => aAttempt.question.id === aDisplayedQuestion.id);
             let lStyleString = `${aDisplayedQuestion.choices.find((aChoice: TChoice) => aChoice.id === aChoiceId)?.correct
                 ? "font-bold text-green"
                 : "font-bold text-red"}`;

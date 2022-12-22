@@ -17,13 +17,14 @@ import { testAdded } from "../../reducers/test";
 import { TTestError } from "../../model/Test";
 import { isEqual } from "lodash";
 import { v4 as uuidv4 } from "uuid";
+import moment from "moment";
 
 const lEmptyTest: TTest =
 {
     id: "",
     name: "",
     isPublic: false,
-    createdAt: "",
+    createdAt: 0,
     description: "",
     tags: [],
     subscribedQuestions: [],
@@ -90,7 +91,8 @@ export const TestDetails = () =>
         const lTest: TTest =
         {
             ...test,
-            id: uuidv4(),
+            id: test.id === "" ? uuidv4() : test.id,
+            createdAt: test.createdAt === 0 ? moment.now()/1000 : test.createdAt,
             subscribedQuestions,
         };
 

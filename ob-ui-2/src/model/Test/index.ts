@@ -1,4 +1,3 @@
-import { TAttempt } from "../Attempt";
 import { TQuestion } from "../Question";
 
 type TTestBase =
@@ -6,7 +5,7 @@ type TTestBase =
     id: string,
     name: string,
     isPublic: boolean,
-    createdAt: string,
+    createdAt: number,
     description: string,
     tags: string[],
     timeLimit: number,

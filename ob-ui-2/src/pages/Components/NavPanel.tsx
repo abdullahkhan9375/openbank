@@ -19,8 +19,8 @@ const HoverBar = (aHoverBarProps: IHoverBarProps) =>
     const [ isHovering, setIsHovering ] = useState<boolean>(false);
     return (
         <div onMouseEnter={() => setIsHovering(true)}
-        onMouseLeave={() => setIsHovering(false)} className={`container flex absolute flex-col cursor-pointer top-3 text-black text-xl justify-start items-center ${isHovering ? "h-[5em]" : "h-[2em]"}  hover:bg-purple hover:text-white w-[4em]`}>
-            <div className={`text-white`} >
+        onMouseLeave={() => setIsHovering(false)} className={`container flex absolute flex-col cursor-pointer top-2 text-black text-xl justify-start items-center ${isHovering ? "h-[5em]" : "h-[2em]"}  hover:bg-purple hover:text-white w-[4em]`}>
+            <div className={`text-white font-semibold`} >
                 {aHoverBarProps.children}
             </div>
             { isHovering &&
@@ -30,7 +30,7 @@ const HoverBar = (aHoverBarProps: IHoverBarProps) =>
                     {
                         return (
                             <div className="container flex flex-col justify-center">
-                                <Link to={`/${aHoverOption.link}`} className="text-gray hover:text-white"> {aHoverOption.name} </Link>
+                                <Link to={`/${aHoverOption.link}`} className="text-gray font-semibold hover:text-white"> {aHoverOption.name} </Link>
                             </div>
                         )
                     })
