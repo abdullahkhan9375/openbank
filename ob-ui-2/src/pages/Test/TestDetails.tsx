@@ -18,6 +18,7 @@ import { TTestError } from "../../model/Test";
 import { isEqual } from "lodash";
 import { v4 as uuidv4 } from "uuid";
 import moment from "moment";
+import { NavPanel } from "../Components/NavPanel";
 
 const lEmptyTest: TTest =
 {
@@ -119,6 +120,8 @@ export const TestDetails = () =>
 
     const lSaveDisabled = Object.values(error).includes(true) || !hasChanged;
     return (
+        <>
+        <NavPanel/>
         <div className={mainContainerClass}>
             <div className="container flex flex-col w-[70em]">
                 <div className={formBoxClass}>
@@ -215,5 +218,6 @@ export const TestDetails = () =>
                 </div>
             </div>
         </div>
+        </>
     )
 };

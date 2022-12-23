@@ -13,7 +13,7 @@ export const ShowSignin = (aSigninDialogProps: ISigninDialogProps) =>
   const [showRegisterDetails, setShowRegisterDetails ] = useState<boolean>(true);
 
   return (
-  <div className="container flex flex-col justify-start py-10 px-5 items-start absolute top-50 w-[40em] z-100 h-[40em] shadow-md rounded-md">
+  <div className="container flex flex-col justify-start py-10 px-5 bg-white items-start absolute border-2 top-50 w-[40em] z-100 h-[40em] rounded-md">
     <h3 className={`${headingTextClass} ml-5`}> {showRegisterDetails ? "Register" : "Login"} </h3>
     { showRegisterDetails ? <RegisterDetails onLogin={() => setShowRegisterDetails(false)}/> : <LoginDetails/> }
     <button type="button"

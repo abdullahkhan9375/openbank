@@ -1,21 +1,35 @@
 import { useState } from "react";
-import { Link } from "react-router-dom";
-import { actionButtonClass, altActionButtonClass, flexColClass, flexRowClass, headingTextClass, labelDivClass, labelTextClass, textInputClass } from "../../common";
+import { useDispatch, useSelector } from "react-redux";
+import { useNavigate } from "react-router-dom";
+import { altActionButtonClass } from "../../common";
 import { mainContainerClass } from "../../common";
-import { ShowSignin } from "../Signin/ShowSignin";
+import { ShowSignin } from "../Authenticate/ShowSignin";
+import { NavPanel } from "../Components/NavPanel";
+import { Welcome } from "./Welcome";
 
 // eslint-disable-next-line @typescript-eslint/no-empty-interface
 interface IShowHome {}
 
 export const ShowHome = (aShowHomeProps: IShowHome) =>
 {
-    const [showLoginDialog, setShowLoginDialog] = useState<boolean>(false);
+    const lIsSignedIn: boolean = useSelector((state: any) => state.global.user.isSignedIn);
 
+    const [showLoginDialog, setShowLoginDialog] = useState<boolean>(false);
+    const navigate = useNavigate();
+    const dispatch = useDispatch();
+
+    if (lIsSignedIn)
+    {
+      return (
+          <Welcome/>
+      )
+    }
     return (
+       <>
+       <NavPanel/>
         <div className={mainContainerClass}>
-          {showLoginDialog
-            ? <ShowSignin onCancel={() => setShowLoginDialog(false)}/>
-            : <>
+          
+            { showLoginDialog && <ShowSignin onCancel={() => setShowLoginDialog(false)}/> }
                 <div className="h-2/5 mt-20 w-[40vw] container mx-auto flex flex-col justify-around items-center">
                   <h1 className='text-9xl text-black font-bold'> OpenBank </h1>
                   <p className='text-6xl w-[10em] text-center text-black font-light'> The first (free) B.Y.O.B platform </p>
@@ -28,8 +42,7 @@ export const ShowHome = (aShowHomeProps: IShowHome) =>
                     Sign Up
                   </button>
                 </div>
-              </>
-        }
       </div>
+      </>
     )
 };

@@ -7,6 +7,7 @@ import { mainContainerClass, SaveItemPanel } from "../../common";
 import Timer from "../../common/panels/Timer";
 import { TQuestionAttempt, TChoice, TExam, TExamAttempt, TQuestion, TResult, TTest } from "../../model";
 import { resultAdded, TExamAttemptState } from "../../reducers/result";
+import { NavPanel } from "../Components/NavPanel";
 
 const alphabet = ["a", "b", "c", "d", "e", "f", "g", "h", "i", "j"];
 
@@ -211,8 +212,6 @@ export const ShowExam = () =>
         navigate("/tests");
     };
 
-    // console.log(examAttempt);
-
     const getQuestionStyle = (aQuestion: TQuestion, activeQuestion: boolean) =>
     {
         if (activeQuestion && !reviewMode)
@@ -278,6 +277,8 @@ export const ShowExam = () =>
     };
 
     return (
+        <>
+        <NavPanel/>
         <div className={mainContainerClass}>
             <h1> {exam.testConfig.name} </h1>
             <div className="self-end">
@@ -320,5 +321,6 @@ export const ShowExam = () =>
                 <SaveItemPanel saveText="Submit" cancelLink="/tests" onSave={handleSubmitExam} error={lIsReviewMode}/>
             </div>
         </div>
+        </>
     );
 };

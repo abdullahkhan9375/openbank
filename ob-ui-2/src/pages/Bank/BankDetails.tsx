@@ -1,4 +1,4 @@
-import { useCallback, useEffect, useMemo, useState } from "react";
+import { useEffect, useMemo, useState } from "react";
 import {
     flexColClass,
         flexRowClass,
@@ -12,17 +12,18 @@ import {
 import { QuestionDetails } from "./QuestionDetails";
 import { isEqual } from "lodash";
 import { v4 as uuidv4 } from 'uuid';
-import { actioButtonDisabledClass, actionButtonClass, altActionButtonClass } from "../../common/buttons/styles";
-import { Link, useNavigate, useParams } from "react-router-dom";
+import { actionButtonClass } from "../../common/buttons/styles";
+import { useNavigate, useParams } from "react-router-dom";
 import TagsInput from "react-tagsinput";
 import { useSelector, useDispatch } from 'react-redux'
 import { bankAdded } from "../../reducers/bank";
-import { CellContext, createColumnHelper, flexRender, getCoreRowModel, useReactTable } from "@tanstack/react-table";
+import { CellContext, createColumnHelper } from "@tanstack/react-table";
 import { Table } from "../../common/Table";
 import { BsFillPencilFill, BsFillTrashFill } from "react-icons/bs";
 import { TBank, TBankError, TChoice, TQuestion } from "../../model";
 import { SaveItemPanel } from "../../common";
 import moment from "moment";
+import { NavPanel } from "../Components/NavPanel";
 
 const lEmptyBank: TBank =
 {
@@ -181,6 +182,8 @@ export const BankDetails = () =>
     const data = useMemo(() => questions, [questions]);
     const lSaveDisabled = (error.invalidName || error.invalidQuestion || error.emptyChoice) || !hasChanged;
     return (
+        <>
+        <NavPanel/>
         <div className={mainContainerClass}>
             { addingQuestion
                     ? <QuestionDetails numChoices={bank.numChoices} onCancelSubmit={handleCancelSubmit} onSubmit={handleSubmitQuestion} question={selectedQuestion}/>
@@ -277,9 +280,7 @@ export const BankDetails = () =>
                             </div>
                         </div>
                 }
-
-    <style>
-    </style>
         </div>
+        </>
     )
 }

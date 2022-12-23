@@ -17,6 +17,7 @@ import { useMemo } from "react";
 import { Table } from "../../common/Table";
 import { TBank, TBankView } from "../../model";
 import moment from "moment";
+import { NavPanel } from "../Components/NavPanel";
 
 export const ShowBanks = () =>
 {
@@ -93,18 +94,21 @@ export const ShowBanks = () =>
     const data = useMemo(() => lBanksData, [banks]);
 
     return (
-        <div className={`${mainContainerClass}`}>
-                <h1 className="font-bold mt-4"> Your Banks </h1>
-                <div className={`${flexRowClass} justify-end mt-5`}>
-                    <button className={`${actionButtonClass} font-bold`} onClick={handleCreateBank}> Create a bank </button>
-                </div>
-                {
-                    banks.length > 0
-                    ? <Table data={data} columns={columns}/>
-                    : <div className="mt-10 text-center">
-                        <h2 className="font-normal text-4xl text-gray">You aren't subscribed to any banks yet.</h2>
-                        </div>
-                }
-        </div>
+        <>
+            <NavPanel/>
+            <div className={`${mainContainerClass}`}>
+                    <h1 className="font-bold mt-4"> Your Banks </h1>
+                    <div className={`${flexRowClass} justify-end mt-5`}>
+                        <button className={`${actionButtonClass} font-bold`} onClick={handleCreateBank}> Create a bank </button>
+                    </div>
+                    {
+                        banks.length > 0
+                        ? <Table data={data} columns={columns}/>
+                        : <div className="mt-10 text-center">
+                            <h2 className="font-normal text-4xl text-gray">You aren't subscribed to any banks yet.</h2>
+                            </div>
+                    }
+            </div>
+        </>
     );
 };

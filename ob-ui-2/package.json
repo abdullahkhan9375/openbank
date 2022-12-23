@@ -11,6 +11,7 @@
   "dependencies": {
     "@reduxjs/toolkit": "^1.9.1",
     "@tanstack/react-table": "^8.7.0",
+    "aws-amplify": "^5.0.7",
     "lodash": "^4.17.21",
     "moment": "^2.29.4",
     "prop-types": "^15.8.1",
@@ -19,6 +20,7 @@
     "react-icons": "^4.7.1",
     "react-redux": "^8.0.5",
     "react-router-dom": "^6.4.4",
+    "react-spinners": "^0.13.7",
     "react-tagsinput": "^3.20.0",
     "uuid": "^9.0.0"
   },

@@ -9,7 +9,7 @@ const lDummyBank: TBank[] =
     name: "Chemistry A-1",
     isPublic: true,
     tags: ["cool", "2022", "wow"],
-    createdAt: "Today",
+    createdAt: Date.now(),
     numChoices: 2,
     questions:
     [
@@ -63,7 +63,7 @@ const lDummyBank: TBank[] =
     name: "Physics O-2",
     isPublic: true,
     tags: ["newp", "2021", "CIE"],
-    createdAt: "Today",
+    createdAt: Date.now(),
     numChoices: 2,
     questions:
     [

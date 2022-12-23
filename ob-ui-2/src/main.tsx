@@ -17,6 +17,12 @@ import { ShowTests } from './pages/Test/ShowTests';
 import { TestDetails } from './pages/Test/TestDetails';
 import { ShowExam } from './pages/Exam/ShowExam';
 
+import { Amplify, Auth } from 'aws-amplify';
+import awsconfig from './aws-exports';
+import { Welcome } from './pages/Home/Welcome';
+
+Amplify.configure(awsconfig);
+
 const router = createBrowserRouter (
   [{
     path: "/",
@@ -26,6 +32,10 @@ const router = createBrowserRouter (
       {
         path: "home",
         element: <ShowHome/>,
+      },
+      {
+        path: "welcome",
+        element: <Welcome/>
       },
       {
         path: "banks",

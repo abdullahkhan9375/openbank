@@ -1,0 +1,23 @@
+{
+  "staging": {
+    "awscloudformation": {
+      "AuthRoleName": "amplify-openbank-staging-84020-authRole",
+      "UnauthRoleArn": "arn:aws:iam::269067838675:role/amplify-openbank-staging-84020-unauthRole",
+      "AuthRoleArn": "arn:aws:iam::269067838675:role/amplify-openbank-staging-84020-authRole",
+      "Region": "ap-northeast-1",
+      "DeploymentBucketName": "amplify-openbank-staging-84020-deployment",
+      "UnauthRoleName": "amplify-openbank-staging-84020-unauthRole",
+      "StackName": "amplify-openbank-staging-84020",
+      "StackId": "arn:aws:cloudformation:ap-northeast-1:269067838675:stack/amplify-openbank-staging-84020/4546a160-81d4-11ed-89a2-0a425c6acb0f",
+      "AmplifyAppId": "de0fazee52jr6"
+    },
+    "categories": {
+      "function": {
+        "GetSubscribedBanks": {}
+      },
+      "auth": {
+        "openbank": {}
+      }
+    }
+  }
+}
