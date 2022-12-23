@@ -4,16 +4,27 @@ import { Auth } from "@aws-amplify/auth";
 import { useEffect, useState } from "react";
 import { mainContainerClass } from "../../common";
 import { NavPanel } from "../Components/NavPanel";
+import { MessagePanel, TMessage } from "../Components/MessagePanel";
 
 export const Welcome = () =>
 {
     const [ username, setUserName ] = useState<string>("");
+    
+    const [message, setMessage] = useState<TMessage | undefined>(undefined);
+
     useEffect(() =>
     {
         (async() =>
         {
-            const lCognitoUser: CognitoUser = await Auth.currentAuthenticatedUser();
-            console.log(lCognitoUser.getUserData((err, result) => { setUserName(result?.UserAttributes[2].Value ?? "Unknown")}))
+            try {
+                const lCognitoUser: CognitoUser = await Auth.currentAuthenticatedUser();
+                console.log(lCognitoUser);
+            }
+            catch(error)
+            {
+                console.log(error);
+                setMessage({ severity: "high", message: "Error" })
+            }
         })();
     }, []);
     return (
@@ -21,7 +32,9 @@ export const Welcome = () =>
             <NavPanel/>
             <div className={mainContainerClass}>
                 Welcome {username}!
+                <MessagePanel onAcknowledge={() => setMessage(undefined)} {...message}/>
             </div>
+
         </>
     )
 };

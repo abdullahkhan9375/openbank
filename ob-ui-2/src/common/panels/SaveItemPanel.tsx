@@ -21,7 +21,7 @@ export const SaveItemPanel = (aSaveItemPanelProps: ISaveItemPanel) => //I don't 
                     Cancel
                 </p>
             </button>
-            <button type="button" onClick={!aSaveItemPanelProps.error ? aSaveItemPanelProps.onSave : undefined} className={`${aSaveItemPanelProps.error
+            <button type="button" onClick={aSaveItemPanelProps.onSave} className={`${aSaveItemPanelProps.error
                     ? `${actioButtonDisabledClass} w-[10em] mx-3`
                     : `${altActionButtonClass} w-[10em] mx-3 text-white`}`}>
                         <p className="font-bold text-lg">{aSaveItemPanelProps.saveText}</p>

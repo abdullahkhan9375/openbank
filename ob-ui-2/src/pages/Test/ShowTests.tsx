@@ -11,13 +11,14 @@ import { testDeleted } from "../../reducers/test";
 import { TExamAttemptState } from "../../reducers/result";
 import moment from "moment";
 import { NavPanel } from "../Components/NavPanel";
-import { MessagePanel } from "../Components/MessagePanel";
+import { MessagePanel, TMessage } from "../Components/MessagePanel";
 // TODO: publish/subscribe system.
 
 export const ShowTests = () =>
 {
     const tests: TTest[] = useSelector((state: any) => state.test);
     const results: TExamAttemptState[] = useSelector((state: any) => state.result);
+    const [ message, setMessage ] = useState<TMessage | undefined>(undefined);
 
     console.log("Tests: ", tests);
     console.log("Results: ", results);
@@ -171,7 +172,7 @@ export const ShowTests = () =>
                         <h2 className="font-normal text-4xl text-gray">You aren't subscribed to any tests currently.</h2>
                     </div>
             }
-            <MessagePanel severity={"medium"} message={"Wow this is a cool error."}/>
+            <MessagePanel onAcknowledge={() => setMessage(undefined)} {...message}/>
         </div>
         </>
     )

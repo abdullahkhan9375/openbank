@@ -1,47 +1,89 @@
 import { useState } from "react";
 import { useDispatch } from "react-redux";
 import { useNavigate } from "react-router-dom";
-import { actionButtonClass, headingTextClass } from "../../common"
-import { userLoggedIn, userSignedInStatusChange } from "../../reducers/global";
+import { actionButtonClass, flexColClass, flexRowClass, headingTextClass, labelTextClass, textInputClass } from "../../common"
+import { userSignedInStatusChange } from "../../reducers/global";
 import { ISignUpResult, CognitoUser } from 'amazon-cognito-identity-js';
-import { Cache } from "aws-amplify";
+import { Auth, Cache } from "aws-amplify";
+import { TMessage } from "../Components/MessagePanel";
+import { LoginDetails } from "./LoginDetails";
 
 interface IVerificationProps
 {
-    signUpResult: ISignUpResult
+    username: string;
+    signUpResult: ISignUpResult;
+    onVerificationSuccess: (message: TMessage) => void;
+    onVerificationCancel: () => void;
+    onLoginFailure: () => void;
+    onLoginError: (error: any) => void;
+    onLoginSuccess: (message: TMessage) => void;
 }
 
 export const Verification = (aVerificationProps: IVerificationProps) =>
 {
     const [ confirmationCode, setConfirmationCode ] = useState<string>("");
+    const [ showLogin, setShowLogin ] = useState<boolean>(false);
     const lUser = aVerificationProps.signUpResult;
     const dispatch = useDispatch();
     const navigate = useNavigate();
 
+    const handleResendCode = async() =>
+    {
+        try {
+            const lResendCodeRequest = await Auth.resendSignUp(aVerificationProps.username);
+            const lMessage: TMessage =
+            {
+                message: "A new code has been sent",
+                severity: "low",
+            }
+            aVerificationProps.onVerificationSuccess(lMessage);
+            setShowLogin(true);
+        } catch (error) {
+            aVerificationProps.onVerificationSuccess({ severity: "high", message: "Error" });
+        }
+    };
+
     const handleConfirmCode = async() =>
     {
-        await aVerificationProps.signUpResult.user.confirmRegistration(confirmationCode, true, (err: any, result: any) => {
+        const lVerificationRequest = aVerificationProps.signUpResult.user.confirmRegistration(confirmationCode, true, (err: any, result: any) => {
             if (err) {
              console.log('error', err.message);
              return;
             }
             console.log('call result: ' + JSON.stringify(result));
-            Cache.setItem("isSignedIn", true);
-            dispatch(userSignedInStatusChange(true));
-            navigate("/welcome");
+            setShowLogin(true);
            });
     };
 
+    if (showLogin)
+    {
+        return <LoginDetails
+                onLoginError={aVerificationProps.onLoginError}
+                onLoginSuccess={aVerificationProps.onLoginSuccess}
+                onLoginCancel={aVerificationProps.onLoginFailure}
+            />;
+    }
     return (
-        <>
-            <h3 className={headingTextClass}> You should've received a code.</h3>
-            <div>
-                <label> Verification Code </label>
+        <div className="container flex flex-col justify-start py-10 px-5 bg-white items-center absolute border-2 top-60 w-[30em] h-[25em] z-100 rounded-md">
+            <h3 className={`text-2xl ${headingTextClass} self-center`}> You should've received a code.</h3>
+            <div className={`${flexColClass} items-center`}>
+                <label className={`${labelTextClass} text-center mt-10`}> Verification Code </label>
                 <input
                     type="text"
+                    className={`${textInputClass} w-[8em]`}
                     onChange={(event) => setConfirmationCode(event.target.value)}/>
-                <button onClick={handleConfirmCode} className={actionButtonClass}> Confirm </button>
+                <button onClick={handleConfirmCode} className={`${actionButtonClass} mt-10 w-[8em]`}> Confirm </button>
             </div>
-        </>
+            <div className={`${flexRowClass} items-center mt-5 ml-2 justify-around`}>
+                <p> 🤦‍♂️ Didn't receive the code? </p>
+                <button onClick={handleResendCode} className="border-none bg-white text-red"> Resend code </button>
+            </div>
+            <button
+                    type="button"
+                    onClick={aVerificationProps.onVerificationCancel}
+                    className={`self-center border-none mt-2 text-black text-lg`}>
+                        Cancel
+            </button>
+        </div>
     )
 }

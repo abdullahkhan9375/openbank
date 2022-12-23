@@ -10,7 +10,7 @@ import {
 import { TBank, TQuestion, TTest } from "../../model";
 import TagsInput from "react-tagsinput";
 import { QuestionSubscription } from "./QuestionSubscription";
-import { Link, Navigate, useNavigate, useParams } from "react-router-dom";
+import { useNavigate, useParams } from "react-router-dom";
 import { useSelector, useDispatch } from 'react-redux';
 import { SaveItemPanel } from "../../common";
 import { testAdded } from "../../reducers/test";
@@ -19,6 +19,7 @@ import { isEqual } from "lodash";
 import { v4 as uuidv4 } from "uuid";
 import moment from "moment";
 import { NavPanel } from "../Components/NavPanel";
+import { getErrorStyle } from "../../common/utils/GetErrorStyle";
 
 const lEmptyTest: TTest =
 {
@@ -49,6 +50,7 @@ export const TestDetails = () =>
         invalidPassingScore: test.passingScore === 0,
     });
     const [ hasChanged, setHasChanged ] = useState<boolean>(false);
+    const [ triedSubmitting, setTriedSubmitting ] = useState<boolean>(false);
 
     const dispatch = useDispatch();
     const navigate = useNavigate();
@@ -89,6 +91,11 @@ export const TestDetails = () =>
 
     const handleSaveTest = () =>
     {
+        setTriedSubmitting(true);
+        if (lSaveDisabled)
+        {
+            return;
+        }
         const lTest: TTest =
         {
             ...test,
@@ -137,11 +144,10 @@ export const TestDetails = () =>
                                     <div className="container flex flex-col justify-center">
                                         <input
                                             value={test.name}
-                                            // placeholder={"enter a cool name!"}
                                             onChange={(event) => { setTest({ ...test, name: event.target.value })}}
-                                            className={`${textInputClass} w-[30em] ${error.invalidName ? "border-b-red" : "border-b-green"}`} type={"text"}
+                                            className={`${textInputClass} w-[30em] ${getErrorStyle(triedSubmitting, error.invalidName, "BORDER")}`} type={"text"}
                                         />
-                                        <p className={`text-red text-sm py-1 ${error.invalidName ? "opacity-1" : "opacity-0"}`}>You haven't entered a name</p>
+                                        <p className={`text-red text-sm py-1 ${getErrorStyle(triedSubmitting, error.invalidName, "OPACITY")}`}>You haven't entered a name</p>
                                     </div>
                                 </div>
                                 <div className={`${labelDivClass} mb-4` }>
@@ -185,10 +191,10 @@ export const TestDetails = () =>
                                     <input
                                         value={test.passingScore}
                                         onChange={(event) => { setTest({ ...test, passingScore: Number(event.target.value)})}}
-                                        className={`${textInputClass} text-center w-[3em] ${error.invalidPassingScore ? "border-b-red" : "border-b-green"}`} type={"number"}
+                                        className={`${textInputClass} text-center w-[3em] ${getErrorStyle(triedSubmitting, error.invalidPassingScore, "BORDER")}`} type={"number"}
                                         max={100} min={1}
                                     />
-                                    <p className={`text-red text-sm py-1 ${error.invalidPassingScore ? "opacity-1" : "opacity-0"}`}>Passing score can't be less than or equal to 0</p>
+                                    <p className={`text-red text-sm py-1 ${getErrorStyle(triedSubmitting, error.invalidPassingScore, "OPACITY")}`}>Passing score can't be less than or equal to 0</p>
                                     </div>
                                 </div>
                                 <div className={labelDivClass}>
@@ -200,16 +206,19 @@ export const TestDetails = () =>
                                     <input
                                         value={test.timeLimit}
                                         onChange={(event) => { setTest({ ...test, timeLimit: Number(event.target.value)})}}
-                                        className={`${textInputClass}  text-center  w-[5.5em] ${error.invalidTimeLimit ? "border-b-red" : "border-b-green"} focus:outline-none`} type={"number"}
+                                        className={`${textInputClass}  text-center  w-[5.5em] ${getErrorStyle(triedSubmitting, error.invalidTimeLimit, "BORDER")} focus:outline-none`} type={"number"}
                                     />
-                                    <p className={`text-red text-sm py-1 ${error.invalidTimeLimit  ? "opacity-1" : "opacity-0"}`}>Time limit has to be between 0 and 360 minutes</p>
+                                        <p className={`text-red text-sm py-1
+                                            ${getErrorStyle(triedSubmitting, error.invalidTimeLimit, "OPACITY")}`}>
+                                                Time limit has to be between 0 and 360 minutes
+                                        </p>
                                     </div>
                                 </div>
                             </div>
                         </div>
                         <div>
                             {MemoizedQuestionSubscription}
-                            <p className={`text-red text-center text-sm py-1 ${error.invalidNumQuestions  ? "opacity-1" : "opacity-0"}`}>Your test needs to be subscribed to questions!</p>
+                            <p className={`text-red text-center text-sm py-1 ${getErrorStyle(triedSubmitting, error.invalidNumQuestions, "OPACITY")}`}>Your test needs to be subscribed to questions!</p>
                         </div>
                         <div className="container flex flex-row mx-auto w-full justify-center items-center mt-3">
                             <SaveItemPanel saveText="Save" onSave={handleSaveTest} cancelLink="/tests" error={lSaveDisabled}/>

@@ -2,7 +2,7 @@ import { Auth, Cache } from "aws-amplify";
 import { useState } from "react";
 import { useDispatch } from "react-redux";
 import { useNavigate } from "react-router-dom";
-import { actionButtonClass, flexColClass, labelDivClass, labelTextClass, textInputClass } from "../../common";
+import { actionButtonClass, flexColClass, flexRowClass, headingTextClass, textInputClass } from "../../common";
 import { getErrorStyle } from "../../common/utils/GetErrorStyle";
 import { userSignedInStatusChange } from "../../reducers/global";
 import { CognitoUser }  from 'amazon-cognito-identity-js';
@@ -20,9 +20,26 @@ type TError =
     invalidPassword: boolean,
 };
 
-export const LoginDetails = () =>
+type TNewPassword =
+{
+    password: string,
+    confirmPassword: string;
+};
+
+interface ILoginDetailsProps
+{
+    onLoginCancel: () => void;
+    onLoginError: (error: any) => void;
+    onLoginSuccess: (message: any) => void;
+}
+
+export const LoginDetails = (aLoginDetailsProps: ILoginDetailsProps) =>
 {
     const [ login, setLogin ] = useState<ILoginDetails>({ email: "", password: "" });
+
+    const [ newPassword, setNewPassword ] = useState<TNewPassword>({ password: "", confirmPassword: ""});
+    const [ resetPassword, setResetPassword ] = useState<boolean>(false);
+    const [ code, setCode ] = useState<string>("");
 
     const [ loading, setLoading ] = useState<boolean>(false);
     const [ error, setError ] = useState<TError>({ invalidEmail: false, invalidPassword: false, });
@@ -30,6 +47,46 @@ export const LoginDetails = () =>
 
     const dispatch = useDispatch(); 
     const navigate = useNavigate();
+
+    const handleResetPassword = async() =>
+    {
+        if (login.email === "")
+        {
+            const lError =
+            {
+                code: "You need to enter an email first",
+            }
+            aLoginDetailsProps.onLoginError(lError);
+            return;
+        }
+        try
+        {
+            const lResetRequest = await Auth.forgotPassword(login.email);
+            setResetPassword(true);
+            console.log(lResetRequest);
+        }
+        catch(error)
+        {
+            aLoginDetailsProps.onLoginError(error);
+        }
+    };
+
+    const handleNewPassword = async() =>
+    {
+        setLoading(true);
+        try
+        {
+            console.log(login.email, code, newPassword);
+            const lNewPasswordRequest = await Auth.forgotPasswordSubmit(login.email, code, newPassword.password);
+            const lMessage = { code: "Password changed successfully", severity: "low" };
+            aLoginDetailsProps.onLoginSuccess(lMessage);
+        }
+        catch(error)
+        {
+            aLoginDetailsProps.onLoginError(error);
+        }
+        setLoading(false);
+    }
 
     const handleLogin = async() =>
     {
@@ -39,6 +96,7 @@ export const LoginDetails = () =>
         {
             return;
         }
+
         setLoading(true);
         try {
             const lLoginResult: CognitoUser = await Auth.signIn(login.email, login.password);
@@ -47,43 +105,70 @@ export const LoginDetails = () =>
             Cache.setItem("isSignedIn", true);
             dispatch(userSignedInStatusChange(true));
             navigate("/welcome");
-        } catch (error) {
-            console.log('error signing in', error);
+        } catch (error)
+        {
+            aLoginDetailsProps.onLoginError(error);
+            setLoading(false);
         }
     }
 
     return (
-        <div className="mt-[5em] mb-20">
-            <div className={`${flexColClass} w-[100%] ml-6 mt-5`}>
-                <div className={`${labelDivClass} my-[1em]`}>
-                    <label className={labelTextClass}> Email </label>
+        <div className="container flex flex-col justify-start py-10 px-5 bg-white
+            items-center absolute border-2 top-40 w-[25em] shadow-lg z-100 h-[34em] rounded-md">
+            <h3 className={`${headingTextClass}`}> {resetPassword ? "Reset Password" : "Login"} </h3>
+            <div className={`${flexColClass} mt-[1em]`}>
+                {resetPassword && <div className={`${flexColClass} items-center mt-[1em]`}>
+                    <label className={`self-start ml-[1em] font-bold text-lg`}> Verification Code </label>
                     <div>
                     <input
-                        type="email"
-                        className={`${textInputClass} w-[15em] ${getErrorStyle(triedSubmitting, error.invalidEmail, "BORDER")}`}
-                        onChange={(event) => setLogin({ ...login, email: event.target.value })} />
-                        <p className={`text-red text-sm pt-1 ${getErrorStyle(triedSubmitting, error.invalidPassword, "OPACITY")}`}>You haven't entered an email.</p>
+                        type={"text"}
+                        className={`${textInputClass} w-[20em] h-[2em] ${getErrorStyle(triedSubmitting, code === "", "BORDER")}`}
+                        onChange={(event) => setCode(event.target.value)} />
+                        <p className={`text-red text-md pt-1 ${getErrorStyle(triedSubmitting, error.invalidPassword, "OPACITY")}`}>You haven't entered a code.</p>
                     </div>
                 </div>
-                <div className={`${labelDivClass} my-[1em]`}>
-                    <label className={labelTextClass}> Password </label>
+                }
+                <div className={`${flexColClass} items-center`}>
+                    <label className={`self-start ml-[1em] font-bold text-lg`}> {resetPassword ? "New Password" : "Email" } </label>
+                    <div>
+                    <input
+                        type={resetPassword ? "password" : "email" }
+                        className={`${textInputClass} w-[20em] h-[2em] ${getErrorStyle(triedSubmitting, error.invalidEmail, "BORDER")}`}
+                        onChange={(event) => resetPassword ? setNewPassword({...newPassword, password: event.target.value }) : setLogin({ ...login, email: event.target.value })} />
+                        <p className={`text-red text-md pt-1 ${getErrorStyle(triedSubmitting, error.invalidPassword, "OPACITY")}`}>You haven't entered {resetPassword ? "a password" : "an email"}</p>
+                    </div>
+                </div>
+                <div className={`${flexColClass} items-center mx-auto`}>
+                    <label className={`self-start ml-[1em] font-bold text-lg`}> {resetPassword ? "Confirm Password" : "Password"} </label>
                     <div>
                     <input
                         type="password"
-                        className={`${textInputClass} w-[15em] ${getErrorStyle(triedSubmitting, error.invalidPassword, "BORDER")}`}
-                        onChange={(event) => setLogin({ ...login, password: event.target.value })} />
-                        <p className={`text-red text-sm pt-1 ${getErrorStyle(triedSubmitting, error.invalidPassword, "OPACITY")}`}>You haven't a password.</p>
+                        className={`${textInputClass} w-[20em] h-[2em] ${getErrorStyle(triedSubmitting, error.invalidPassword, "BORDER")}`}
+                        onChange={(event) => resetPassword ? setNewPassword({ ...newPassword, confirmPassword: event.target.value }) : setLogin({ ...login, password: event.target.value })} />
+                        <p className={`text-red text-sm pt-1 ${getErrorStyle(triedSubmitting, error.invalidPassword, "OPACITY")}`}>{resetPassword ? "Password doesn't match" : "You haven't a password."}</p>
                     </div>
                 </div>
             </div>
+            <div className={`self-center mt-9`}>
+                { loading ? <SyncLoader className="mt-[1.6em]" size={18}/>
+                          : <button onClick={resetPassword ? handleNewPassword : handleLogin}
+                                    className={`${actionButtonClass} w-[12em] font-bold text-lg`}>
+                                        {resetPassword ? "Confirm" : "Login"}
+                            </button>
+                }
+            </div>
             {
-                loading
-                    ? <SyncLoader/>
-                    : <div className={`self-start mt-9 ml-6`}>
-                        <button onClick={handleLogin} className={`${actionButtonClass} w-[12em] font-bold text-lg`}> Login </button> 
-                      </div>
+                !resetPassword && <div className={`${flexRowClass} items-center mt-5 ml-2 justify-around`}>
+                <p> 🤦‍♂️ Forgot password?</p>
+                <button onClick={handleResetPassword} className="border-none bg-white text-red"> Reset Password </button>
+            </div>
             }
-            
+            <button
+                    type="button"
+                    onClick={aLoginDetailsProps.onLoginCancel}
+                    className={`self-center border-none mt-2 text-black text-lg`}>
+                        Cancel
+            </button>
         </div>
     )
 }

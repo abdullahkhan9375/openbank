@@ -1,14 +1,18 @@
 import { isEqual } from "lodash";
 import { useEffect, useState } from "react";
-import { actionButtonClass, altActionButtonClass, flexColClass, flexRowClass, labelDivClass, labelTextClass, textInputClass } from "../../common"
+import { actionButtonClass, altActionButtonClass, flexColClass, flexRowClass, headingTextClass, labelDivClass, labelTextClass, textInputClass } from "../../common"
 import { getErrorStyle } from "../../common/utils/GetErrorStyle";
 import { Auth } from 'aws-amplify';
 import { Verification } from "./Verification";
 import { ISignUpResult, CognitoUser } from 'amazon-cognito-identity-js';
+import { TMessage } from "../Components/MessagePanel";
 
 interface IRegisterDetailProps
 {
     onLogin: () => void;
+    onRegisterationError: (error: any) => void;
+    onRegisterationCancel: () => void;
+    onRegisterationSuccess: (message: TMessage) => void;
 }
 
 type TRegister =
@@ -57,6 +61,7 @@ export const RegisterDetails = (aRegisterDetailProps: IRegisterDetailProps) =>
     const [ register, setRegister ] = useState<TRegister>(lEmptyRegister);
     const [ showVerification, setShowVerification ] = useState<boolean>(false);
 
+    const [ loading, setLoading ] = useState<boolean>(false);
     const [ triedSubmitting, setTriedSubmitting ] = useState<boolean>(false);
     const [ error, setError ] = useState<TError>(lInitialError);
 
@@ -70,7 +75,8 @@ export const RegisterDetails = (aRegisterDetailProps: IRegisterDetailProps) =>
             invalidEmail: register.email === lEmptyRegister.email,
             invalidNickname: register.nickname === lEmptyRegister.nickname,
             invalidPassword: register.password === lEmptyRegister.password,
-            invalidConfirmPassword: register.password !== register.confirmPassword || register.confirmPassword === lEmptyRegister.confirmPassword,
+            invalidConfirmPassword: register.password !== register.confirmPassword
+                                    || register.confirmPassword === lEmptyRegister.confirmPassword,
         });
 
     }, [register]);
@@ -83,7 +89,7 @@ export const RegisterDetails = (aRegisterDetailProps: IRegisterDetailProps) =>
         {
             return;
         }
-
+        setLoading(true);
         try {
             const result: ISignUpResult = await Auth.signUp({
                 username: register.email,
@@ -94,28 +100,38 @@ export const RegisterDetails = (aRegisterDetailProps: IRegisterDetailProps) =>
                     email: register.email,
                     nickname: register.nickname,
                 },
-                autoSignIn: { // optional - enables auto sign in after user is confirmed
+                autoSignIn: {
                     enabled: true,
                 }
             });
             console.log(result);
             setSignUpResult(result);
             setShowVerification(true);
-        } catch (error) {
-            // Add error handling.
-            console.log('error signing up:', error);
         }
+        catch (error) { aRegisterDetailProps.onRegisterationError(error); }
+        setLoading(false);
+    };
+
+    if (showVerification)
+    {
+        return <Verification
+                username={register.email}
+                onVerificationSuccess={aRegisterDetailProps.onRegisterationSuccess}
+                signUpResult={signUpResult!}
+                onVerificationCancel={aRegisterDetailProps.onRegisterationCancel}
+                onLoginError={aRegisterDetailProps.onRegisterationError}
+                onLoginFailure={aRegisterDetailProps.onRegisterationCancel}
+                onLoginSuccess={aRegisterDetailProps.onRegisterationSuccess}
+        />;
     }
 
     return (
-        <>
-            { showVerification
-                ? <Verification signUpResult={signUpResult!}/>
-                : <>
-                    <div className={`${flexRowClass} w-[100%] ml-6 mt-2`}>
-                        <div className={labelDivClass}>
+        <div className="container flex flex-col justify-start py-10 px-5 bg-white items-start absolute border-2 top-50 w-[40em] z-100 h-[40em] rounded-md">
+            <h3 className={`${headingTextClass} ml-5`}> Register with Openbank </h3>
+            <div className={`${flexRowClass} w-[100%] ml-6 mt-2`}>
+                    <div className={labelDivClass}>
                         <label className={labelTextClass}> First Name </label>
-                        <div>
+                    <div>
                         <input
                             type="text"
                             className={`${textInputClass} w-[15em] ${getErrorStyle(triedSubmitting, error.invalidFirstName, "BORDER")}`}
@@ -194,8 +210,14 @@ export const RegisterDetails = (aRegisterDetailProps: IRegisterDetailProps) =>
                         <button className="w-[10em] my-2 bg-gray-light"> Apple </button>
                     </div>
                 </div>
-            </>
-}
-</>
+            <button
+                    type="button"
+                    onClick={aRegisterDetailProps.onRegisterationCancel}
+                    className={`rounded-sm hover:border-0 self-center mt-2 text-black text-lg w-[10em] mx-3`}>
+                <p className="text-black font-bold hover:text-black">
+                    Cancel
+                </p>
+            </button>
+    </div>
     )
 }
