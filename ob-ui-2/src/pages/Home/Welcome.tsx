@@ -1,10 +1,11 @@
-import { useSelector } from "react-redux";
 import { CognitoUser } from 'amazon-cognito-identity-js';
 import { Auth } from "@aws-amplify/auth";
 import { useEffect, useState } from "react";
 import { mainContainerClass } from "../../common";
 import { NavPanel } from "../Components/NavPanel";
 import { MessagePanel, TMessage } from "../Components/MessagePanel";
+import { handleMessage } from "../../common/utils/HandleMessage";
+import { Hub } from 'aws-amplify';
 
 export const Welcome = () =>
 {
@@ -12,18 +13,30 @@ export const Welcome = () =>
     
     const [message, setMessage] = useState<TMessage | undefined>(undefined);
 
+    function listenToAutoSignInEvent() {
+        Hub.listen('auth', ({ payload }) => {
+            const { event } = payload;
+            if (event === 'autoSignIn') {
+                const user = payload.data;
+                console.log("Hub", user);
+            } else if (event === 'autoSignIn_failure') {
+                console.log("Nope")
+            }
+        })
+    }
+
     useEffect(() =>
     {
         (async() =>
         {
             try {
-                const lCognitoUser: CognitoUser = await Auth.currentAuthenticatedUser();
+                const lCognitoUser: any = await Auth.currentAuthenticatedUser();
                 console.log(lCognitoUser);
+                setUserName(lCognitoUser.attributes.given_name);
             }
             catch(error)
             {
                 console.log(error);
-                setMessage({ severity: "high", message: "Error" })
             }
         })();
     }, []);

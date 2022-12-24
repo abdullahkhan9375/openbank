@@ -24,6 +24,8 @@ import { TBank, TBankError, TChoice, TQuestion } from "../../model";
 import { SaveItemPanel } from "../../common";
 import moment from "moment";
 import { NavPanel } from "../Components/NavPanel";
+import { getErrorStyle } from "../../common/utils/GetErrorStyle";
+import { MessagePanel, TMessage } from "../Components/MessagePanel";
 
 const lEmptyBank: TBank =
 {
@@ -65,10 +67,14 @@ export const BankDetails = () =>
     const [ selectedQuestion, setSelectedQuestion ] = useState<TQuestion>(lEmptyQuestion);
     const [ questions, setQuestions ] = useState<TQuestion[]>(bank.questions);
     const [ error, setError ] = useState<TBankError>({ invalidName: bank.name==="", invalidQuestion: bank.questions.length === 0, emptyChoice: false });
+
     const [ hasChanged, setHasChanged ] = useState<boolean>(false);
     const [ triedSubmitting, setTriedSubmitting ] = useState<boolean>(false);
+    const [ message, setMessage ] = useState<TMessage | undefined>(undefined);
 
     const navigate = useNavigate();
+
+    const data = useMemo(() => questions, [questions]);
 
     useEffect(() =>
     {
@@ -80,25 +86,11 @@ export const BankDetails = () =>
         setHasChanged(!isEqual(bank, editingBank ?? lEmptyBank));
     }, [questions, bank]);
 
-    const validateQuestions = () =>
+    const onAddQuestion = () =>
     {
-        for (const question of questions)
-        {
-            if (question.choices.length !== bank.numChoices)
-            {
-                setError({ ...error, emptyChoice: true });
-                return;
-            }
-        }
-        setError({ ...error, emptyChoice: false })
+        setHasChanged(true);
+        setAddingQuestion(true);
     };
-
-    useEffect(() =>
-    {
-        validateQuestions();
-    }, [bank.numChoices, bank.questions]);
-
-    const onAddQuestion = () => setAddingQuestion(true);
 
     const handleDeleteQuestion = (info: CellContext<TQuestion, string>) =>
     {
@@ -124,6 +116,7 @@ export const BankDetails = () =>
 
     const handleSaveBank = () =>
     {
+        setTriedSubmitting(true);
         if (error.invalidName || error.invalidQuestion) return;
 
         const lBank: TBank =
@@ -160,7 +153,6 @@ export const BankDetails = () =>
 
         setAddingQuestion(false);
         setSelectedQuestion(lEmptyQuestion);
-        validateQuestions();
     };
 
     const columnHelper = createColumnHelper<TQuestion>();
@@ -179,12 +171,11 @@ export const BankDetails = () =>
     }),
     ], [questions]);
 
-    const data = useMemo(() => questions, [questions]);
     const lSaveDisabled = (error.invalidName || error.invalidQuestion || error.emptyChoice) || !hasChanged;
     return (
         <>
         <NavPanel/>
-        <div className={mainContainerClass}>
+        <div className={`${mainContainerClass}`}>
             { addingQuestion
                     ? <QuestionDetails numChoices={bank.numChoices} onCancelSubmit={handleCancelSubmit} onSubmit={handleSubmitQuestion} question={selectedQuestion}/>
                     :  <div className={flexColClass}>
@@ -202,9 +193,11 @@ export const BankDetails = () =>
                                                 <input
                                                     value={bank.name}
                                                     onChange={(event) => { setBank({ ...bank, name: event.target.value })}}
-                                                    className={`${textInputClass} w-[30em] ${error.invalidName ? "border-b-red" : "border-b-green"}`} type={"text"}
+                                                    className={`${textInputClass} w-[30em] ${getErrorStyle(triedSubmitting, error.invalidName, "BORDER")}`} type={"text"}
                                                 />
-                                                <p className={`text-red text-sm py-1 ${error.invalidName ? "opacity-1" : "opacity-0"}`}>You haven't entered a name</p>
+                                                    <p className={`text-red text-sm py-1 ${getErrorStyle(triedSubmitting, error.invalidName, "OPACITY")}`}>
+                                                        You haven't entered a name
+                                                    </p>
                                                 </div>
                                             </div>
                                             <div className={labelDivClass}>
@@ -250,7 +243,13 @@ export const BankDetails = () =>
                                                         type="number"
 
                                                         min={1}
-                                                        onChange={(event) => { setBank({ ...bank, numChoices: Number(event.target.value)})}}
+                                                        onChange={(event) => {
+                                                            if (questions.length > 0)
+                                                            {
+                                                                setMessage({ severity: "medium", message: "delete questions to change choice qty"})
+                                                                return;
+                                                            }
+                                                            setBank({ ...bank, numChoices: Number(event.target.value)})}}
                                                         className={`${textInputClass} text-center w-[5em] ${bank.numChoices >= 1 ? "border-b-green" : "border-b-black"}`}
                                                     />
                                                 </div>
@@ -280,7 +279,8 @@ export const BankDetails = () =>
                             </div>
                         </div>
                 }
+        <MessagePanel onAcknowledge={() => setMessage(undefined)} {...message}/>
         </div>
         </>
     )
-}
+};

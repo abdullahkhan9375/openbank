@@ -58,7 +58,7 @@ export const MessagePanel = (aMessagePanelProps: IMessagePanelProps) =>
         return (
                 <div
                 ref={wrapperRef}
-                className={`container flex flex-row opacity-75 shadow-lg border-[2px] rounded-md
+                className={`container flex flex-row opacity-100 bg-white shadow-lg border-[2px] rounded-md
                 items-center justify-center mx-auto w-[30em] h-[4em] absolute z-100 top-[80vh]
                     ${lMessageColor[aMessagePanelProps.severity!]}`}>
                 <p className="text-lg text-center font-semibold">

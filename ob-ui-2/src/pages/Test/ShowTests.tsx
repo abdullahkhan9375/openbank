@@ -19,7 +19,7 @@ export const ShowTests = () =>
     const tests: TTest[] = useSelector((state: any) => state.test);
     const results: TExamAttemptState[] = useSelector((state: any) => state.result);
     const [ message, setMessage ] = useState<TMessage | undefined>(undefined);
-
+    const lBanks = useSelector((state: any) => state.bank);
     console.log("Tests: ", tests);
     console.log("Results: ", results);
 
@@ -72,6 +72,12 @@ export const ShowTests = () =>
 
     const handleCreateTest = () =>
     {
+        if (lBanks.length === 0)
+        {
+            setMessage({ severity: "high", message: "You aren't subscribed to any banks"})
+            return;
+        }
+
         navigate("new");
     };
 

@@ -14,20 +14,12 @@ interface IShowHome {}
 
 export const ShowHome = (aShowHomeProps: IShowHome) =>
 {
-    const lIsSignedIn: boolean = useSelector((state: any) => state.global.user.isSignedIn);
-
     const [showLoginDialog, setShowLoginDialog] = useState<boolean>(false);
     const [message, setMessage] = useState<TMessage | undefined>(undefined);
 
     const navigate = useNavigate();
     const dispatch = useDispatch();
 
-    if (lIsSignedIn)
-    {
-      return (
-          <Welcome/>
-      )
-    }
     return (
        <>
        <NavPanel/>
