@@ -86,7 +86,7 @@ export const LoginDetails = (aLoginDetailsProps: ILoginDetailsProps) =>
             aLoginDetailsProps.onLoginError(error);
         }
         setLoading(false);
-    }
+    };
 
     const handleLogin = async() =>
     {
@@ -98,6 +98,7 @@ export const LoginDetails = (aLoginDetailsProps: ILoginDetailsProps) =>
         }
 
         setLoading(true);
+
         try {
             const lLoginResult: CognitoUser = await Auth.signIn(login.email, login.password);
             setLoading(false);
@@ -110,7 +111,7 @@ export const LoginDetails = (aLoginDetailsProps: ILoginDetailsProps) =>
             aLoginDetailsProps.onLoginError(error);
             setLoading(false);
         }
-    }
+    };
 
     return (
         <div className="container flex flex-col justify-start py-10 px-5 bg-white

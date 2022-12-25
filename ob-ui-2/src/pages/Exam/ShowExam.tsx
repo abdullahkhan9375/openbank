@@ -1,4 +1,3 @@
-import { attempt, isEqual, result } from "lodash";
 import { useState } from "react";
 import { useDispatch, useSelector } from "react-redux";
 import { useNavigate, useParams } from "react-router-dom";
@@ -67,6 +66,7 @@ export const ShowExam = () =>
     console.log("Type: ", type);
     const lIsReviewMode = type === "reviewMode";
 
+    // TODO: Clean up and refactor.
     const lTest: TTest = useSelector((state: any) => state.test.find((aTest: TTest) => aTest.id === id));
     const lResults: TExamAttemptState = useSelector((state: any) => state.result.find((aExamAttempt: TExamAttemptState) => aExamAttempt.testId === lTest.id));
     const lExamAttempt: TExamAttempt = lIsReviewMode ? lResults.attempts[lResults.attempts.length - 1] : lEmptyExamAttempt;

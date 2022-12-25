@@ -14,7 +14,7 @@ export const SignOut = (aSignOutProps: ISignOutProps) =>
     const navigate = useNavigate();
     const handleSignOut = async() =>
     {
-        const lSignOut = await Auth.signOut();
+        await Auth.signOut();
         dispatch(userSignedInStatusChange(false));
         aSignOutProps.onSignOut();
         navigate("/home");
@@ -27,4 +27,4 @@ export const SignOut = (aSignOutProps: ISignOutProps) =>
             Sign Out
         </div>
     )
-}
+};

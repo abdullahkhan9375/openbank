@@ -16,4 +16,4 @@ export type TQuestionError =
     invalidStatement: boolean,
     invalidQty: boolean,
     invalidCorrect: boolean,
-}
+};

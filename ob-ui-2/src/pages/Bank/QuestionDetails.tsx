@@ -1,9 +1,9 @@
-import { FormEvent, useEffect, useState } from "react";
-import { flexColClass, flexRowClass, formDivClass, labelDivClass, labelTextClass, textInputClass } from "../../common/CommonStyling";
+import { useEffect, useState } from "react";
+import { flexColClass, flexRowClass, formDivClass, labelTextClass, textInputClass } from "../../common/CommonStyling";
 import { actioButtonDisabledClass, actionButtonClass } from "../../common/buttons/styles";
 import { TChoice, TQuestion, TQuestionError } from "../../model";
 import { ChoiceDetails } from "./ChoiceDetails";
-import { isEqual, trimEnd } from "lodash";
+import { isEqual } from "lodash";
 
 interface IQuestionDetailsProps
 {
@@ -82,8 +82,8 @@ export const QuestionDetails = (aQuestionDetailsProps: IQuestionDetailsProps) =>
         if (lError) { return; }
 
         let lCorrectSum = 0;
-        question.choices.forEach((aChoice: TChoice) => aChoice.correct ? lCorrectSum += 1 : lCorrectSum += 0)
-        const lMutlipleCorrect: boolean = lCorrectSum > 1
+        question.choices.forEach((aChoice: TChoice) =>
+            aChoice.correct ? lCorrectSum += 1 : lCorrectSum += 0);
 
         const lEditedQuestion: TQuestion =
         {
@@ -162,10 +162,12 @@ export const QuestionDetails = (aQuestionDetailsProps: IQuestionDetailsProps) =>
                             <button
                                 type="button"
                                 onClick={handleSubmit}
-                                className={`${lError ? actioButtonDisabledClass : actionButtonClass} w-[10em]`}><p className="font-bold text-white text-lg">Submit</p></button>
+                                className={`${lError ? actioButtonDisabledClass : actionButtonClass} w-[10em]`}>
+                                    <p className="font-bold text-white text-lg">Submit</p>
+                            </button>
                     </div>
                 </div>
             </form>
         </div>
-    )
+    );
 };

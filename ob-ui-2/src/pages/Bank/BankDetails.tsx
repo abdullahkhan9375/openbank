@@ -86,7 +86,7 @@ export const BankDetails = () =>
         setHasChanged(!isEqual(bank, editingBank ?? lEmptyBank));
     }, [questions, bank]);
 
-    const onAddQuestion = () =>
+    const handleAddQuestion = () =>
     {
         setHasChanged(true);
         setAddingQuestion(true);
@@ -258,7 +258,7 @@ export const BankDetails = () =>
                                     <div className={`${flexColClass} justify-between items-center mt-2`}>
                                         <div className={`${flexRowClass} items-center justify-between`}>
                                             <h3 className={headingTextClass}> Your questions </h3>
-                                            <button className={`${actionButtonClass} mr-2 text-lg font-bold w-[10em]`} onClick={() => setAddingQuestion(true)}>
+                                            <button className={`${actionButtonClass} mr-2 text-lg font-bold w-[10em]`} onClick={handleAddQuestion}>
                                                 Add a question
                                             </button>
                                         </div>

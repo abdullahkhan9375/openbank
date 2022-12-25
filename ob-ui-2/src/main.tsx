@@ -8,7 +8,6 @@ import {
 import { Root } from "./pages/Root";
 import { ShowHome } from './pages/Home/ShowHome';
 import { ErrorPage } from './pages/ErrorPage';
-import { ShowUser } from './pages/User/ShowUser';
 import { BankDetails } from './pages/Bank/BankDetails';
 import { ShowBanks } from './pages/Bank/ShowBanks';
 import  store from "./store";
@@ -58,10 +57,6 @@ const router = createBrowserRouter (
             element: <TestDetails/>
           }
         ]
-      },
-      {
-        path:"user",
-        element: <ShowUser/>,
       },
       {
         path:"exam",

@@ -1,4 +1,4 @@
-import { flexRender, getCoreRowModel, RowModel, useReactTable } from "@tanstack/react-table"
+import { flexRender, getCoreRowModel, useReactTable } from "@tanstack/react-table"
 
 interface ITableProps
 {
@@ -44,5 +44,5 @@ export const Table = (aTableProps: ITableProps) =>
                 ))}
             </tbody>
     </table>
-    )
-}
+    );
+};

@@ -6,7 +6,7 @@ import { useSelector, useDispatch } from 'react-redux';
 import { CellContext, createColumnHelper } from "@tanstack/react-table";
 import { BsFillPencilFill, BsFillTrashFill, BsFillBookFill, BsFillCaretRightFill } from "react-icons/bs";
 import { Table } from "../../common/Table";
-import { TExamAttempt, TQuestion, TTest, TTestView } from "../../model";
+import { TTest, TTestView } from "../../model";
 import { testDeleted } from "../../reducers/test";
 import { TExamAttemptState } from "../../reducers/result";
 import moment from "moment";
@@ -175,7 +175,9 @@ export const ShowTests = () =>
             {tests.length > 0
                 ? <Table data={data} columns={columns}/>
                 : <div className="mt-10">
-                        <h2 className="font-normal text-4xl text-gray">You aren't subscribed to any tests currently.</h2>
+                        <h2 className="font-normal text-4xl text-gray">
+                            You aren't subscribed to any tests currently.
+                        </h2>
                     </div>
             }
             <MessagePanel onAcknowledge={() => setMessage(undefined)} {...message}/>

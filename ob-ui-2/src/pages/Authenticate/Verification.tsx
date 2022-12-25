@@ -1,10 +1,9 @@
 import { useState } from "react";
-import { useDispatch } from "react-redux";
-import { useNavigate } from "react-router-dom";
-import { actionButtonClass, flexColClass, flexRowClass, headingTextClass, labelTextClass, textInputClass } from "../../common"
-import { userSignedInStatusChange } from "../../reducers/global";
-import { ISignUpResult, CognitoUser } from 'amazon-cognito-identity-js';
-import { Auth, Cache } from "aws-amplify";
+import { actionButtonClass, flexColClass, flexRowClass,
+         headingTextClass, labelTextClass, textInputClass
+        } from "../../common";
+import { ISignUpResult } from 'amazon-cognito-identity-js';
+import { Auth} from "aws-amplify";
 import { TMessage } from "../Components/MessagePanel";
 import { LoginDetails } from "./LoginDetails";
 
@@ -23,14 +22,11 @@ export const Verification = (aVerificationProps: IVerificationProps) =>
 {
     const [ confirmationCode, setConfirmationCode ] = useState<string>("");
     const [ showLogin, setShowLogin ] = useState<boolean>(false);
-    const lUser = aVerificationProps.signUpResult;
-    const dispatch = useDispatch();
-    const navigate = useNavigate();
 
     const handleResendCode = async() =>
     {
         try {
-            const lResendCodeRequest = await Auth.resendSignUp(aVerificationProps.username);
+            await Auth.resendSignUp(aVerificationProps.username);
             const lMessage: TMessage =
             {
                 message: "A new code has been sent",
@@ -45,7 +41,7 @@ export const Verification = (aVerificationProps: IVerificationProps) =>
 
     const handleConfirmCode = async() =>
     {
-        const lVerificationRequest = aVerificationProps.signUpResult.user.confirmRegistration(confirmationCode, true, (err: any, result: any) => {
+        aVerificationProps.signUpResult.user.confirmRegistration(confirmationCode, true, (err: any, result: any) => {
             if (err) {
              console.log('error', err.message);
              return;
@@ -64,7 +60,8 @@ export const Verification = (aVerificationProps: IVerificationProps) =>
             />;
     }
     return (
-        <div className="container flex flex-col justify-start py-10 px-5 bg-white items-center absolute border-2 top-60 w-[30em] h-[25em] z-100 rounded-md">
+        <div className="container flex flex-col justify-start py-10 px-5 bg-white
+        items-center absolute border-2 top-60 w-[30em] h-[25em] z-100 rounded-md">
             <h3 className={`text-2xl ${headingTextClass} self-center`}> You should've received a code.</h3>
             <div className={`${flexColClass} items-center`}>
                 <label className={`${labelTextClass} text-center mt-10`}> Verification Code </label>
@@ -85,5 +82,5 @@ export const Verification = (aVerificationProps: IVerificationProps) =>
                         Cancel
             </button>
         </div>
-    )
-}
+    );
+};

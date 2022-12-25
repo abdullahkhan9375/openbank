@@ -1,5 +1,5 @@
 import { BsFillCheckCircleFill, BsFillExclamationCircleFill, BsFillXCircleFill } from "react-icons/bs";
-import React, { useRef, useEffect, useState } from "react";
+import { useRef, useEffect, useState } from "react";
 
 export type TMessage =
 {
@@ -68,6 +68,5 @@ export const MessagePanel = (aMessagePanelProps: IMessagePanelProps) =>
                 </div>
             );
     }
-
     return (<></>);
 };

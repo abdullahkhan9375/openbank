@@ -1,4 +1,3 @@
-import React from 'react';
 import { useState, useEffect } from 'react';
 import { TTime } from '../../pages/Exam/ShowExam';
 
@@ -14,16 +13,10 @@ export const Timer = (aTimerProps: ITimerProps) =>
   const lTime = aTimerProps.time;
   const onTimeChange = aTimerProps.onTimeChange;
 
-  const [ timeUp, setTimeUp ] = useState<boolean>(false);
-
   const lNowInSeconds: number = Math.floor(Date.now()/1000);
   const lDeadline = lNowInSeconds + (lTime.minutes * 60);
 
   const getTime = () => {
-    if (timeUp)
-    {
-      return;
-    }
     const time: number = lDeadline - Math.floor(Date.now()/1000);
     // console.log("Time: ", time);
     onTimeChange({
@@ -47,18 +40,18 @@ export const Timer = (aTimerProps: ITimerProps) =>
   {
     return (
       <p className={`text-lg border-gray rounded-sm border-r-4 px-3 py-2 font-bold`}>
-        Remaining time: {lTimeString} </p>
-    )
+        Remaining time: {lTimeString}
+      </p>
+    );
   }
   else
   {
-    // console.log(lTime);
-  return (
-    <p className={`text-lg border-gray rounded-sm border-r-4 px-3 py-2 font-bold
-    ${lTime.minutes < 1 ? " border-red text-red" : " border-black text-black "}`}>
-      {(lTime.seconds > 0 && lTime.minutes > 0) ? `Remaining time
-      ${lTimeString}` : "Time Over"}</p>
-  );
+    return (
+      <p className={`text-lg border-gray rounded-sm border-r-4 px-3 py-2 font-bold
+      ${lTime.minutes < 1 ? " border-red text-red" : " border-black text-black "}`}>
+        {(lTime.seconds > 0 && lTime.minutes > 0) ? `Remaining time
+        ${lTimeString}` : "Time Over"}</p>
+    );
   }
 };
 

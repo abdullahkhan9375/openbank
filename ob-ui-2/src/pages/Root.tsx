@@ -1,6 +1,4 @@
-import { useSelector } from "react-redux";
 import { Outlet } from "react-router-dom";
-import { NavPanel } from "./Components/NavPanel";
 
 export const Root = () =>
 {

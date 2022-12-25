@@ -16,7 +16,7 @@ export const ChoiceDetails = (aChoiceProps: IChoiceProps) =>
     const [ error, setError ] = useState<boolean>(aChoiceProps.selectedChoice.body === "");
     const [ hasChanged, setHasChanged ] = useState<boolean>(false);
 
-    const handleSubmit = (event: FormEvent) =>
+    const handleSubmit = () =>
     {
         if (lSaveDisabled) return;
         aChoiceProps.onSaveChoice(choice);
@@ -43,24 +43,41 @@ export const ChoiceDetails = (aChoiceProps: IChoiceProps) =>
                     </div>
                     <div className={`${flexColClass} justify-center mb-1 items-start`}>
                         <div className={`${flexRowClass} justify-between"`}>
-                            <input type="text" className={`${textInputClass} w-4/5 ${error ? "border-b-red" : "border-b-green"}`} value={choice.body} onChange={(event) => {setChoice({...choice, body: event.target.value })}
+                            <input type="text"
+                                   className={`${textInputClass} w-4/5 ${error ? "border-b-red" : "border-b-green"}`}
+                                   value={choice.body} onChange={(event) => {setChoice({...choice, body: event.target.value })}
                             }/>
                             <div>
                                 <label className={labelTextClass}> Correct </label>
-                                <input type="checkbox" className="bg-gray-light" value={String(choice.correct)} checked={choice.correct} onChange={(event) => {setChoice({...choice, correct: event.target.checked })}
+                                <input type="checkbox"
+                                       className="bg-gray-light"
+                                       value={String(choice.correct)}
+                                       checked={choice.correct}
+                                       onChange={(event) => {setChoice({...choice, correct: event.target.checked })}
                                 } />
                             </div>
                         </div>
-                        <p className={`text-red text-sm py-1 ${error ? "opacity-1" : "opacity-0"}`}>You haven't entered a choice</p>
+                        <p className={`text-red text-sm py-1 ${error ? "opacity-1" : "opacity-0"}`}>
+                            You haven't entered a choice
+                        </p>
                     </div>
                     <div className="">
                         <label className={labelTextClass}> Explanation </label>
                     </div>
                     <div className={flexRowClass}>
-                        <input className={`border-b-2 px-3 focus:outline-none w-full h-[80px]`} value={choice.explanation} onChange={(event) => {setChoice({...choice, explanation: event.target.value })}} type="text"/>
-                        <button type="button" className={`h-[3em] self-end ${lSaveDisabled ? actioButtonDisabledClass : actionButtonClass} ml-2`} onClick={handleSubmit}><p className="text-lg font-bold"> save </p></button>
+                        <input className={`border-b-2 px-3 focus:outline-none w-full h-[80px]`}
+                               value={choice.explanation}
+                               onChange={(event) => {setChoice({...choice, explanation: event.target.value })}}
+                               type="text"/>
+                        <button type="button"
+                                className={`h-[3em] self-end ${lSaveDisabled ? actioButtonDisabledClass : actionButtonClass} ml-2`}
+                                onClick={handleSubmit}>
+                                    <p className="text-lg font-bold">
+                                        save
+                                    </p>
+                                </button>
                     </div>
                 </form>
             </div>
-        )
+        );
 };

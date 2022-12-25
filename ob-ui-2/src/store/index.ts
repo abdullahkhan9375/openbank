@@ -15,4 +15,3 @@ const reducer =
 export default configureStore({
   reducer: reducer,
 });
-

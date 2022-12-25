@@ -6,6 +6,7 @@ import { Auth } from 'aws-amplify';
 import { Verification } from "./Verification";
 import { ISignUpResult, CognitoUser } from 'amazon-cognito-identity-js';
 import { TMessage } from "../Components/MessagePanel";
+import { SyncLoader } from "react-spinners";
 
 interface IRegisterDetailProps
 {
@@ -196,8 +197,16 @@ export const RegisterDetails = (aRegisterDetailProps: IRegisterDetailProps) =>
                 </div>
                 <div className={flexRowClass}>
                     <div className={flexColClass}>
-                        <div className="self-start mt-9 ml-6">
-                            <button onClick={handleSubmitRegister} className={`${actionButtonClass} w-[12em] font-bold text-lg`}> Register </button> 
+                        <div className={`ml-6`}>
+                            { loading
+                                ? <SyncLoader
+                                          className="mt-[1.6em]" size={18}
+                                    />
+                                : <button onClick={handleSubmitRegister}
+                                          className={`${actionButtonClass} w-[12em] font-bold text-lg`}>
+                                            Register
+                                  </button>
+                            }
                         </div>
                         <div className={`${flexColClass} mt-9 ml-6`}>
                             <label className={labelTextClass}> Already have an account? </label>

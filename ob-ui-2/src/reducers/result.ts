@@ -1,6 +1,5 @@
 import { createSlice } from '@reduxjs/toolkit'
-import { isEmpty, isEqual } from 'lodash';
-import { TExamAttempt, TTest } from '../model';
+import { TExamAttempt } from '../model';
 
 export type TExamAttemptState = { testId: string, attempts: TExamAttempt[]};
 
@@ -11,15 +10,16 @@ export const resultSlice = createSlice({
     resultAdded(state: TExamAttemptState[], action)
     {
         const lExamAttempt: TExamAttempt = action.payload;
-        const lState = state;
-        const lExamAttemptIndex = state.findIndex((aAttempt: TExamAttemptState) => aAttempt.testId === lExamAttempt.testId);
+        const lExamAttemptIndex = state.findIndex((aAttempt: TExamAttemptState) =>
+          aAttempt.testId === lExamAttempt.testId);
         if (lExamAttemptIndex === -1)
         {
             state.push({ testId: lExamAttempt.testId, attempts: [action.payload]});
         }
         else
         {
-            state[lExamAttemptIndex] = {...state[lExamAttemptIndex], attempts: [...new Set([...state[lExamAttemptIndex].attempts, action.payload])]};
+            state[lExamAttemptIndex] = {...state[lExamAttemptIndex], attempts:
+              [...new Set([...state[lExamAttemptIndex].attempts, action.payload])]};
         }
     }
   }});

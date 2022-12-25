@@ -1,24 +1,17 @@
-import { useMemo, useState } from "react";
-import { useDispatch, useSelector } from "react-redux";
+import { useState } from "react";
+import { useDispatch } from "react-redux";
 import { useNavigate } from "react-router-dom";
 import { altActionButtonClass } from "../../common";
 import { mainContainerClass } from "../../common";
 import { handleMessage } from "../../common/utils/HandleMessage";
 import { ShowSignin } from "../Authenticate/ShowSignin";
-import { IMessagePanelProps, MessagePanel, TMessage } from "../Components/MessagePanel";
+import { MessagePanel, TMessage } from "../Components/MessagePanel";
 import { NavPanel } from "../Components/NavPanel";
-import { Welcome } from "./Welcome";
 
-// eslint-disable-next-line @typescript-eslint/no-empty-interface
-interface IShowHome {}
-
-export const ShowHome = (aShowHomeProps: IShowHome) =>
+export const ShowHome = () =>
 {
     const [showLoginDialog, setShowLoginDialog] = useState<boolean>(false);
     const [message, setMessage] = useState<TMessage | undefined>(undefined);
-
-    const navigate = useNavigate();
-    const dispatch = useDispatch();
 
     return (
        <>

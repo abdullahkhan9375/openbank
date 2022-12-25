@@ -1,4 +1,4 @@
-import { ChangeEventHandler, useState } from "react";
+import { useState } from "react";
 import { labelTextClass } from "../../common/CommonStyling"
 import { TBank, TChoice, TQuestion } from "../../model";
 import { useSelector } from "react-redux";
@@ -7,14 +7,6 @@ import { BsXSquareFill } from "react-icons/bs";
 const lSubscriptionWidth = 56;
 const lSubscriptionBoxClass = `container flex flex-col text-center w-[${lSubscriptionWidth/3}em]
         h-[20em] bg-white border-2`;
-
-const lEmptyChoice: TChoice =
-{
-    id: 0,
-    body: "",
-    correct: false,
-    explanation: "",
-};
 
 interface IQuestionSubscriptionProps
 {
@@ -27,7 +19,6 @@ interface IQuestionSubscriptionProps
 export const QuestionSubscription = (aSubProps: IQuestionSubscriptionProps) =>
 {
     const lSubscribedBanks: TBank[] = useSelector((state: any) => state.bank);
-    // console.log("Subscribed banks: ", lSubscribedBanks);
 
     const [selectedBank, setSelectedBank] = useState<TBank | undefined>(undefined);
    
@@ -44,7 +35,9 @@ export const QuestionSubscription = (aSubProps: IQuestionSubscriptionProps) =>
                     {lSubscribedBanks.map((aBank: TBank) =>
                     {
                         return (
-                        <div onClick={() => setSelectedBank(aBank)} className={`container flex flex-row items-center justify-center cursor-pointer overflow-scroll ${selectedBank?.id === aBank.id ? "bg-purple" : "bg-gray-light"}`}>
+                        <div onClick={() => setSelectedBank(aBank)}
+                             className={`container flex flex-row items-center justify-center cursor-pointer overflow-scroll
+                                ${selectedBank?.id === aBank.id ? "bg-purple" : "bg-gray-light"}`}>
                             <a><p className={`text-md py-1 ${selectedBank?.id === aBank.id ? "text-white" : "text-black"}`}> {aBank.name} </p></a>
                         </div>
                         )
@@ -82,12 +75,14 @@ export const QuestionSubscription = (aSubProps: IQuestionSubscriptionProps) =>
                                             lQuestion.id === aQuestion.id))?.name})
                                     </p>
                                 </div>
-                                <span onClick={() => aSubProps.onDeleteQuestion(aQuestion.id)}> <BsXSquareFill className="cursor-pointer" color={"red"}/> </span>
+                                <span onClick={() => aSubProps.onDeleteQuestion(aQuestion.id)}>
+                                    <BsXSquareFill className="cursor-pointer" color={"red"}/>
+                                </span>
                             </div>
                         );
                     })}
                 </div>
             </div>
         </div>
-    )
+    );
 };

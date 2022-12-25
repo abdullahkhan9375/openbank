@@ -1,5 +1,5 @@
 import { createSlice } from '@reduxjs/toolkit'
-import { isEmpty, isEqual } from 'lodash';
+import { isEqual } from 'lodash';
 import { TTest } from '../model';
 
 export const testSlice = createSlice({

@@ -1,17 +1,8 @@
 import { BsFillPencilFill, BsFillTrashFill } from "react-icons/bs";
-import
-{
-    CellContext,
-    ColumnDef,
-    createColumnHelper,
-    flexRender,
-    getCoreRowModel,
-    useReactTable,
-} from '@tanstack/react-table';
+import { CellContext, createColumnHelper } from '@tanstack/react-table';
 import { actionButtonClass, flexColClass, flexRowClass, mainContainerClass } from "../../common";
-import { BankDetails } from "./BankDetails";
 import { useSelector, useDispatch } from 'react-redux'
-import { bankAdded, bankDeleted } from "../../reducers/bank";
+import { bankDeleted } from "../../reducers/bank";
 import { useNavigate } from "react-router-dom";
 import { useMemo } from "react";
 import { Table } from "../../common/Table";

@@ -145,9 +145,12 @@ export const TestDetails = () =>
                                         <input
                                             value={test.name}
                                             onChange={(event) => { setTest({ ...test, name: event.target.value })}}
-                                            className={`${textInputClass} w-[30em] ${getErrorStyle(triedSubmitting, error.invalidName, "BORDER")}`} type={"text"}
+                                            className={`${textInputClass} w-[30em] ${getErrorStyle(triedSubmitting, error.invalidName, "BORDER")}`}
+                                            type={"text"}
                                         />
-                                        <p className={`text-red text-sm py-1 ${getErrorStyle(triedSubmitting, error.invalidName, "OPACITY")}`}>You haven't entered a name</p>
+                                        <p className={`text-red text-sm py-1 ${getErrorStyle(triedSubmitting, error.invalidName, "OPACITY")}`}>
+                                            You haven't entered a name
+                                        </p>
                                     </div>
                                 </div>
                                 <div className={`${labelDivClass} mb-4` }>
@@ -158,13 +161,16 @@ export const TestDetails = () =>
                                     <input
                                         value={test.description}
                                         onChange={(event) => { setTest({ ...test, description: event.target.value })}}
-                                        className={`${textInputClass} ${test.description !== "" ? "border-b-green" : "border-b-black"} w-[35em]`} type={"text"}
+                                        className={`${textInputClass} ${test.description !== "" ? "border-b-green" : "border-b-black"} w-[35em]`}
+                                        type={"text"}
                                     />
                                 </div>
                                 <div className={labelDivClass}>
                                     <label className={labelTextClass}> Tags </label>
                                     <div className="mt-3">
-                                        <TagsInput value={test.tags} onChange={(tags: string[]) => setTest({...test, tags: tags })} />
+                                        <TagsInput value={test.tags}
+                                                   onChange={(tags: string[]) => setTest({...test, tags: tags })}
+                                        />
                                     </div>
                                 </div>
                             </div>
@@ -188,13 +194,16 @@ export const TestDetails = () =>
                                             Passing Score (%)
                                     </label>
                                     <div className="container flex flex-col pt-1 justify-center">
-                                    <input
-                                        value={test.passingScore}
-                                        onChange={(event) => { setTest({ ...test, passingScore: Number(event.target.value)})}}
-                                        className={`${textInputClass} text-center w-[3em] ${getErrorStyle(triedSubmitting, error.invalidPassingScore, "BORDER")}`} type={"number"}
-                                        max={100} min={1}
-                                    />
-                                    <p className={`text-red text-sm py-1 ${getErrorStyle(triedSubmitting, error.invalidPassingScore, "OPACITY")}`}>Passing score can't be less than or equal to 0</p>
+                                        <input
+                                            value={test.passingScore}
+                                            onChange={(event) => { setTest({ ...test, passingScore: Number(event.target.value)})}}
+                                            className={`${textInputClass} text-center w-[3em] ${getErrorStyle(triedSubmitting, error.invalidPassingScore, "BORDER")}`}
+                                            type={"number"}
+                                            max={100} min={1}
+                                        />
+                                        <p className={`text-red text-sm py-1 ${getErrorStyle(triedSubmitting, error.invalidPassingScore, "OPACITY")}`}>
+                                            Passing score can't be less than or equal to 0
+                                        </p>
                                     </div>
                                 </div>
                                 <div className={labelDivClass}>
@@ -203,11 +212,11 @@ export const TestDetails = () =>
                                             Time Limit (minutes)
                                     </label>
                                     <div className="container flex flex-col pt-1 justify-center">
-                                    <input
-                                        value={test.timeLimit}
-                                        onChange={(event) => { setTest({ ...test, timeLimit: Number(event.target.value)})}}
-                                        className={`${textInputClass}  text-center  w-[5.5em] ${getErrorStyle(triedSubmitting, error.invalidTimeLimit, "BORDER")} focus:outline-none`} type={"number"}
-                                    />
+                                        <input
+                                            value={test.timeLimit}
+                                            onChange={(event) => { setTest({ ...test, timeLimit: Number(event.target.value)})}}
+                                            className={`${textInputClass}  text-center  w-[5.5em] ${getErrorStyle(triedSubmitting, error.invalidTimeLimit, "BORDER")} focus:outline-none`} type={"number"}
+                                        />
                                         <p className={`text-red text-sm py-1
                                             ${getErrorStyle(triedSubmitting, error.invalidTimeLimit, "OPACITY")}`}>
                                                 Time limit has to be between 0 and 360 minutes
@@ -218,7 +227,9 @@ export const TestDetails = () =>
                         </div>
                         <div>
                             {MemoizedQuestionSubscription}
-                            <p className={`text-red text-center text-sm py-1 ${getErrorStyle(triedSubmitting, error.invalidNumQuestions, "OPACITY")}`}>Your test needs to be subscribed to questions!</p>
+                            <p className={`text-red text-center text-sm py-1 ${getErrorStyle(triedSubmitting, error.invalidNumQuestions, "OPACITY")}`}>
+                                Your test needs to be subscribed to questions!
+                            </p>
                         </div>
                         <div className="container flex flex-row mx-auto w-full justify-center items-center mt-3">
                             <SaveItemPanel saveText="Save" onSave={handleSaveTest} cancelLink="/tests" error={lSaveDisabled}/>
