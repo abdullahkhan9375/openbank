@@ -3,7 +3,7 @@ import { useEffect, useState } from "react";
 import { mainContainerClass } from "../../common";
 import { NavPanel } from "../Components/NavPanel";
 import { MessagePanel, TMessage } from "../Components/MessagePanel";
-import { Hub } from 'aws-amplify';
+import { API } from 'aws-amplify';
 
 export const Welcome = () =>
 {
@@ -11,25 +11,13 @@ export const Welcome = () =>
     
     const [message, setMessage] = useState<TMessage | undefined>(undefined);
 
-    // function listenToAutoSignInEvent() {
-    //     Hub.listen('auth', ({ payload }) => {
-    //         const { event } = payload;
-    //         if (event === 'autoSignIn') {
-    //             const user = payload.data;
-    //             console.log("Hub", user);
-    //         } else if (event === 'autoSignIn_failure') {
-    //             console.log("Nope")
-    //         }
-    //     })
-    // }
-
     useEffect(() =>
     {
         (async() =>
         {
             try {
                 const lCognitoUser: any = await Auth.currentAuthenticatedUser();
-                console.log(lCognitoUser);
+                // console.log(lCognitoUser);
                 setUserName(lCognitoUser.attributes.given_name);
             }
             catch(error)
@@ -37,6 +25,11 @@ export const Welcome = () =>
                 console.log(error);
             }
         })();
+
+        // (async function() {
+        //     const response = await getData();
+        //     console.log(response);
+        //   })();
     }, []);
     return (
         <>

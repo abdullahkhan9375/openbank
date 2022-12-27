@@ -11,11 +11,18 @@ export type AmplifyDependentResourcesAttributes = {
         }
     },
     "function": {
-        "postUser": {
+        "user": {
             "Name": "string",
             "Arn": "string",
             "Region": "string",
             "LambdaExecutionRole": "string"
+        }
+    },
+    "api": {
+        "openbank": {
+            "RootUrl": "string",
+            "ApiName": "string",
+            "ApiId": "string"
         }
     }
 }

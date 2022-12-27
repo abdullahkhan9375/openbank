@@ -61,6 +61,7 @@ export const RegisterDetails = (aRegisterDetailProps: IRegisterDetailProps) =>
     const [ signUpResult, setSignUpResult ] = useState<ISignUpResult | undefined>(undefined);
     const [ register, setRegister ] = useState<TRegister>(lEmptyRegister);
     const [ showVerification, setShowVerification ] = useState<boolean>(false);
+    const [ cognitoUser, setCognitoUser] = useState<any>(undefined);
 
     const [ loading, setLoading ] = useState<boolean>(false);
     const [ triedSubmitting, setTriedSubmitting ] = useState<boolean>(false);

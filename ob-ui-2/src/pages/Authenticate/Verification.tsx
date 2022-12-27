@@ -47,6 +47,8 @@ export const Verification = (aVerificationProps: IVerificationProps) =>
              return;
             }
             console.log('call result: ' + JSON.stringify(result));
+            
+            // await aVerificationProps.postUserData();
             setShowLogin(true);
            });
     };

@@ -1,4 +1,4 @@
-import { Auth, Cache } from "aws-amplify";
+import { API, Auth, Cache } from "aws-amplify";
 import { useState } from "react";
 import { useDispatch } from "react-redux";
 import { useNavigate } from "react-router-dom";
@@ -7,6 +7,8 @@ import { getErrorStyle } from "../../common/utils/GetErrorStyle";
 import { userSignedInStatusChange } from "../../reducers/global";
 import { CognitoUser }  from 'amazon-cognito-identity-js';
 import { SyncLoader } from "react-spinners";
+import moment from "moment";
+import { TReqUser } from "../../model";
 
 interface ILoginDetails
 {
@@ -48,6 +50,36 @@ export const LoginDetails = (aLoginDetailsProps: ILoginDetailsProps) =>
     const dispatch = useDispatch(); 
     const navigate = useNavigate();
 
+    const postUserData = async(lCognitoUser: any) =>
+    {
+        const lNow = moment.now();
+        const lData: TReqUser =
+        {
+            PK: `UR#${lCognitoUser.attributes.sub}`,
+            SK: `UR#${lNow}`,
+            id: lCognitoUser.attributes.sub,
+            lastLoggedIn: lNow,
+            createdAt: lNow,
+            type: "user",
+            givenName: lCognitoUser.attributes.given_name,
+            familyName: lCognitoUser.attributes.family_name,
+            username: lCognitoUser.attributes.email,
+            nickName: lCognitoUser.attributes.nickname,
+            email: lCognitoUser.attributes.email,
+            subscribedBanks: [""],
+            subscribedTests: [""],
+        };
+    
+        const apiName = 'openbank';
+        const path = '/user';
+        const lReqUser = {
+            body: lData,
+            headers: {} // OPTIONAL
+        };
+  
+        return API.post(apiName, path, lReqUser);
+  }
+
     const handleResetPassword = async() =>
     {
         if (login.email === "")
@@ -77,7 +109,7 @@ export const LoginDetails = (aLoginDetailsProps: ILoginDetailsProps) =>
         try
         {
             console.log(login.email, code, newPassword);
-            const lNewPasswordRequest = await Auth.forgotPasswordSubmit(login.email, code, newPassword.password);
+            await Auth.forgotPasswordSubmit(login.email, code, newPassword.password);
             const lMessage = { code: "Password changed successfully", severity: "low" };
             aLoginDetailsProps.onLoginSuccess(lMessage);
         }
@@ -101,10 +133,12 @@ export const LoginDetails = (aLoginDetailsProps: ILoginDetailsProps) =>
 
         try {
             const lLoginResult: CognitoUser = await Auth.signIn(login.email, login.password);
-            setLoading(false);
-            console.log(lLoginResult);
             Cache.setItem("isSignedIn", true);
+            const lResponse = await postUserData(lLoginResult);
+            // dispatch(postUserData(lLoginResult)); // TODO
             dispatch(userSignedInStatusChange(true));
+            console.log(lResponse);
+            setLoading(false);
             navigate("/welcome");
         } catch (error)
         {

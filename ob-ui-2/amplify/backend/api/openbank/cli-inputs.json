@@ -1,0 +1,26 @@
+{
+  "version": 1,
+  "paths": {
+    "/user": {
+      "name": "/user",
+      "lambdaFunction": "user",
+      "permissions": {
+        "setting": "open"
+      }
+    },
+    "/bank": {
+      "name": "/bank",
+      "lambdaFunction": "bank",
+      "permissions": {
+        "setting": "open"
+      }
+    },
+    "/test": {
+      "name": "/test",
+      "lambdaFunction": "test",
+      "permissions": {
+        "setting": "open"
+      }
+    }
+  }
+}

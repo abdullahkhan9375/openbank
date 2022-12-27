@@ -6,18 +6,14 @@ export type TMessage =
     severity?: "low" | "medium" | "high";
     message?: string;
 }
-export interface IMessagePanelProps
+export type TMessagePanelProps =
 {
-    severity?: "low" | "medium" | "high";
-    message?: string;
     onAcknowledge: () => void;
-}
+} & TMessage;
 
-export const MessagePanel = (aMessagePanelProps: IMessagePanelProps) =>
+export const MessagePanel = (aMessagePanelProps: TMessagePanelProps) =>
 {
-    console.log(aMessagePanelProps);
     const [visible, setVisible] = useState<boolean>(aMessagePanelProps.message !== undefined);
-    console.log(visible);
     const wrapperRef = useRef<any>();
 
     useEffect(() => { setVisible(aMessagePanelProps.message !== undefined)}, [aMessagePanelProps]);

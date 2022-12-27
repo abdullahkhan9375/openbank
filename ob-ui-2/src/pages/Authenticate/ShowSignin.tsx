@@ -1,4 +1,7 @@
+import { API, Auth } from "aws-amplify";
+import moment from "moment";
 import { useState } from "react";
+import { TReqUser } from "../../model/User";
 import { TMessage } from "../Components/MessagePanel";
 import { LoginDetails } from "./LoginDetails";
 import { RegisterDetails } from "./RegisterDetails";
@@ -13,6 +16,7 @@ interface ISigninDialogProps
 export const ShowSignin = (aSigninDialogProps: ISigninDialogProps) =>
 {
   const [showRegisterDetails, setShowRegisterDetails ] = useState<boolean>(true);
+
 
   if (showRegisterDetails)
   {

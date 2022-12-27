@@ -13,9 +13,29 @@
     },
     "categories": {
       "function": {
-        "GetSubscribedBanks": {}
+        "GetSubscribedBanks": {},
+        "user": {
+          "deploymentBucketName": "amplify-openbank-staging-84020-deployment",
+          "s3Key": "amplify-builds/user-76643974585a33733351-build.zip"
+        },
+        "bank": {},
+        "test": {}
       },
       "auth": {
+        "openbank": {}
+      },
+      "storage": {
+        "Openbankdev": {
+          "tableName": "Openbank_dev",
+          "region": "ap-northeast-1",
+          "arn": "arn:aws:dynamodb:ap-northeast-1:269067838675:table/Openbank_dev",
+          "partitionKeyName": "PK",
+          "partitionKeyType": "S",
+          "sortKeyName": "SK",
+          "sortKeyType": "S"
+        }
+      },
+      "api": {
         "openbank": {}
       }
     }

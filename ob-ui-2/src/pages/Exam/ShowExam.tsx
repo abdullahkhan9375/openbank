@@ -196,7 +196,7 @@ export const ShowExam = () =>
             pass: lPass,
             timeTaken: lTimeTaken,
             attempt: lQuestionAttempt,
-        }
+        };
 
         const lNewExamAttempt: TExamAttempt =
         {
@@ -243,7 +243,7 @@ export const ShowExam = () =>
                 return `${lActiveChoice} border-l-green text-black`;
             }
         }
-    }
+    };
 
     const getChoiceStyle = (aChoiceId: number, aDisplayedQuestion: TQuestion) =>
     {
@@ -282,14 +282,14 @@ export const ShowExam = () =>
         <div className={mainContainerClass}>
             <h1> {exam.testConfig.name} </h1>
             <div className="self-end">
-            { time.minutes >= 0 && time.seconds >= 0 && !lIsReviewMode
-                ? <Timer
-                    time={time}
-                    onTimeChange={setTime}
-                    pauseTime={reviewMode}
-                    />
-                : <></>
-            }
+                { time.minutes >= 0 && time.seconds >= 0 && !lIsReviewMode
+                    ? <Timer
+                        time={time}
+                        onTimeChange={setTime}
+                        pauseTime={reviewMode}
+                        />
+                    : <></>
+                }
             </div>
             <div className="container flex flex-row justify-start mt-5">
                 <div className="container flex flex-col justify-start w-1/6 h-[40em] border-r-2 border-black">
