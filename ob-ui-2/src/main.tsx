@@ -10,15 +10,15 @@ import { ShowHome } from './pages/Home/ShowHome';
 import { ErrorPage } from './pages/ErrorPage';
 import { BankDetails } from './pages/Bank/BankDetails';
 import { ShowBanks } from './pages/Bank/ShowBanks';
-import  store from "./store";
+import { store } from "./store";
 import { Provider } from 'react-redux';
 import { ShowTests } from './pages/Test/ShowTests';
 import { TestDetails } from './pages/Test/TestDetails';
 import { ShowExam } from './pages/Exam/ShowExam';
 
-import { Amplify, Auth } from 'aws-amplify';
+import { Amplify } from 'aws-amplify';
 import awsconfig from './aws-exports';
-import { Welcome } from './pages/Home/Welcome';
+import { Welcome } from './pages/User/Welcome';
 
 Amplify.configure(awsconfig);
 

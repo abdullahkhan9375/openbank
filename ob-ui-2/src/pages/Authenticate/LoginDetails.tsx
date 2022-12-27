@@ -56,7 +56,7 @@ export const LoginDetails = (aLoginDetailsProps: ILoginDetailsProps) =>
         const lData: TReqUser =
         {
             PK: `UR#${lCognitoUser.attributes.sub}`,
-            SK: `UR#${lNow}`,
+            SK: `UR#${lCognitoUser.attributes.family_name}`,
             id: lCognitoUser.attributes.sub,
             lastLoggedIn: lNow,
             createdAt: lNow,

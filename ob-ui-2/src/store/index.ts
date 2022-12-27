@@ -12,6 +12,8 @@ const reducer =
   global: globalSlice,
 };
 
-export default configureStore({
+export const store = configureStore({
   reducer: reducer,
 });
+
+export type AppDispatch = typeof store.dispatch;

@@ -1,4 +1,5 @@
-import { createSlice } from '@reduxjs/toolkit';
+import { createAsyncThunk, createSlice } from '@reduxjs/toolkit';
+import { API } from 'aws-amplify';
 import { isEqual } from 'lodash';
 import { TBank } from '../model';
 
@@ -140,6 +141,20 @@ const lDummyBank: TBank[] =
   }
 ];
 
+// First, create the thunk
+export const getBanksForUser = createAsyncThunk(
+  'users/getBanksForUser',
+  async (userId: string, thunkAPI) => {
+    const apiName = 'openbank';
+        const path = `/bank/${userId}`;
+        const lReqUser = {
+            headers: {} // OPTIONAL
+        };
+    const response = await API.get(apiName, path, lReqUser);
+    return response.data;
+  }
+);
+
 export const bankSlice = createSlice({
   name: 'bank',
   initialState: [...lDummyBank],
@@ -151,8 +166,8 @@ export const bankSlice = createSlice({
 
         if (lBanks.length === 0)
         {
-            state.push(action.payload);
-            return;
+          state.push(action.payload);
+          return;
         }
 
         const lExistsIndex = lBanks.findIndex((aBank: TBank) => aBank.id === lNewBank.id);
@@ -169,7 +184,15 @@ export const bankSlice = createSlice({
     {
         return state.filter((aBank: TBank) => aBank.id !== action.payload);
     }
-  }});
+  },
+  extraReducers: (builder) => {
+    // Add reducers for additional action types here, and handle loading state as needed
+    builder.addCase(getBanksForUser.fulfilled, (state, action) => {
+      console.log(action.payload);
+      // state.entities.push(action.payload)
+    })
+  },
+});
 
 // Action creators are generated for each case reducer function
 export const { bankAdded, bankDeleted } = bankSlice.actions;
