@@ -22,6 +22,10 @@ module.exports = {
     'gray-dark': '#273444',
   },
     extend: {
+      fontSize:
+      {
+        '4xl': '1.7rem'
+      }
     },
   },
   plugins: [],

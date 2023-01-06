@@ -1,4 +1,4 @@
-import { useEffect, useState } from "react";
+import { useEffect, useMemo, useState } from "react";
 import { flexColClass, flexRowClass, formDivClass, labelTextClass, textInputClass } from "../../common/CommonStyling";
 import { actioButtonDisabledClass, actionButtonClass } from "../../common/buttons/styles";
 import { TChoice, TQuestion, TQuestionError } from "../../model";
@@ -117,6 +117,11 @@ export const QuestionDetails = (aQuestionDetailsProps: IQuestionDetailsProps) =>
         setSelectedChoice(aChoice);
     }
 
+    const lMemoizedChoiceDetails = useMemo(() =>
+    {
+        return <ChoiceDetails selectedChoice={selectedChoice} onSaveChoice={onChoiceSubmit}/>
+    }, [selectedChoice])
+
     return (
         <div className={`${flexColClass} mx-auto h-[33em] pt-3 px-[3em] mt-[10em] border-2`}>
             <form>
@@ -147,7 +152,7 @@ export const QuestionDetails = (aQuestionDetailsProps: IQuestionDetailsProps) =>
                         </div>
                     </div>
                     <div className={formDivClass}>
-                        <div className={`${flexColClass} border-2 border-black text-center pt-3 w-1/6 h-[197px] bg-white overflow-scroll`}>
+                        <div className={`${flexColClass} border-2 border-black text-center pt-3 w-1/6 h-[197px] bg-white ${choiceQty > 5 ? "overflow-y-scroll" : ""}`}>
                             {
                                 Array(choiceQty).fill(0).map((_, index: number) =>
                                 {
@@ -155,7 +160,7 @@ export const QuestionDetails = (aQuestionDetailsProps: IQuestionDetailsProps) =>
                                 })
                             }
                         </div>
-                        <ChoiceDetails selectedChoice={selectedChoice} onSaveChoice={onChoiceSubmit}/>
+                        {lMemoizedChoiceDetails}
                     </div>
                     <div className={`${flexRowClass} items-center h-20 w-[65em] justify-center`}>
                             <button className="border-0 mr-4 rounded-sm text-lg" onClick={aQuestionDetailsProps.onCancelSubmit}> Cancel </button>

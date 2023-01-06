@@ -1,7 +1,8 @@
 import { isEqual } from "lodash";
-import { FormEvent, useEffect, useState } from "react";
+import { useEffect, useState } from "react";
 import { actioButtonDisabledClass, actionButtonClass, flexColClass, flexRowClass } from "../../common";
 import { labelTextClass, textInputClass } from "../../common";
+import { getErrorStyle } from "../../common/utils/GetErrorStyle";
 import { TChoice } from "../../model";
 
 interface IChoiceProps
@@ -13,11 +14,14 @@ interface IChoiceProps
 export const ChoiceDetails = (aChoiceProps: IChoiceProps) =>
 {
     const [ choice, setChoice ] = useState<TChoice>(aChoiceProps.selectedChoice);
+
+    const [ triedSubmitting, setTriedSubmitting ] = useState<boolean>(false);
     const [ error, setError ] = useState<boolean>(aChoiceProps.selectedChoice.body === "");
     const [ hasChanged, setHasChanged ] = useState<boolean>(false);
 
     const handleSubmit = () =>
     {
+        setTriedSubmitting(true);
         if (lSaveDisabled) return;
         aChoiceProps.onSaveChoice(choice);
     };
@@ -44,7 +48,7 @@ export const ChoiceDetails = (aChoiceProps: IChoiceProps) =>
                     <div className={`${flexColClass} justify-center mb-1 items-start`}>
                         <div className={`${flexRowClass} justify-between"`}>
                             <input type="text"
-                                   className={`${textInputClass} w-4/5 ${error ? "border-b-red" : "border-b-green"}`}
+                                   className={`${textInputClass} w-4/5 ${getErrorStyle(triedSubmitting, error, "BORDER")}`}
                                    value={choice.body} onChange={(event) => {setChoice({...choice, body: event.target.value })}
                             }/>
                             <div>
@@ -57,7 +61,7 @@ export const ChoiceDetails = (aChoiceProps: IChoiceProps) =>
                                 } />
                             </div>
                         </div>
-                        <p className={`text-red text-sm py-1 ${error ? "opacity-1" : "opacity-0"}`}>
+                        <p className={`text-red text-sm py-1 ${getErrorStyle(triedSubmitting, error, "OPACITY")}`}>
                             You haven't entered a choice
                         </p>
                     </div>

@@ -258,16 +258,16 @@ export const BankDetails = () =>
                                     <div className={`${flexColClass} justify-between items-center mt-2`}>
                                         <div className={`${flexRowClass} items-center justify-between`}>
                                             <h3 className={headingTextClass}> Your questions </h3>
-                                            <button className={`${actionButtonClass} mr-2 text-lg font-bold w-[10em]`} onClick={handleAddQuestion}>
+                                            <button className={`${actionButtonClass} text-lg font-bold w-[10em]`} onClick={handleAddQuestion}>
                                                 Add a question
                                             </button>
                                         </div>
-                                        <div className={`${flexColClass} justify-between h-[20em] overflow-scroll`}>
+                                        <div className={`${flexColClass} justify-between h-[20em] ${data.length > 6 ? "overflow-y-scroll" : ""}`}>
                                             {
                                                 questions.length > 0
                                                 ? <Table data={data} columns={columns}/>
                                                 : <div className="mt-10 text-center">
-                                                    <h2 className="font-normal text-4xl text-gray">You haven't added any questions yet.</h2>
+                                                    <h2 className={`font-normal text-4xl ${triedSubmitting ? "opacity-50 text-red" : "text-gray"}`}>You haven't added any questions yet.</h2>
                                                     </div>
                                             }
                                         </div>

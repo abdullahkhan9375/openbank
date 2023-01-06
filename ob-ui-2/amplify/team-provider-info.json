@@ -12,21 +12,6 @@
       "AmplifyAppId": "de0fazee52jr6"
     },
     "categories": {
-      "function": {
-        "GetSubscribedBanks": {},
-        "user": {
-          "deploymentBucketName": "amplify-openbank-staging-84020-deployment",
-          "s3Key": "amplify-builds/user-336e485a676752315a6b-build.zip"
-        },
-        "bank": {
-          "deploymentBucketName": "amplify-openbank-staging-84020-deployment",
-          "s3Key": "amplify-builds/bank-513673536876656d7837-build.zip"
-        },
-        "test": {
-          "deploymentBucketName": "amplify-openbank-staging-84020-deployment",
-          "s3Key": "amplify-builds/test-325347312b544b346b6f-build.zip"
-        }
-      },
       "auth": {
         "openbank": {}
       },
@@ -41,8 +26,19 @@
           "sortKeyType": "S"
         }
       },
-      "api": {
-        "openbank": {}
+      "function": {
+        "user": {
+          "deploymentBucketName": "amplify-openbank-staging-84020-deployment",
+          "s3Key": "amplify-builds/user-336e485a676752315a6b-build.zip"
+        },
+        "bank": {
+          "deploymentBucketName": "amplify-openbank-staging-84020-deployment",
+          "s3Key": "amplify-builds/bank-513673536876656d7837-build.zip"
+        },
+        "test": {
+          "deploymentBucketName": "amplify-openbank-staging-84020-deployment",
+          "s3Key": "amplify-builds/test-325347312b544b346b6f-build.zip"
+        }
       }
     }
   }
