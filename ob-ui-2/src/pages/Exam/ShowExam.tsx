@@ -1,58 +1,12 @@
 import { useState } from "react";
 import { useDispatch, useSelector } from "react-redux";
 import { useNavigate, useParams } from "react-router-dom";
-import { v4 as uuidv4 } from "uuid";
-import { mainContainerClass, SaveItemPanel } from "../../common";
+import { actionButtonClass, mainContainerClass, SaveItemPanel } from "../../common";
 import Timer from "../../common/panels/Timer";
 import { TQuestionAttempt, TChoice, TExam, TExamAttempt, TQuestion, TResult, TTest } from "../../model";
 import { resultAdded, TExamAttemptState } from "../../reducers/result";
 import { NavPanel } from "../Components/NavPanel";
-
-const alphabet = ["a", "b", "c", "d", "e", "f", "g", "h", "i", "j"];
-
-const lEmptyQuestion: TQuestion =
-{
-    id: "",
-    name: "",
-    statement: "",
-    correctChoices: 0,
-    choices: [ { id: 0, correct: false, body: ""}]
-};
-
-const lNewExam: TExam =
-{
-    id: uuidv4(),
-    testConfig:
-    {
-        id: "",
-        name: "",
-        isPublic: false,
-        createdAt: 0,
-        description: "",
-        tags: [],
-        timeLimit: 0,
-        passingScore: 0,
-        subscribedQuestions: [lEmptyQuestion],
-    },
-};
-
-const lResult: TResult =
-{
-    status: "INCOMPLETE",
-    score: 0,
-    pass: false,
-    timeTaken: -1,
-    attempt: [],
-};
-
-const lEmptyExamAttempt: TExamAttempt =
-{
-    id: uuidv4(),
-    testId: lNewExam.testConfig.id,
-    examId: lNewExam.id,
-    createdAt: 0,
-    results: [],
-};
+import { alphabet, lEmptyExamAttempt, lNewExam, lResult } from "./ExamConstants";
 
 export type TTime =
 {
@@ -63,14 +17,21 @@ export type TTime =
 export const ShowExam = () =>
 {
     const { id, type } = useParams();
-    console.log("Type: ", type);
     const lIsReviewMode = type === "reviewMode";
 
     // TODO: Clean up and refactor.
     const lTest: TTest = useSelector((state: any) => state.test.find((aTest: TTest) => aTest.id === id));
     const lResults: TExamAttemptState = useSelector((state: any) => state.result.find((aExamAttempt: TExamAttemptState) => aExamAttempt.testId === lTest.id));
-    const lExamAttempt: TExamAttempt = lIsReviewMode ? lResults.attempts[lResults.attempts.length - 1] : lEmptyExamAttempt;
-    const lMostRecentResult: TResult = lIsReviewMode ? lExamAttempt.results[lExamAttempt.results.length -1 ] : lResult;
+
+    let lExamAttempt: TExamAttempt = lEmptyExamAttempt;
+    let lMostRecentResult: TResult = lResult;
+
+    if (lIsReviewMode) // Set the exma to the most recent attmept.
+    {
+        lExamAttempt = lResults.attempts[lResults.attempts.length - 1];
+        lMostRecentResult = lExamAttempt.results[lExamAttempt.results.length -1 ]
+    }
+
     const lMostRecentAttempt: TQuestionAttempt = lMostRecentResult.attempt[lMostRecentResult.attempt.length - 1];
 
     const [ exam, setExam ] = useState<TExam>({...lNewExam, testConfig: lTest });
@@ -104,7 +65,8 @@ export const ShowExam = () =>
         const lSelectedQuestion = exam.testConfig.subscribedQuestions[aIndex];
         setIndex(aIndex);
         setDisplayedQuestion(lSelectedQuestion);
-        const lSelectedAttempt: TQuestionAttempt | undefined = questionAttempts.find((aAttempt: TQuestionAttempt) => aAttempt.question.id === lSelectedQuestion.id);
+        const lSelectedAttempt: TQuestionAttempt | undefined = questionAttempts.find((aAttempt: TQuestionAttempt) =>
+            aAttempt.question.id === lSelectedQuestion.id);
         if (lSelectedAttempt === undefined)
         {
             setSelectedChoices([]);
@@ -318,7 +280,19 @@ export const ShowExam = () =>
                 </div>
             </div>
             <div className="mt-2">
-                <SaveItemPanel saveText="Submit" cancelLink="/tests" onSave={handleSubmitExam} error={lIsReviewMode}/>
+                {reviewMode
+                    ? <button
+                        onClick={() => navigate("/tests")}
+                        className={`${actionButtonClass} w-[10em] text-lg text-white font-semibold`}>
+                            All good.
+                      </button>
+                    : <SaveItemPanel
+                        saveText="Submit"
+                        cancelLink="/tests"
+                        onSave={handleSubmitExam}
+                        error={lIsReviewMode}
+                      />
+                }
             </div>
         </div>
         </>

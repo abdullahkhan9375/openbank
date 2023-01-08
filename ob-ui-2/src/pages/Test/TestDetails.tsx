@@ -30,7 +30,7 @@ const lEmptyTest: TTest =
     description: "",
     tags: [],
     subscribedQuestions: [],
-    timeLimit: 0,
+    timeLimit: 1,
     passingScore: 10,
 };
 
@@ -58,10 +58,10 @@ export const TestDetails = () =>
     useEffect(() =>
     {
         setError({
-        invalidName: test.name === "",
-        invalidTimeLimit: test.timeLimit > 360 || test.timeLimit <= 0,
-        invalidNumQuestions: subscribedQuestions.length === 0,
-        invalidPassingScore: test.passingScore <= 0,
+            invalidName: test.name === "",
+            invalidTimeLimit: test.timeLimit > 360 || test.timeLimit <= 0,
+            invalidNumQuestions: subscribedQuestions.length === 0,
+            invalidPassingScore: test.passingScore <= 0,
         });
         setHasChanged(!isEqual(test, editingTest ?? lEmptyTest));
     }, [test, subscribedQuestions])
@@ -161,7 +161,7 @@ export const TestDetails = () =>
                                     <input
                                         value={test.description}
                                         onChange={(event) => { setTest({ ...test, description: event.target.value })}}
-                                        className={`${textInputClass} ${test.description !== "" ? "border-b-green" : "border-b-black"} w-[35em]`}
+                                        className={`${textInputClass} ${test.description !== "" && triedSubmitting ? "border-b-green" : "border-b-black"} w-[35em]`}
                                         type={"text"}
                                     />
                                 </div>
@@ -214,6 +214,7 @@ export const TestDetails = () =>
                                     <div className="container flex flex-col pt-1 justify-center">
                                         <input
                                             value={test.timeLimit}
+                                            min={1}
                                             onChange={(event) => { setTest({ ...test, timeLimit: Number(event.target.value)})}}
                                             className={`${textInputClass}  text-center  w-[5.5em] ${getErrorStyle(triedSubmitting, error.invalidTimeLimit, "BORDER")} focus:outline-none`} type={"number"}
                                         />

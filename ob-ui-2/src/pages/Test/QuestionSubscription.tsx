@@ -70,16 +70,18 @@ export const QuestionSubscription = (aSubProps: IQuestionSubscriptionProps) =>
                     { aSubProps.subscribedQuestions.map((aQuestion: TQuestion) =>
                     {
                         return (
-                            <div className="container flex flex-row justify-between px-10 items-center">
-                                <div className="container flex flex-row text-center">
-                                    <p className={"text-md py-1"}>{aQuestion.name}</p>
+                            <div className="container flex flex-row px-10 items-center">
+                                <div className="container flex flex-row  text-center ml-7 justify-startr">
+                                    <p className={"text-md py-1"}>
+                                        {`${aQuestion.name}`}
+                                    </p>
                                     <p className="text-md py-1 text-gray">({lSubscribedBanks.find((aSubscribedBank: TBank) =>
                                         aSubscribedBank.questions.find((lQuestion: TQuestion) =>
                                             lQuestion.id === aQuestion.id))?.name})
                                     </p>
                                 </div>
                                 <span onClick={() => aSubProps.onDeleteQuestion(aQuestion.id)}>
-                                    <BsXSquareFill className="cursor-pointer" color={"red"}/>
+                                    <BsXSquareFill size={23} className="ml-2 cursor-pointer" color={"red"}/>
                                 </span>
                             </div>
                         );

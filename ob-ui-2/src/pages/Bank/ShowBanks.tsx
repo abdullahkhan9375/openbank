@@ -65,7 +65,7 @@ export const ShowBanks = () =>
     }),
     columnHelper.accessor('tags', {
         header: () => "Tags",
-        cell: info => <p> {`${info.getValue()}`} </p>,
+        cell: info => <p className="text-center"> {`${info.getValue()}`} </p>,
     }),
     columnHelper.accessor('numQuestions', {
         header: () => "Total Questions",

@@ -23,7 +23,7 @@ export const SignOut = (aSignOutProps: ISignOutProps) =>
     return (
         <div
             onClick={handleSignOut}
-            className="text-gray-light text-lg font-semibold hover:text-white cursor-pointer">
+            className="text-gray-light mr-3 text-lg font-semibold hover:text-white cursor-pointer">
             Sign Out
         </div>
     )

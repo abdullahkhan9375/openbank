@@ -20,11 +20,14 @@ export const NavPanel = () =>
             <div className="container flex flex-row justify-between px-4">
                 {signedIn
                 ? <>
-                    <div className="container flex flex-row justify-around bg-purple self-start w-[10em]"> 
-                        <div className="container flex flex-col justify-center">
+                    <div className="container flex flex-row justify-around bg-purple self-start ml-8 w-[10em]"> 
+                        <div className="container flex flex-col px-3 justify-center">
+                            <Link to={`/welcome`} className="text-gray-light text-lg font-semibold hover:text-white"> Home </Link>
+                        </div>
+                        <div className="container flex flex-col px-3 justify-center">
                             <Link to={`/banks`} className="text-gray-light text-lg font-semibold hover:text-white"> Banks </Link>
                         </div>
-                        <div className="container flex flex-col justify-center">
+                        <div className="container flex flex-col px-3 justify-center">
                             <Link to={`/tests`} className="text-gray-light text-lg font-semibold hover:text-white"> Tests </Link>
                         </div>
                     </div>

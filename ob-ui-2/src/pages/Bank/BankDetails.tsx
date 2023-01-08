@@ -30,7 +30,7 @@ import { MessagePanel, TMessage } from "../Components/MessagePanel";
 const lEmptyBank: TBank =
 {
     id: "",
-    name: "A new bank!",
+    name: "",
     isPublic: false,
     tags: [],
     numChoices: 1,
@@ -107,7 +107,7 @@ export const BankDetails = () =>
             setSelectedQuestion(selectedQuestion);
             setAddingQuestion(true);
         }
-    }
+    };
 
     const handleCancelSubmit = () =>
     {
@@ -117,7 +117,7 @@ export const BankDetails = () =>
     const handleSaveBank = () =>
     {
         setTriedSubmitting(true);
-        if (error.invalidName || error.invalidQuestion) return;
+        if (error.invalidName || error.invalidQuestion || !hasChanged) return;
 
         const lBank: TBank =
         {
@@ -129,12 +129,7 @@ export const BankDetails = () =>
 
         dispatch(bankAdded(lBank));
         navigate("/banks");
-    }
-
-    const handleCancel = () =>
-    {
-        navigate("/banks");
-    }
+    };
 
     const handleSubmitQuestion = (aQuestion: TQuestion) =>
     {
@@ -172,115 +167,115 @@ export const BankDetails = () =>
     ], [questions]);
 
     const lSaveDisabled = (error.invalidName || error.invalidQuestion || error.emptyChoice) || !hasChanged;
+
     return (
         <>
-        <NavPanel/>
-        <div className={`${mainContainerClass}`}>
-            { addingQuestion
-                    ? <QuestionDetails numChoices={bank.numChoices} onCancelSubmit={handleCancelSubmit} onSubmit={handleSubmitQuestion} question={selectedQuestion}/>
-                    :  <div className={flexColClass}>
-                            <div className={formBoxClass}>
-                                <h3 className={headingTextClass}> {editingBank ? "Edit this question bank" : "Set up a new question bank"}</h3>
-                                <form className="py-2">
-                                    <div className={`${flexRowClass} mr-2`}>
-                                        <div className={flexColClass}>
-                                            <div className={labelDivClass}>
-                                                <label
-                                                    className={labelTextClass}>
-                                                        Name
-                                                </label>
-                                                <div className={`${flexColClass} justify-center`}>
-                                                <input
-                                                    value={bank.name}
-                                                    onChange={(event) => { setBank({ ...bank, name: event.target.value })}}
-                                                    className={`${textInputClass} w-[30em] ${getErrorStyle(triedSubmitting, error.invalidName, "BORDER")}`} type={"text"}
-                                                />
-                                                    <p className={`text-red text-sm py-1 ${getErrorStyle(triedSubmitting, error.invalidName, "OPACITY")}`}>
-                                                        You haven't entered a name
-                                                    </p>
-                                                </div>
-                                            </div>
-                                            <div className={labelDivClass}>
-                                                <label
-                                                    className={labelTextClass}>
-                                                        Description
-                                                </label>
-                                                <input
-                                                    value={bank.description}
-                                                    onChange={(event) => { setBank({ ...bank, description: event.target.value })}}
-                                                    className={`${textInputClass} mb-3 w-[30em] ${bank.description !== undefined ? "border-b-green" : "border-b-black"}`} type={"text"}
-                                                />
-                                            </div>
-                                            <div className={labelDivClass}>
-                                                <label className={labelTextClass}> Tags </label>
-                                                <div className="mt-3">
-                                                    <TagsInput value={bank.tags} onChange={(tags: string[]) => setBank({...bank, tags: tags })} />
-                                                </div>
-                                            </div>
-                                            </div>
-                                            <div className={`${flexColClass}  border-l-2 border-gray-light pl-4 ml-2`}>
+            <NavPanel/>
+            <div className={`${mainContainerClass}`}>
+                { addingQuestion
+                        ? <QuestionDetails numChoices={bank.numChoices} onCancelSubmit={handleCancelSubmit} onSubmit={handleSubmitQuestion} question={selectedQuestion}/>
+                        :  <div className={flexColClass}>
+                                <div className={formBoxClass}>
+                                    <h3 className={headingTextClass}> {editingBank ? "Edit this question bank" : "Set up a new question bank"}</h3>
+                                    <form className="py-2">
+                                        <div className={`${flexRowClass} mr-2`}>
+                                            <div className={flexColClass}>
                                                 <div className={labelDivClass}>
-                                                    <label className={labelTextClass}> Visibility </label>
-                                                    <div>
-                                                        <label className={`text-lg text-black font-normal w-[20em]`}>
-                                                            Public
-                                                        </label>
-                                                        <input
-                                                            checked={bank.isPublic}
-                                                            // checked={Boolean(bank.isPublic)}
-                                                            onChange={(event) => setBank({ ...bank, isPublic: event.target.checked })}
-                                                            className="bg-gray-light border-0 mx-2" type={"checkbox"}
-                                                        />
+                                                    <label
+                                                        className={labelTextClass}>
+                                                            Name
+                                                    </label>
+                                                    <div className={`${flexColClass} justify-center`}>
+                                                    <input
+                                                        value={bank.name}
+                                                        onChange={(event) => { setBank({ ...bank, name: event.target.value })}}
+                                                        className={`${textInputClass} w-[30em] ${getErrorStyle(triedSubmitting, error.invalidName, "BORDER")}`} type={"text"}
+                                                    />
+                                                        <p className={`text-red text-sm py-1 ${getErrorStyle(triedSubmitting, error.invalidName, "OPACITY")}`}>
+                                                            You haven't entered a name
+                                                        </p>
                                                     </div>
                                                 </div>
                                                 <div className={labelDivClass}>
                                                     <label
                                                         className={labelTextClass}>
-                                                            Choices per Question
+                                                            Description
                                                     </label>
                                                     <input
-                                                        value={bank.numChoices}
-                                                        type="number"
-
-                                                        min={1}
-                                                        onChange={(event) => {
-                                                            if (questions.length > 0)
-                                                            {
-                                                                setMessage({ severity: "medium", message: "delete questions to change choice qty"})
-                                                                return;
-                                                            }
-                                                            setBank({ ...bank, numChoices: Number(event.target.value)})}}
-                                                        className={`${textInputClass} text-center w-[5em] ${bank.numChoices >= 1 ? "border-b-green" : "border-b-black"}`}
+                                                        value={bank.description}
+                                                        onChange={(event) => { setBank({ ...bank, description: event.target.value })}}
+                                                        className={`${textInputClass} mb-3 w-[30em] ${bank.description !== undefined && triedSubmitting ? "border-b-green" : "border-b-black"}`} type={"text"}
                                                     />
                                                 </div>
-                                            </div>
-                                    </div>
-                                    <div className={`${flexColClass} justify-between items-center mt-2`}>
-                                        <div className={`${flexRowClass} items-center justify-between`}>
-                                            <h3 className={headingTextClass}> Your questions </h3>
-                                            <button className={`${actionButtonClass} text-lg font-bold w-[10em]`} onClick={handleAddQuestion}>
-                                                Add a question
-                                            </button>
-                                        </div>
-                                        <div className={`${flexColClass} justify-between h-[20em] ${data.length > 6 ? "overflow-y-scroll" : ""}`}>
-                                            {
-                                                questions.length > 0
-                                                ? <Table data={data} columns={columns}/>
-                                                : <div className="mt-10 text-center">
-                                                    <h2 className={`font-normal text-4xl ${triedSubmitting ? "opacity-50 text-red" : "text-gray"}`}>You haven't added any questions yet.</h2>
+                                                <div className={labelDivClass}>
+                                                    <label className={labelTextClass}> Tags </label>
+                                                    <div className="mt-3">
+                                                        <TagsInput value={bank.tags} onChange={(tags: string[]) => setBank({...bank, tags: tags })} />
                                                     </div>
-                                            }
+                                                </div>
+                                                </div>
+                                                <div className={`${flexColClass}  border-l-2 border-gray-light pl-4 ml-2`}>
+                                                    <div className={labelDivClass}>
+                                                        <label className={labelTextClass}> Visibility </label>
+                                                        <div>
+                                                            <label className={`text-lg text-black font-normal w-[20em]`}>
+                                                                Public
+                                                            </label>
+                                                            <input
+                                                                checked={bank.isPublic}
+                                                                onChange={(event) => setBank({ ...bank, isPublic: event.target.checked })}
+                                                                className="bg-gray-light border-0 mx-2" type={"checkbox"}
+                                                            />
+                                                        </div>
+                                                    </div>
+                                                    <div className={labelDivClass}>
+                                                        <label
+                                                            className={labelTextClass}>
+                                                                Choices per Question
+                                                        </label>
+                                                        <input
+                                                            value={bank.numChoices}
+                                                            type="number"
+
+                                                            min={1}
+                                                            onChange={(event) => {
+                                                                if (questions.length > 0)
+                                                                {
+                                                                    setMessage({ severity: "medium", message: "delete questions to change choice qty"})
+                                                                    return;
+                                                                }
+                                                                setBank({ ...bank, numChoices: Number(event.target.value)})}}
+                                                            className={`${textInputClass} text-center w-[5em] ${bank.numChoices >= 1 && triedSubmitting ? "border-b-green" : "border-b-black"}`}
+                                                        />
+                                                    </div>
+                                                </div>
                                         </div>
-                                    </div>
-                                    <div className={`${flexRowClass} mx-auto w-full justify-center items-center`}>
-                                        <SaveItemPanel saveText={"Save"} onSave={handleSaveBank} cancelLink={"/banks"} error={lSaveDisabled}/>
-                                    </div>
-                                </form>
+                                        <div className={`${flexColClass} justify-between items-center mt-2`}>
+                                            <div className={`${flexRowClass} items-center justify-between`}>
+                                                <h3 className={headingTextClass}> Your questions </h3>
+                                                <button className={`${actionButtonClass} text-lg font-bold w-[10em]`} onClick={handleAddQuestion}>
+                                                    Add a question
+                                                </button>
+                                            </div>
+                                            <div className={`${flexColClass} justify-between h-[20em] ${data.length > 6 ? "overflow-y-scroll" : ""}`}>
+                                                {
+                                                    questions.length > 0
+                                                    ? <Table data={data} columns={columns}/>
+                                                    : <div className="mt-10 text-center">
+                                                        <h2 className={`font-normal text-4xl ${triedSubmitting ? "opacity-50 text-red" : "text-gray"}`}>You haven't added any questions yet.</h2>
+                                                        </div>
+                                                }
+                                            </div>
+                                        </div>
+                                        <div className={`${flexRowClass} mx-auto w-full justify-center items-center`}>
+                                            <SaveItemPanel saveText={"Save"} onSave={handleSaveBank} cancelLink={"/banks"} error={lSaveDisabled}/>
+                                        </div>
+                                    </form>
+                                </div>
                             </div>
-                        </div>
-                }
-        <MessagePanel onAcknowledge={() => setMessage(undefined)} {...message}/>
-        </div>
+                    }
+            <MessagePanel onAcknowledge={() => setMessage(undefined)} {...message}/>
+            </div>
         </>
     )
 };

@@ -19,6 +19,8 @@ export const QuestionDetails = (aQuestionDetailsProps: IQuestionDetailsProps) =>
     const [ question, setQuestion ] = useState<TQuestion>(lQuestion)
     const [ choiceQty, setChoiceQty ] = useState<number>(aQuestionDetailsProps.numChoices);
     const [ selectedChoice, setSelectedChoice ] = useState<TChoice>(lQuestion.choices[0]);
+
+    const [ triedSubmitting, setTriedSubmitting ] = useState<boolean>(false);
     const [ hasChanged, setHasChanged ] = useState<boolean>(false);
     const [ error, setError ] = useState<TQuestionError>(
         {
@@ -79,6 +81,8 @@ export const QuestionDetails = (aQuestionDetailsProps: IQuestionDetailsProps) =>
 
     const handleSubmit = () =>
     {
+
+        setTriedSubmitting(true);
         if (lError) { return; }
 
         let lCorrectSum = 0;
