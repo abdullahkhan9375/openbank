@@ -17,7 +17,6 @@ import { SyncLoader } from "react-spinners";
 
 export const ShowBanks = () =>
 {
-
     const [ page, setPage ] = useState<number>(1);
     const [ loading, setLoading ] = useState<boolean>(false);
 
@@ -36,6 +35,7 @@ export const ShowBanks = () =>
                 name: aBank.name,
                 type: "bank",
                 isPublic: aBank.isPublic,
+                lastUpdated: aBank.lastUpdated,
                 tags: aBank.tags,
                 numQuestions: aBank.questions.length,
                 createdAt: aBank.createdAt,
@@ -82,7 +82,7 @@ export const ShowBanks = () =>
     columnHelper.accessor('createdAt',
     {
         header: () => "Created At",
-        cell: info => <p className="text-center"> {moment.unix(info.getValue()).format("DD/MM/YYYY")}</p>
+        cell: info => <p className="text-center"> {moment(info.getValue()).format("DD/MM/YYYY")}</p>
     }),
     columnHelper.accessor('isPublic', {
         header:() => "Visibility",

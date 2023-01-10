@@ -28,26 +28,7 @@ import { getErrorStyle } from "../../common/utils/GetErrorStyle";
 import { MessagePanel, TMessage } from "../Components/MessagePanel";
 import { Cache } from "aws-amplify";
 import { AppDispatch } from "../../store";
-
-const lEmptyBank: TBank =
-{
-    id: "",
-    name: "",
-    type: "bank",
-    isPublic: false,
-    tags: [],
-    numChoices: 1,
-    questions: [],
-    createdAt: 0,
-};
-
-const lEmptyChoice: TChoice =
-{
-    id: 0,
-    body: "",
-    correct: false,
-    explanation: "",
-};
+import { lEmptyBank, lEmptyChoice } from "./BankConstants";
 
 export const BankDetails = () =>
 {
@@ -123,16 +104,20 @@ export const BankDetails = () =>
         setTriedSubmitting(true);
         if (error.invalidName || error.invalidQuestion || !hasChanged) return;
 
-        const lPostBankRequest: TPostBankRequest =
+        const lNow: number = moment.now();
+        const lIsNew: boolean = bank.id === "";
+
+        const lBankRequest: TPostBankRequest =
         {
             ...bank,
             questions,
-            createdAt: bank.createdAt === 0 ? moment.now() : bank.createdAt,
-            id: bank.id !== "" ? bank.id : uuidv4(),
+            createdAt: lIsNew ? lNow : bank.createdAt,
+            lastUpdated: lNow,
+            id: lIsNew ? uuidv4() : bank.id,
             userId: Cache.getItem("userId"),
         };
 
-        dispatch(postBankForUser(lPostBankRequest));
+        dispatch(postBankForUser(lBankRequest));
         navigate("/banks");
     };
 

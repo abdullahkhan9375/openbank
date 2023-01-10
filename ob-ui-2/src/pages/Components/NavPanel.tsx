@@ -10,6 +10,8 @@ export const NavPanel = () =>
 
     const [signedIn, setSignedIn] = useState<boolean>(Cache.getItem("isSignedIn"));
 
+    // TODO: API GET request everytime tab is changed.
+
     useEffect(() =>
     {
         setSignedIn(Cache.getItem("isSignedIn"));

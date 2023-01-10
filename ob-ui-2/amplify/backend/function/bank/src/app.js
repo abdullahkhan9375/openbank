@@ -153,13 +153,6 @@ app.post('/bank/new', async (req, res) => {
 
   console.log("Bank Request object:", lBody);
 
-  const lGetResult = await checkIfEntryExists(lBankId);
-
-  if (lGetResult)
-  {
-    return res.json({success: 'post call succeeded!', body: { message: `Bank already exists.`, severity: "low"}});
-  }
-  
   const lPartitionKey = `BK#${lBankId}`;
   
   // 1. Update User's subscribedBanks.
@@ -184,7 +177,15 @@ app.post('/bank/new', async (req, res) => {
   }
   else
   {
-    lSubscribedBanks.push(lBankId);
+    const lDuplicateIndex = lSubscribedBanks.findIndex(aBankId => aBankId === lBankId);
+    if (lDuplicateIndex === -1)
+    {
+      lSubscribedBanks.push(lBankId);
+    }
+    else
+    {
+      lSubscribedBanks[lDuplicateIndex] = lBankId;
+    }
   }
 
   const lParams = {
@@ -219,12 +220,30 @@ app.post('/bank/new', async (req, res) => {
   };
   await ddbDocumentClient.put(lPutParams).promise();
 
-  return res.json({success: 'post call succeed!', url: req.url, body: lBody })
+  return res.json({success: 'Bank successfully added.', url: req.url, body: lBody })
 });
 
-app.post('/user/*', function(req, res) {
-  // Add your code here
-  res.json({success: 'post call succeed!', url: req.url, body: req.body})
+app.post('/bank/update', async (req, res) => {
+  
+  const lBankPK = `BK#${req.body.id}`;
+  
+  const lRetrievedBank = await getItemFromDB(lBankPK);
+  
+  const lBankDetails =
+  {
+    ...req.body,
+    PK: lBankPK,
+  };
+  
+  const lPutParams =
+  {
+    Item: lBankDetails,
+    TableName: TABLENAME,
+  };
+  
+  await ddbDocumentClient.put(lPutParams).promise();
+  
+  res.json({success: 'Bank successfully updated!', url: req.url, body: req.body})
 });
 
 /****************************

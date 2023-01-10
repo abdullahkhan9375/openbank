@@ -190,27 +190,6 @@ export const bankSlice = createSlice({
   initialState: [
   ] as TBank[],
   reducers: {
-    bankAdded(state: TBank[], action)
-    {
-        const lBanks: TBank[] = state;
-        const lNewBank: TBank = action.payload;
-
-        if (lBanks.length === 0)
-        {
-          state.push(action.payload);
-          return;
-        }
-
-        const lExistsIndex = lBanks.findIndex((aBank: TBank) => aBank.id === lNewBank.id);
-        if (lExistsIndex === -1)
-        {
-            state.push(action.payload);
-        }
-        else if (!isEqual(lBanks[lExistsIndex], lNewBank))
-        {
-            state[lExistsIndex] = action.payload;
-        }
-    },
     bankDeleted(state, action)
     {
         return state.filter((aBank: TBank) => aBank.id !== action.payload);
@@ -225,19 +204,33 @@ export const bankSlice = createSlice({
     // Add reducers for additional action types here, and handle loading state as needed
     builder.addCase(getBanksForUser.fulfilled, (state, action) =>
     {
-      console.log(action.payload);
       return state = action.payload;
-      // state.entities.push(action.payload)
     }),
     builder.addCase(postBankForUser.fulfilled, (state, action) =>
     {
-      state.push(action.payload);
+        const lBanks: TBank[] = state;
+        const lNewBank: TBank = action.payload;
+
+        if (lBanks.length === 0)
+        {
+          state.push(action.payload);
+        }
+
+        const lExistsIndex = lBanks.findIndex((aBank: TBank) => aBank.id === lNewBank.id);
+        if (lExistsIndex === -1)
+        {
+          state.push(action.payload);
+        }
+        else if (!isEqual(lBanks[lExistsIndex], lNewBank))
+        {
+          state[lExistsIndex] = action.payload;
+        }
       // state.push(action.payload);
     })
   },
 });
 
 // Action creators are generated for each case reducer function
-export const { bankAdded, bankDeleted, clearBankState } = bankSlice.actions;
+export const {  bankDeleted, clearBankState } = bankSlice.actions;
 
 export default bankSlice.reducer;
