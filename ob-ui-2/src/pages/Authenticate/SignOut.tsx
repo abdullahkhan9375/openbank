@@ -1,6 +1,7 @@
 import { Auth } from "aws-amplify"
 import { useDispatch } from "react-redux";
 import { useNavigate } from "react-router-dom";
+import { clearBankState } from "../../reducers/bank";
 import { userSignedInStatusChange } from "../../reducers/global";
 
 interface ISignOutProps
@@ -16,6 +17,7 @@ export const SignOut = (aSignOutProps: ISignOutProps) =>
     {
         await Auth.signOut();
         dispatch(userSignedInStatusChange(false));
+        dispatch(clearBankState());
         aSignOutProps.onSignOut();
         navigate("/home");
     };

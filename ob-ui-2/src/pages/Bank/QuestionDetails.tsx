@@ -93,6 +93,7 @@ export const QuestionDetails = (aQuestionDetailsProps: IQuestionDetailsProps) =>
         {
             id: question.id,
             name: question.name,
+            type: "question",
             statement: question.statement,
             correctChoices: lCorrectSum,
             choices: question.choices,

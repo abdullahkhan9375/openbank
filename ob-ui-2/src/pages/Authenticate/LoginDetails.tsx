@@ -5,7 +5,6 @@ import { useNavigate } from "react-router-dom";
 import { actionButtonClass, flexColClass, flexRowClass, headingTextClass, textInputClass } from "../../common";
 import { getErrorStyle } from "../../common/utils/GetErrorStyle";
 import { userSignedInStatusChange } from "../../reducers/global";
-import { CognitoUser }  from 'amazon-cognito-identity-js';
 import { SyncLoader } from "react-spinners";
 import moment from "moment";
 import { TReqUser } from "../../model";
@@ -56,7 +55,6 @@ export const LoginDetails = (aLoginDetailsProps: ILoginDetailsProps) =>
         const lData: TReqUser =
         {
             PK: `UR#${lCognitoUser.attributes.sub}`,
-            SK: `UR#${lCognitoUser.attributes.family_name}`,
             id: lCognitoUser.attributes.sub,
             lastLoggedIn: lNow,
             createdAt: lNow,
@@ -132,15 +130,20 @@ export const LoginDetails = (aLoginDetailsProps: ILoginDetailsProps) =>
         setLoading(true);
 
         try {
-            const lLoginResult: CognitoUser = await Auth.signIn(login.email, login.password);
-            Cache.setItem("isSignedIn", true);
+            const lLoginResult: any = await Auth.signIn(login.email, login.password);
             const lResponse = await postUserData(lLoginResult);
             // dispatch(postUserData(lLoginResult)); // TODO
-            dispatch(userSignedInStatusChange(true));
+            dispatch(
+                userSignedInStatusChange({
+                    userId: lLoginResult.attributes.sub,
+                    lastName: lLoginResult.attributes.family_name,
+                    isSignedIn: true
+                }));
             console.log(lResponse);
             setLoading(false);
             navigate("/welcome");
-        } catch (error)
+        }
+        catch (error)
         {
             aLoginDetailsProps.onLoginError(error);
             setLoading(false);

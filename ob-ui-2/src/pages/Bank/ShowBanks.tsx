@@ -2,19 +2,31 @@ import { BsFillPencilFill, BsFillTrashFill } from "react-icons/bs";
 import { CellContext, createColumnHelper } from '@tanstack/react-table';
 import { actionButtonClass, flexColClass, flexRowClass, mainContainerClass } from "../../common";
 import { useSelector, useDispatch } from 'react-redux'
-import { bankDeleted } from "../../reducers/bank";
+import { bankDeleted, getBanksForUser } from "../../reducers/bank";
 import { useNavigate } from "react-router-dom";
-import { useMemo } from "react";
+import { useMemo, useState } from "react";
 import { Table } from "../../common/Table";
 import { TBank, TBankView } from "../../model";
 import moment from "moment";
 import { NavPanel } from "../Components/NavPanel";
+import { useEffect } from "react";
+import { Cache } from "aws-amplify";
+import { TGlobalState } from "../../reducers/global";
+import { AppDispatch } from "../../store";
+import { SyncLoader } from "react-spinners";
 
 export const ShowBanks = () =>
 {
+
+    const [ page, setPage ] = useState<number>(1);
+    const [ loading, setLoading ] = useState<boolean>(false);
+
     const banks: TBank[] = useSelector((state: any) => state.bank);
+    const global: TGlobalState = useSelector((state: any) => state.global);
     const navigate = useNavigate();
-    const dispatch = useDispatch();
+    const dispatch = useDispatch<AppDispatch>();
+
+    const lApiCalled = Cache.getItem("getBanksCalled") ?? false;
 
     const lBanksData: TBankView[] = banks.map((aBank: TBank) =>
     {
@@ -22,6 +34,7 @@ export const ShowBanks = () =>
             {
                 id: aBank.id,
                 name: aBank.name,
+                type: "bank",
                 isPublic: aBank.isPublic,
                 tags: aBank.tags,
                 numQuestions: aBank.questions.length,
@@ -30,6 +43,18 @@ export const ShowBanks = () =>
             }
         )
     });
+
+    useEffect(() =>
+    {
+        if (!lApiCalled)
+        {
+            console.log("Api call made for getBanks");
+            Cache.setItem("getBanksCalled", true);
+            setLoading(true);
+            (async() => (await dispatch(getBanksForUser({ userId: global.user.userId, page }))))();
+            setLoading(false);
+        }
+    }, []);
 
     const handleBankEdit = (info: CellContext<TBankView, string>) =>
     {
@@ -92,12 +117,17 @@ export const ShowBanks = () =>
                     <div className={`${flexRowClass} justify-end mt-5`}>
                         <button className={`${actionButtonClass} font-bold`} onClick={handleCreateBank}> Create a bank </button>
                     </div>
-                    {
-                        banks.length > 0
-                        ? <Table data={data} columns={columns}/>
-                        : <div className="mt-10 text-center">
-                            <h2 className="font-normal text-4xl text-gray">You aren't subscribed to any banks yet.</h2>
-                            </div>
+                    { loading
+                    ? <SyncLoader className="mt-[1.6em]" size={18}/>
+                    : <>
+                        {
+                            banks.length > 0
+                            ? <Table data={data} columns={columns}/>
+                            : <div className="mt-10 text-center">
+                                <h2 className="font-normal text-4xl text-gray">You aren't subscribed to any banks yet.</h2>
+                                </div>
+                        }
+                        </>
                     }
             </div>
         </>

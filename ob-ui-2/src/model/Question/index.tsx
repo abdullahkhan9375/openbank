@@ -4,6 +4,7 @@ export type TQuestion =
 {
     id: string,
     name: string,
+    type: "question",
     statement: string,
     choices: TChoice[],
     correctChoices: number,

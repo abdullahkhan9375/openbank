@@ -1,3 +1,4 @@
+import { TableOptionsResolved } from "@tanstack/react-table";
 import { TQuestion } from "../Question";
 
 type TBankBase =
@@ -5,6 +6,7 @@ type TBankBase =
     id: string,
     name: string,
     description?: string,
+    type: "bank",
     isPublic: boolean,
     tags: string[],
     createdAt: number,
@@ -27,3 +29,15 @@ export type TBankError =
     invalidQuestion: boolean,
     emptyChoice: boolean,
 };
+
+export type TBankRequest =
+{
+    userId: string;
+}
+
+export type TPostBankRequest = TBankRequest & TBank;
+
+export type TGetBankRequest =
+{
+    page: number;
+} & TBankRequest;

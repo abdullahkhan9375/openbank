@@ -3,21 +3,35 @@ import { Cache } from 'aws-amplify';
 
 export type TGlobalState =
 {
-    user: { isSignedIn: boolean }
+    user: {
+      userId: string,
+      lastName: string, 
+      isSignedIn: boolean }
 };
 
 export const globalSlice = createSlice({
   name: 'global',
   initialState: {
     user: {
-        isSignedIn: Cache.getItem("isSignedIn") !== null
+        userId: Cache.getItem("userId"),
+        lastName: Cache.getItem("lastName"),
+        isSignedIn: Cache.getItem("isSignedIn") !== null,
       },
     },
   reducers: {
     userSignedInStatusChange(state: any, action)
     {
-        Cache.setItem("isSignedIn", action.payload);
-        state.user.isSignedIn = action.payload;
+        Cache.setItem("isSignedIn", action.payload.isSignedIn);
+        Cache.setItem("userId", action.payload.userId);
+        Cache.setItem("lastName", action.payload.lastName);
+        state.user.userId = action.payload.userId;
+        state.user.lastName = action.payload.lastName;
+        state.user.isSignedIn = action.payload.isSignedIn;
+
+        if (!action.payload.isSignedIn)
+        {
+          Cache.setItem("getBanksCalled", false);
+        }
     },
 }});
 

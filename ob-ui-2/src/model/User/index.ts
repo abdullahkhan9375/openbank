@@ -15,6 +15,5 @@ export type TUser =
 export type TReqUser =
 {
     PK: string, // UR#userID
-    SK: string // UR#createdAt
     type: "user",
 } & TUser;

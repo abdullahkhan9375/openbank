@@ -11,6 +11,8 @@ var AWS = require('aws-sdk');
 // Set the region
 AWS.config.update({region: 'ap-northeast-1'});
 
+const TABLENAME = "OpenbankDevelopment";
+
 // Create the DynamoDB service object
 // var ddb = new AWS.DynamoDB({apiVersion: '2012-08-10'});
 var ddbDocumentClient = new AWS.DynamoDB.DocumentClient();
@@ -51,7 +53,7 @@ app.get('/user/*', function(req, res) {
 const checkIfEntryExists = async(id) => {
     try {
       var params = {
-            TableName : "Openbank_dev",
+            TableName : TABLENAME,
             KeyConditionExpression   : "PK = :pk",
             ExpressionAttributeValues: {
                 ":pk": id
@@ -79,8 +81,8 @@ app.post('/user', async (req, res) => {
     const lUser = lQueryResult.Items[0];
     try {
       const lParams = {
-        TableName: 'Openbank_dev',
-        Key: { PK : lUser.PK, SK: lUser.SK },
+        TableName: TABLENAME,
+        Key: { PK : lUser.PK },
         UpdateExpression: 'set lastLoggedIn = :lastLoggedIn',
         ExpressionAttributeValues: {
           ':lastLoggedIn': lBody.lastLoggedIn,
@@ -101,7 +103,7 @@ app.post('/user', async (req, res) => {
         var lParams =
         {
             Item: lBody,
-            TableName: "Openbank_dev",
+            TableName: TABLENAME,
         };
         await ddbDocumentClient.put(lParams).promise();
     }

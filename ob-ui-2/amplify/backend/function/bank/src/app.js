@@ -11,6 +11,8 @@ var AWS = require('aws-sdk');
 // Set the region
 AWS.config.update({region: 'ap-northeast-1'});
 
+const TABLENAME = "OpenbankDevelopment";
+
 // Create the DynamoDB service object
 // var ddb = new AWS.DynamoDB({apiVersion: '2012-08-10'});
 var ddbDocumentClient = new AWS.DynamoDB.DocumentClient();
@@ -30,16 +32,104 @@ app.use(function(req, res, next) {
   next()
 });
 
+// Helper Methods
+const checkIfEntryExists = async(id) =>
+{
+  try {
+   const lParams =
+    {
+      TableName: TABLENAME,
+      Key: { 
+        PK: `BK#${id}`,
+      },
+    };
+    var result = await ddbDocumentClient.get(lParams).promise();
+    console.log("Bank Query Result: ", result);
+    return result.Item !== undefined;
+  }
+  catch (error)
+  {
+      console.error(error);
+  }
+};
+
+const getItemFromDB = async (aPK) =>
+{
+  try {
+    const lParams =
+    {
+      TableName: TABLENAME,
+      Key: {
+        PK: aPK,
+      },
+    };
+    const lResult = await ddbDocumentClient.get(lParams).promise();
+    console.log("aPK: ", aPK);
+    console.log("Retrieved: ", lResult);
+    return lResult.Item;
+  }
+  catch (error)
+  {
+    console.log(error);
+  };
+};
+
 /**********************
  * Example get method *
  **********************/
 
-app.get('/bank', function(req, res) {
+app.post('/bank', async(req, res) => {
 
-  // Get all subscribed banks for the user.
+  //1. Get user id from header.
+  //2. Get List of 5 banks.
+  //3. Get Data for 5 banks and send them.
+  
+  console.log("Request received: ", req);
 
-  // Add your code here
-  res.json({success: 'get call succeed!', url: req.url});
+  let lUserId = req.body.userId;
+  let lPageNumber = req.body.page;
+  const lStart = lPageNumber === 1 ? 0 : 5 * (lPageNumber - 1);
+  const lEnd = lPageNumber * 5;
+
+  let lSubscribedBanks = [];
+
+  try {
+    const lParams =
+    {
+      TableName: TABLENAME,
+      Key: {
+        PK: `UR#${lUserId}`,
+      },
+      AttributesToGet: ["subscribedBanks"],
+    };
+    const lResult = await ddbDocumentClient.get(lParams).promise();
+    lSubscribedBanks = lResult.Item.subscribedBanks;
+  }
+  catch (error)
+  {
+    console.log(error);
+  };
+  
+  const lBanks = [];
+  console.log(lSubscribedBanks);
+  for (let lIndex = lStart; lIndex < Math.min(lSubscribedBanks.length, lEnd); lIndex ++)
+  {
+    const lSubscribedBankId = lSubscribedBanks[lIndex];
+    const lRetrievedBank = await getItemFromDB(`BK#${lSubscribedBankId}`);
+    console.log(lRetrievedBank);
+    let lQuestions = [];
+    for (const lQuestionID of lRetrievedBank.questions)
+    {
+      const lRetrievedQuestion = await getItemFromDB(`QN#${lQuestionID}`);
+      lQuestions.push(lRetrievedQuestion);
+    }
+    lRetrievedBank.questions = lQuestions;
+    // console.log("Retrieved bank: ", lRetrievedBank);
+    lBanks.push(lRetrievedBank);
+  }
+  
+  // console.log("Banks: ", lBanks);
+  res.json({success: 'get call succeed!', data: lBanks });
 });
 
 app.get('/user/*', function(req, res) {
@@ -51,69 +141,85 @@ app.get('/user/*', function(req, res) {
 * Example post method *
 ****************************/
 
-const checkIfEntryExists = async(id) => {
-    try {
-      var params = {
-            TableName : "Openbank_dev",
-            KeyConditionExpression   : "PK = :pk",
-            ExpressionAttributeValues: {
-                ":pk": id
-            }
-        };
-        var result = await ddbDocumentClient.query(params).promise();
-        console.log("Query result: ", result);
-        return result;
-    }
-    catch (error)
-    {
-        console.error(error);
-    }
-};
+app.post('/bank/new', async (req, res) => {
 
-app.post('/user', async (req, res) => {
-  
+  // 1. Add BankID to subscribedBanks for user. Create a function for that.
+  // 2. Add Questions to the database.
+  // 3. Add Bank to the database with list of Question IDs.
+
+  const lBankId = req.body.id;
+  const lUserId = req.body.userId;
   const lBody = req.body;
-  const lPartitionKey = lBody["PK"];
 
-  const lQueryResult = await checkIfEntryExists(lPartitionKey);
+  console.log("Bank Request object:", lBody);
 
-  if (lQueryResult.Count > 0)
+  const lGetResult = await checkIfEntryExists(lBankId);
+
+  if (lGetResult)
   {
-    const lUser = lQueryResult.Items[0];
-    try {
-      const lParams = {
-        TableName: 'Openbank_dev',
-        Key: { PK : lUser.PK, SK: lUser.SK },
-        UpdateExpression: 'set lastLoggedIn = :lastLoggedIn',
-        ExpressionAttributeValues: {
-          ':lastLoggedIn': lBody.lastLoggedIn,
-          },
-        };
-        await ddbDocumentClient.update(lParams).promise();
-        console.log("Updated user");
-    }
-    catch (error)
-    {
-        console.error(error);
-    }
-    
-    // TODO: update last logged in.
-    return res.json({success: 'post call succeed!', url: req.url, body: { message: `Welcome back, ${lBody.nickName}`, severity: "low"}});
+    return res.json({success: 'post call succeeded!', body: { message: `Bank already exists.`, severity: "low"}});
   }
-  try {
-        var lParams =
-        {
-            Item: lBody,
-            TableName: "Openbank_dev",
-        };
-        await ddbDocumentClient.put(lParams).promise();
-    }
-    catch (error)
-    {
-        console.error(error);
-    }
+  
+  const lPartitionKey = `BK#${lBankId}`;
+  
+  // 1. Update User's subscribedBanks.
+  let lSubscribedBanks = [];
+  let lUserPK = `UR#${lUserId}`;
 
-  return res.json({success: 'post call succeed!', url: req.url, body: { message: `Thanks for signing up, ${lBody.nickName}`, severity: "low"}})
+  const lGetParams =
+  {
+    TableName: TABLENAME,
+    Key: {
+      PK: lUserPK,
+    },
+    AttributesToGet: ["subscribedBanks"],
+  };
+  const lResult = await ddbDocumentClient.get(lGetParams).promise();
+  lSubscribedBanks = lResult.Item.subscribedBanks;
+  console.log("Query result: ", lSubscribedBanks)
+  
+  if (lSubscribedBanks[0] === "")
+  {
+    lSubscribedBanks[0] = lBankId; // For the first time only.
+  }
+  else
+  {
+    lSubscribedBanks.push(lBankId);
+  }
+
+  const lParams = {
+    TableName: TABLENAME,
+    Key: { PK : lUserPK },
+    UpdateExpression: 'set subscribedBanks = :subscribedBanks',
+    ExpressionAttributeValues: {
+      ':subscribedBanks': lSubscribedBanks,
+      },
+  };
+  await ddbDocumentClient.update(lParams).promise();
+  console.log("Updated user");
+
+  //2. Decouple questions and add them to the DB.
+  for (const lQuestion of lBody.questions)
+  {
+    const lQuestionPK = `QN#${lQuestion.id}`;
+    const lPutParams =
+    {
+      Item: { ...lQuestion, bankId: lBankId, PK: lQuestionPK },
+      TableName: TABLENAME
+    };
+    await ddbDocumentClient.put(lPutParams).promise();
+  }
+  
+  //3. Add Bank to the database.
+  const lQuestionsList = lBody.questions.map(aQuestion => aQuestion.id);
+  const lPutParams =
+  {
+    Item: { ...lBody, PK: lPartitionKey, questions: lQuestionsList },
+    TableName: TABLENAME,
+  };
+  await ddbDocumentClient.put(lPutParams).promise();
+
+  return res.json({success: 'post call succeed!', url: req.url, body: lBody })
 });
 
 app.post('/user/*', function(req, res) {

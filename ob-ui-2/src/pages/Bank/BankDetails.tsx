@@ -16,21 +16,24 @@ import { actionButtonClass } from "../../common/buttons/styles";
 import { useNavigate, useParams } from "react-router-dom";
 import TagsInput from "react-tagsinput";
 import { useSelector, useDispatch } from 'react-redux'
-import { bankAdded } from "../../reducers/bank";
+import { postBankForUser } from "../../reducers/bank";
 import { CellContext, createColumnHelper } from "@tanstack/react-table";
 import { Table } from "../../common/Table";
 import { BsFillPencilFill, BsFillTrashFill } from "react-icons/bs";
-import { TBank, TBankError, TChoice, TQuestion } from "../../model";
+import { TBank, TBankError, TChoice, TPostBankRequest, TQuestion } from "../../model";
 import { SaveItemPanel } from "../../common";
 import moment from "moment";
 import { NavPanel } from "../Components/NavPanel";
 import { getErrorStyle } from "../../common/utils/GetErrorStyle";
 import { MessagePanel, TMessage } from "../Components/MessagePanel";
+import { Cache } from "aws-amplify";
+import { AppDispatch } from "../../store";
 
 const lEmptyBank: TBank =
 {
     id: "",
     name: "",
+    type: "bank",
     isPublic: false,
     tags: [],
     numChoices: 1,
@@ -48,12 +51,13 @@ const lEmptyChoice: TChoice =
 
 export const BankDetails = () =>
 {
-    const dispatch = useDispatch();
+    const dispatch = useDispatch<AppDispatch>();
     const { id } = useParams();
 
     const lEmptyQuestion: TQuestion =
     {
         id: uuidv4(),
+        type: "question",
         name: "",
         statement: "",
         correctChoices: 1,
@@ -119,15 +123,16 @@ export const BankDetails = () =>
         setTriedSubmitting(true);
         if (error.invalidName || error.invalidQuestion || !hasChanged) return;
 
-        const lBank: TBank =
+        const lPostBankRequest: TPostBankRequest =
         {
             ...bank,
-            questions: questions,
+            questions,
             createdAt: bank.createdAt === 0 ? moment.now() : bank.createdAt,
             id: bank.id !== "" ? bank.id : uuidv4(),
+            userId: Cache.getItem("userId"),
         };
 
-        dispatch(bankAdded(lBank));
+        dispatch(postBankForUser(lPostBankRequest));
         navigate("/banks");
     };
 
