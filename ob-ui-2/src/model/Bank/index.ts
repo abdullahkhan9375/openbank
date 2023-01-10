@@ -34,9 +34,14 @@ export type TBankError =
 export type TBankRequest =
 {
     userId: string;
-}
+};
 
 export type TPostBankRequest = TBankRequest & TBank;
+
+export type TDeleteBankRequest =
+{
+    bankId: string
+} & TBankRequest;
 
 export type TGetBankRequest =
 {

@@ -1,7 +1,7 @@
 import { createAsyncThunk, createSlice } from '@reduxjs/toolkit';
 import { API } from 'aws-amplify';
 import { isEqual } from 'lodash';
-import { TBank, TGetBankRequest, TPostBankRequest } from '../model';
+import { TBank, TDeleteBankRequest, TGetBankRequest, TPostBankRequest } from '../model';
 
 // const lDummyBank: TBank[] =
 // [
@@ -185,10 +185,27 @@ export const postBankForUser = createAsyncThunk(
   }
 );
 
+export const deleteBankForUser = createAsyncThunk(
+  'users/deleteBankForUser',
+  async (aDeleteBankRequest: TDeleteBankRequest, thunkAPI) => {
+    const apiName = 'openbank';
+        const path = `/bank/delete`;
+        const lReqUser = {
+            headers: {}, // OPTIONAL
+            body:
+            {
+              userId: aDeleteBankRequest.userId,
+              bankId: aDeleteBankRequest.bankId,
+            },
+        };
+    const response = await API.post(apiName, path, lReqUser);
+    return response.body;
+  }
+);
+
 export const bankSlice = createSlice({
   name: 'bank',
-  initialState: [
-  ] as TBank[],
+  initialState: [] as TBank[],
   reducers: {
     bankDeleted(state, action)
     {
@@ -225,12 +242,15 @@ export const bankSlice = createSlice({
         {
           state[lExistsIndex] = action.payload;
         }
-      // state.push(action.payload);
+    }),
+    builder.addCase(deleteBankForUser.fulfilled, (state, action) =>
+    {
+      return state.filter((aBank: TBank) => aBank.id !== action.payload)
     })
   },
 });
 
 // Action creators are generated for each case reducer function
-export const {  bankDeleted, clearBankState } = bankSlice.actions;
+export const { clearBankState } = bankSlice.actions;
 
 export default bankSlice.reducer;

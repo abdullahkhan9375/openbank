@@ -2,7 +2,7 @@ import { BsFillPencilFill, BsFillTrashFill } from "react-icons/bs";
 import { CellContext, createColumnHelper } from '@tanstack/react-table';
 import { actionButtonClass, flexColClass, flexRowClass, mainContainerClass } from "../../common";
 import { useSelector, useDispatch } from 'react-redux'
-import { bankDeleted, getBanksForUser } from "../../reducers/bank";
+import { deleteBankForUser, getBanksForUser } from "../../reducers/bank";
 import { useNavigate } from "react-router-dom";
 import { useMemo, useState } from "react";
 import { Table } from "../../common/Table";
@@ -65,12 +65,12 @@ export const ShowBanks = () =>
     const handleCreateBank = () =>
     {
         navigate(`new`);
-    }
+    };
 
     const handleDeleteBank = (info: CellContext<TBankView, string>) =>
     {
-        dispatch(bankDeleted(info.row.original.id));
-    }
+        dispatch(deleteBankForUser({ userId: Cache.getItem("userId"), bankId: info.row.original.id }));
+    };
 
     const columnHelper = createColumnHelper<TBankView>();
     const columns = useMemo (() =>[
