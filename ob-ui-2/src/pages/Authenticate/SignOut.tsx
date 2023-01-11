@@ -16,7 +16,7 @@ export const SignOut = (aSignOutProps: ISignOutProps) =>
     const handleSignOut = async() =>
     {
         await Auth.signOut();
-        dispatch(userSignedInStatusChange(false));
+        dispatch(userSignedInStatusChange({ isSignedIn: false, userId: "", lastName: "" }));
         dispatch(clearBankState());
         aSignOutProps.onSignOut();
         navigate("/home");

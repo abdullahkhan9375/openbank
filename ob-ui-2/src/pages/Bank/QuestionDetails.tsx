@@ -1,9 +1,17 @@
-import { useEffect, useMemo, useState } from "react";
-import { flexColClass, flexRowClass, formDivClass, labelTextClass, textInputClass } from "../../common/CommonStyling";
-import { actioButtonDisabledClass, actionButtonClass } from "../../common/buttons/styles";
+import { useEffect, useState } from "react";
+import { flexColClass,
+        flexRowClass,
+        headingTextClass,
+        labelDivClass,
+        labelTextClass,
+        mainContainerClass,
+        textInputClass } from "../../common/CommonStyling";
 import { TChoice, TQuestion, TQuestionError } from "../../model";
-import { ChoiceDetails } from "./ChoiceDetails";
 import { isEqual } from "lodash";
+import { getErrorStyle } from "../../common/utils/GetErrorStyle";
+import { SaveItemPanel } from "../../common";
+import { ChoiceTable } from "./ChoiceTable";
+import { MessagePanel, TMessage } from "../Components/MessagePanel";
 
 interface IQuestionDetailsProps
 {
@@ -16,25 +24,24 @@ interface IQuestionDetailsProps
 export const QuestionDetails = (aQuestionDetailsProps: IQuestionDetailsProps) =>
 {
     const lQuestion = aQuestionDetailsProps.question;
+    const lIsNew: boolean = lQuestion.name === "";
     const [ question, setQuestion ] = useState<TQuestion>(lQuestion)
     const [ choiceQty, setChoiceQty ] = useState<number>(aQuestionDetailsProps.numChoices);
-    const [ selectedChoice, setSelectedChoice ] = useState<TChoice>(lQuestion.choices[0]);
 
+    const [ message, setMessage ] = useState<TMessage | undefined>(undefined);
     const [ triedSubmitting, setTriedSubmitting ] = useState<boolean>(false);
     const [ hasChanged, setHasChanged ] = useState<boolean>(false);
     const [ error, setError ] = useState<TQuestionError>(
         {
-            invalidName: true,
-            invalidChoices: false,
-            invalidStatement: true,
-            invalidQty: false,
-            invalidCorrect: false,
+            invalidName:        false,
+            invalidChoices:     false,
+            invalidStatement:   false,
+            invalidCorrect:     false,
         }
     );
 
     const lError: boolean =  error.invalidChoices
                           || error.invalidCorrect
-                          || error.invalidQty
                           || error.invalidStatement
                           || error.invalidName
                           || !hasChanged;
@@ -47,137 +54,127 @@ export const QuestionDetails = (aQuestionDetailsProps: IQuestionDetailsProps) =>
 
     useEffect(() =>
     {
-        const lBlankChoiceExists = question.choices.findIndex((aChoice: TChoice) => aChoice.body === "") !== -1;
-        const lCorrectOptionDoesntExist = question.choices.findIndex((aChoice: TChoice) => aChoice.correct === true) === -1;
+        console.log("Choices: ", question.choices);
+
+        const lBlankChoiceExists = question.choices
+            .findIndex((aChoice: TChoice) => aChoice.body === "") !== -1;
+        const lCorrectOptionDoesntExist = question.choices.
+            findIndex((aChoice: TChoice) => aChoice.correct === true) === -1;
 
         setError({
-            invalidName: question.name === "",
-            invalidQty: choiceQty === 0,
-            invalidCorrect: lCorrectOptionDoesntExist,
-            invalidStatement: question.statement === "",
-            invalidChoices: question.choices.length === 0
-                         || choiceQty !== question.choices.length
-                         || lBlankChoiceExists
+            invalidName:        question.name === "",
+            invalidCorrect:     lCorrectOptionDoesntExist,
+            invalidStatement:   question.statement === "",
+            invalidChoices:     lBlankChoiceExists
                 });
         setHasChanged(!isEqual(question, aQuestionDetailsProps.question));
     }, [question, choiceQty])
 
-    const handleSelectedChoice = (index: number) =>
-    {
-        const lIndex = question.choices.findIndex((aChoice: TChoice) =>
-        {
-            return aChoice.id === index
-        });
-
-        if (lIndex === -1)
-        {
-            setSelectedChoice({ id: index, body: "", correct: false, explanation: ""});
-        } else
-        {
-            setSelectedChoice({...question.choices[lIndex]})
-        }
-        console.log("Selected choice: ", selectedChoice);
-    };
-
     const handleSubmit = () =>
     {
+        const lBlankChoiceExists = question.choices
+        .findIndex((aChoice: TChoice) => aChoice.body === "") !== -1;
 
+        const lCorrectOptionDoesntExist = question.choices.
+            findIndex((aChoice: TChoice) => aChoice.correct === true) === -1;
+
+        if (lBlankChoiceExists && lCorrectOptionDoesntExist)
+        {
+            setMessage({ severity: "high", message: "choices must have a statement with at least one correct"})
+        }
+
+        console.log("Error state: ", error);
         setTriedSubmitting(true);
-        if (lError) { return; }
-
+        if (Object.values(error).includes(true)) return;
         let lCorrectSum = 0;
         question.choices.forEach((aChoice: TChoice) =>
             aChoice.correct ? lCorrectSum += 1 : lCorrectSum += 0);
 
         const lEditedQuestion: TQuestion =
         {
-            id: question.id,
-            name: question.name,
-            type: "question",
-            statement: question.statement,
+            id:             question.id,
+            name:           question.name,
+            type:           "question",
+            statement:      question.statement,
             correctChoices: lCorrectSum,
-            choices: question.choices,
+            choices:        question.choices,
         };
 
         aQuestionDetailsProps.onSubmit(lEditedQuestion);
     };
 
-    const onChoiceSubmit = (aChoice: TChoice) =>
+    //TODO: Bank Details does not respond to changes in the Your Questions table.
+
+    const generateChoices = () =>
     {
-        const lChoices: TChoice[] = [...question.choices];
-
-        const choiceIndex: number = lChoices.findIndex((lChoice: TChoice) =>
+        const lChoices: TChoice[] = [];
+        for (let index = 1; index <= choiceQty + 1; index ++)
         {
-            return lChoice.id === aChoice.id
-        });
-
-        if (choiceIndex === -1)
-        {
-            setQuestion({ ...question, choices: [...question.choices, aChoice ]});
-        } else
-        {
-            lChoices[choiceIndex] = aChoice;
-            setQuestion({ ...question, choices: lChoices});
+            lChoices.push(
+                {
+                    id:         index,
+                    body:       "",
+                    correct:    false,
+                }
+            )
         }
-        setSelectedChoice(aChoice);
+
+        return lChoices;
     }
 
-    const lMemoizedChoiceDetails = useMemo(() =>
-    {
-        return <ChoiceDetails selectedChoice={selectedChoice} onSaveChoice={onChoiceSubmit}/>
-    }, [selectedChoice])
-
     return (
-        <div className={`${flexColClass} mx-auto h-[33em] pt-3 px-[3em] mt-[10em] border-2`}>
-            <form>
-                <div
-                className={`${flexColClass} h-full justify-around`}>
-                    <div className={`${formDivClass} my-5 flex-col`}>
-                        <div className={`${flexColClass} px-2 justify-between`}>
-                                <label className={labelTextClass}> Name </label>
-                                <div className={`${flexColClass} justify-center`}>
-                                    <input type="text"
-                                        className={`${textInputClass} w-[15em] ${error.invalidName ? "border-b-red" : "border-b-green"}`}
-                                        value={question.name}
-                                        onChange={(event) => setQuestion({ ...question, name: event.target.value })}
-                                    />
-                                <p className={`text-red text-sm py-1 ${error.invalidName ? "opacity-1" : "opacity-0"}`}>You haven't entered a name</p>
-                                </div>
-                            </div>
-                        <div className={`${flexColClass} justify-between px-2 w-full`}>
-                            <label className={`${labelTextClass} w-[15em]`}> Question Statement </label>
-                            <div className={`${flexColClass} justify-center`}>
-                                <input type="text"
-                                    className={`${textInputClass} w-[40em] p-0 mt-2 ${error.invalidStatement ? "border-b-red" : "border-b-green"}`}
-                                    value={question.statement}
-                                    onChange={(event) => setQuestion({ ...question, statement: event.target.value })}
-                                />
-                                <p className={`text-red text-sm py-1 ${error.invalidStatement ? "opacity-1" : "opacity-0"}`}>Every question needs a statement!</p>
-                            </div>
+        <div className={`${mainContainerClass}`}>
+            <h3 className={`${headingTextClass} self-start`}> Edit this question </h3>
+            <div className={`${flexRowClass} mr-2 mt-5`}>
+                <div className={flexColClass}>
+                    <div className={labelDivClass}>
+                        <label
+                            className={labelTextClass}>
+                                Name
+                        </label>
+                        <div className={`${flexColClass} justify-center`}>
+                        <input
+                            value={question.name}
+                            onChange={(event) => { setQuestion({ ...question, name: event.target.value })}}
+                            className={`${textInputClass} w-[15em] ${getErrorStyle(triedSubmitting, error.invalidName, "BORDER")}`} type={"text"}
+                        />
+                            <p className={`text-red text-sm py-1 ${getErrorStyle(triedSubmitting, error.invalidName, "OPACITY")}`}>
+                                You haven't entered a name for your question
+                            </p>
                         </div>
                     </div>
-                    <div className={formDivClass}>
-                        <div className={`${flexColClass} border-2 border-black text-center pt-3 w-1/6 h-[197px] bg-white ${choiceQty > 5 ? "overflow-y-scroll" : ""}`}>
+                    <div className={labelDivClass}>
+                        <label
+                            className={labelTextClass}>
+                                Statement
+                        </label>
+                        <input
+                            value={question.statement}
+                            onChange={(event) => { setQuestion({ ...question, statement: event.target.value })}}
+                            className={`${textInputClass} mb-3 w-[60em] ${getErrorStyle(triedSubmitting, question.statement === "", "BORDER")}`} type={"text"}
+                        />
+                        <p className={`text-red text-sm py-1 ${getErrorStyle(triedSubmitting, error.invalidStatement, "OPACITY")}`}>
+                                You haven't written a question statement.
+                            </p>
+                    </div>
+                    <div className={`${flexColClass} justify-between items-center mt-2`}>
+                        <div className={`${flexRowClass} items-center justify-between`}>
+                            <h3 className={headingTextClass}> Choices </h3>
+                        </div>
+                        <div className={`${flexColClass} justify-between h-[20em] ${choiceQty > 6 ? "overflow-y-scroll" : ""}`}>
                             {
-                                Array(choiceQty).fill(0).map((_, index: number) =>
-                                {
-                                    return <div onClick={() => handleSelectedChoice(index)}><p> Choice #{index} </p></div>
-                                })
+                               <ChoiceTable
+                                choices={lIsNew ? generateChoices() : question.choices}
+                                onSaveChoices={(aChoices: TChoice[]) => setQuestion({ ...question, choices: aChoices })}/>
                             }
                         </div>
-                        {lMemoizedChoiceDetails}
                     </div>
-                    <div className={`${flexRowClass} items-center h-20 w-[65em] justify-center`}>
-                            <button className="border-0 mr-4 rounded-sm text-lg" onClick={aQuestionDetailsProps.onCancelSubmit}> Cancel </button>
-                            <button
-                                type="button"
-                                onClick={handleSubmit}
-                                className={`${lError ? actioButtonDisabledClass : actionButtonClass} w-[10em]`}>
-                                    <p className="font-bold text-white text-lg">Submit</p>
-                            </button>
-                    </div>
+                <div className={`${flexRowClass} mx-auto w-full justify-center items-center`}>
+                    <SaveItemPanel saveText={"Save"} onSave={handleSubmit} cancelLink={"/banks"} error={!hasChanged}/>
                 </div>
-            </form>
+            </div>
+        </div>
+        <MessagePanel {...message} onAcknowledge={() => setMessage(undefined)}/>
         </div>
     );
 };

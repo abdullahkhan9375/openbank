@@ -8,6 +8,8 @@ See the License for the specific language governing permissions and limitations 
 
 // Load the AWS SDK for Node.js
 var AWS = require('aws-sdk');
+const { getItemFromDB, updateUserBankSubscription } = require("./utils");
+
 // Set the region
 AWS.config.update({region: 'ap-northeast-1'});
 
@@ -31,48 +33,6 @@ app.use(function(req, res, next) {
   res.header("Access-Control-Allow-Headers", "*")
   next()
 });
-
-// Helper Methods
-const checkIfEntryExists = async(id) =>
-{
-  try {
-   const lParams =
-    {
-      TableName: TABLENAME,
-      Key: { 
-        PK: `BK#${id}`,
-      },
-    };
-    var result = await ddbDocumentClient.get(lParams).promise();
-    console.log("Bank Query Result: ", result);
-    return result.Item !== undefined;
-  }
-  catch (error)
-  {
-      console.error(error);
-  }
-};
-
-const getItemFromDB = async (aPK) =>
-{
-  try {
-    const lParams =
-    {
-      TableName: TABLENAME,
-      Key: {
-        PK: aPK,
-      },
-    };
-    const lResult = await ddbDocumentClient.get(lParams).promise();
-    console.log("aPK: ", aPK);
-    console.log("Retrieved: ", lResult);
-    return lResult.Item;
-  }
-  catch (error)
-  {
-    console.log(error);
-  };
-};
 
 /**********************
  * Example get method *
@@ -156,48 +116,7 @@ app.post('/bank/new', async (req, res) => {
   const lPartitionKey = `BK#${lBankId}`;
   
   // 1. Update User's subscribedBanks.
-  let lSubscribedBanks = [];
-  let lUserPK = `UR#${lUserId}`;
-
-  const lGetParams =
-  {
-    TableName: TABLENAME,
-    Key: {
-      PK: lUserPK,
-    },
-    AttributesToGet: ["subscribedBanks"],
-  };
-  const lResult = await ddbDocumentClient.get(lGetParams).promise();
-  lSubscribedBanks = lResult.Item.subscribedBanks;
-  console.log("Query result: ", lSubscribedBanks)
-  
-  if (lSubscribedBanks[0] === "")
-  {
-    lSubscribedBanks[0] = lBankId; // For the first time only.
-  }
-  else
-  {
-    const lDuplicateIndex = lSubscribedBanks.findIndex(aBankId => aBankId === lBankId);
-    if (lDuplicateIndex === -1)
-    {
-      lSubscribedBanks.push(lBankId);
-    }
-    else
-    {
-      lSubscribedBanks[lDuplicateIndex] = lBankId;
-    }
-  }
-
-  const lParams = {
-    TableName: TABLENAME,
-    Key: { PK : lUserPK },
-    UpdateExpression: 'set subscribedBanks = :subscribedBanks',
-    ExpressionAttributeValues: {
-      ':subscribedBanks': lSubscribedBanks,
-      },
-  };
-  await ddbDocumentClient.update(lParams).promise();
-  console.log("Updated user");
+  await updateUserBankSubscription(lUserId, lBankId);
 
   //2. Decouple questions and add them to the DB.
   for (const lQuestion of lBody.questions)
@@ -223,27 +142,22 @@ app.post('/bank/new', async (req, res) => {
   return res.json({success: 'Bank successfully added.', url: req.url, body: lBody })
 });
 
-app.post('/bank/update', async (req, res) => {
+app.post('/bank/delete', async (req, res) => {
   
-  const lBankPK = `BK#${req.body.id}`;
+  const lBankId = req.body.bankId;
+  const lUserId = req.body.userId;
   
-  const lRetrievedBank = await getItemFromDB(lBankPK);
-  
-  const lBankDetails =
-  {
-    ...req.body,
-    PK: lBankPK,
+  await updateUserBankSubscription(lUserId, lBankId, "delete");
+
+  const lDeleteParams = {
+    TableName : TABLENAME,
+    Key: {
+      PK: `BK#${lBankId}`
+    }
   };
-  
-  const lPutParams =
-  {
-    Item: lBankDetails,
-    TableName: TABLENAME,
-  };
-  
-  await ddbDocumentClient.put(lPutParams).promise();
-  
-  res.json({success: 'Bank successfully updated!', url: req.url, body: req.body})
+
+  await ddbDocumentClient.delete(lDeleteParams).promise();
+  res.json({success: 'Bank successfully deleted!', url: req.url, body: req.body.bankId})
 });
 
 /****************************

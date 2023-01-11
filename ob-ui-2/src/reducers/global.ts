@@ -15,7 +15,7 @@ export const globalSlice = createSlice({
     user: {
         userId: Cache.getItem("userId"),
         lastName: Cache.getItem("lastName"),
-        isSignedIn: Cache.getItem("isSignedIn") !== null,
+        isSignedIn: localStorage.getItem("amplify-auto-sign-in") ?? false,
       },
     },
   reducers: {

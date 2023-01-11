@@ -16,7 +16,7 @@ export const SaveItemPanel = (aSaveItemPanelProps: ISaveItemPanel) => //I don't 
         <>
             <button type="button"
                 onClick={() => navigate(`${aSaveItemPanelProps.cancelLink}`)}
-                className={`rounded-sm hover:border-0 text-black text-lg w-[10em] mx-3`}>
+                className={`rounded-sm hover:border-0 border-none hover:border-none text-black text-lg w-[10em] mx-3`}>
                 <p className="text-black font-bold hover:text-black">
                     Cancel
                 </p>
