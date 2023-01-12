@@ -16,9 +16,11 @@ import { MessagePanel, TMessage } from "../Components/MessagePanel";
 interface IQuestionDetailsProps
 {
     question: TQuestion;
+    bankId: string;
     numChoices: number;
     onCancelSubmit: () => void;
     onSubmit: (aQuestion: TQuestion) => void;
+    onCancel: () => void;
 }
 
 export const QuestionDetails = (aQuestionDetailsProps: IQuestionDetailsProps) =>
@@ -58,8 +60,8 @@ export const QuestionDetails = (aQuestionDetailsProps: IQuestionDetailsProps) =>
 
         const lBlankChoiceExists = question.choices
             .findIndex((aChoice: TChoice) => aChoice.body === "") !== -1;
-        const lCorrectOptionDoesntExist = question.choices.
-            findIndex((aChoice: TChoice) => aChoice.correct === true) === -1;
+        const lCorrectOptionDoesntExist = question.choices
+            .findIndex((aChoice: TChoice) => aChoice.correct === true) === -1;
 
         setError({
             invalidName:        question.name === "",
@@ -93,6 +95,7 @@ export const QuestionDetails = (aQuestionDetailsProps: IQuestionDetailsProps) =>
         const lEditedQuestion: TQuestion =
         {
             id:             question.id,
+            bankId:         aQuestionDetailsProps.bankId,
             name:           question.name,
             type:           "question",
             statement:      question.statement,
@@ -116,10 +119,16 @@ export const QuestionDetails = (aQuestionDetailsProps: IQuestionDetailsProps) =>
                     body:       "",
                     correct:    false,
                 }
-            )
+            );
         }
 
         return lChoices;
+    }
+
+    const handleCancel = () =>
+    {
+        console.log("go back!");
+        aQuestionDetailsProps.onCancel()
     }
 
     return (
@@ -170,11 +179,11 @@ export const QuestionDetails = (aQuestionDetailsProps: IQuestionDetailsProps) =>
                         </div>
                     </div>
                 <div className={`${flexRowClass} mx-auto w-full justify-center items-center`}>
-                    <SaveItemPanel saveText={"Save"} onSave={handleSubmit} cancelLink={"/banks"} error={!hasChanged}/>
+                    <SaveItemPanel saveText={"Save"} onSave={handleSubmit} onCancel={handleCancel} error={!hasChanged}/>
                 </div>
             </div>
         </div>
-        <MessagePanel {...message} onAcknowledge={() => setMessage(undefined)}/>
+            <MessagePanel {...message} onAcknowledge={() => setMessage(undefined)}/>
         </div>
     );
 };

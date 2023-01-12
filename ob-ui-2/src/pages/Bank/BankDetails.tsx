@@ -39,6 +39,7 @@ export const BankDetails = () =>
     {
         id: uuidv4(),
         type: "question",
+        bankId: "",
         name: "",
         statement: "",
         correctChoices: 1,
@@ -73,6 +74,7 @@ export const BankDetails = () =>
 
     const handleAddQuestion = () =>
     {
+        setSelectedQuestion(lEmptyQuestion);
         setHasChanged(true);
         setAddingQuestion(true);
     };
@@ -135,7 +137,7 @@ export const BankDetails = () =>
             lQuestions[lQuestionIndex] = aQuestion;
             setQuestions(lQuestions);
         }
-
+        setHasChanged(true);
         setAddingQuestion(false);
         setSelectedQuestion(lEmptyQuestion);
     };
@@ -163,7 +165,7 @@ export const BankDetails = () =>
             <NavPanel/>
             <div className={`${mainContainerClass}`}>
                 { addingQuestion
-                        ? <QuestionDetails numChoices={bank.numChoices} onCancelSubmit={handleCancelSubmit} onSubmit={handleSubmitQuestion} question={selectedQuestion}/>
+                        ? <QuestionDetails numChoices={bank.numChoices} onCancel={() => setAddingQuestion(false)} onCancelSubmit={handleCancelSubmit} onSubmit={handleSubmitQuestion} bankId={bank.id} question={selectedQuestion}/>
                         :  <div className={flexColClass}>
                                 <div className={formBoxClass}>
                                     <h3 className={headingTextClass}> {editingBank ? "Edit this question bank" : "Set up a new question bank"}</h3>
